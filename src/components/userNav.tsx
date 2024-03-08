@@ -17,12 +17,15 @@ import {
 
 import { auth } from "../lib/firebase/firebaseConfig"
 import { signOut } from "firebase/auth"
+import { useNavigate } from 'react-router-dom'
 
 export function UserNav(props: any) {
+  const navigate = useNavigate()
 
   async function logout() {
     try {
       await signOut(auth)
+      navigate("/login")
     } catch(error) {
       console.error("failed to logout", error)    
     }
@@ -33,17 +36,17 @@ export function UserNav(props: any) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage src="/avatars/01.png" alt="avatar" />
-            <AvatarFallback>SC</AvatarFallback>
+            <AvatarImage src={props.user?.photoURL} alt="avatar" />
+            <AvatarFallback>US</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{props.user.displayName || "User" }</p>
+            <p className="text-sm font-medium leading-none">{props.user?.displayName || "User" }</p>
             <p className="text-xs leading-none text-muted-foreground">
-              { props.user.email }
+              { props.user?.email }
             </p>
           </div>
         </DropdownMenuLabel>

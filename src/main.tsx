@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import Root from "./routes/root"
 import Signup from "./routes/signup"
+import Login from "./routes/login"
 import Dashboard from "./routes/dashboard"
 import ErrorPage from "./error-page"
 import "./globals.css"
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
       {
         path: "signup",
         element: <Signup />,
+      },
+      {
+        path: "login",
+        element: <Login />,
       },
       {
         path: "dashboard",
