@@ -2,6 +2,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
+import { Toaster } from "@/components/ui/toaster"
 import {
   Form,
   FormControl,
@@ -164,6 +165,7 @@ export default function Login() {
           </div>
         </div>
       </div>
+      <Toaster />
     </div>
   )
 }

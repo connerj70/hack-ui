@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useUserContext } from "../contexts/userContext"
 import { useEffect, useState } from "react"
+import { Toaster } from "@/components/ui/toaster"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -466,6 +467,7 @@ export default function Dashboard() {
             </TabsContent>
           </Tabs>
         </div>
+        <Toaster />
       </div>
     </>
   )
