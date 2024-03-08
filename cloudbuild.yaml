@@ -1,0 +1,18 @@
+steps:
+  # Install Node.js dependencies
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['install']
+
+  # Lint TypeScript code
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['run', 'lint']
+
+  # Build the project
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['run', 'build']
+
+  # Deploy the application to App Engine
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['app', 'deploy', '--version', '$BUILD_ID', '--quiet']
+
+timeout: '1200s'
