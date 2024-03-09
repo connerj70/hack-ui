@@ -3,15 +3,15 @@ service: web
 
 handlers:
   - url: /static
-    static_dir: build/static
+    static_dir: dist/static
 
   - url: /(.*\.(json|ico|js|css|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot))
-    static_files: build/\1
-    upload: build/(.*\.(json|ico|js|css|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot))
+    static_files: dist/\1
+    upload: dist/(.*\.(json|ico|js|css|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot))
 
   - url: /.*
-    static_files: build/index.html
-    upload: build/index.html
+    static_files: dist/index.html
+    upload: dist/index.html
 
 env_variables:
   NODE_ENV: production
