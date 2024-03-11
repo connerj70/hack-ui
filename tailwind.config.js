@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+const defaultTheme = require("tailwindcss/defaultTheme");
 module.exports = {
   darkMode: ["class"],
   content: [
@@ -15,6 +16,10 @@ module.exports = {
       screens: {
         "2xl": "1400px",
       },
+    },
+    fontFamily: {
+      'sans': ['Raleway', ...defaultTheme.fontFamily.sans],
+      'serif': ['Merriweather', ...defaultTheme.fontFamily.serif],
     },
     extend: {
       colors: {
@@ -73,5 +78,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: ["postcss-import", require("tailwindcss-animate")],
 }

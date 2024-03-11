@@ -1,26 +1,27 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { auth } from "../lib/firebase/firebaseConfig";
-import { onAuthStateChanged } from "firebase/auth";
+import { createContext, useContext, useState } from "react";
+import Cookies from "js-cookie"
 
 const UserContext = createContext(null as any);
 
 export const UserProvider = (props: any) => {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(() => {
+    const user = Cookies.get('user')
+    return user ? JSON.parse(user) : null;
+  });
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user: any) => {
-      console.log("currentUser: ", user)
-      setCurrentUser(user);
-      setLoading(false);
-    })
+  const updateUser = (newUserData: any) => {
+    Cookies.set('user', JSON.stringify(newUserData), { expires: 7 })
+    setCurrentUser(newUserData); // Update state
+  }
 
-    return () => unsubscribe();
-  }, [])
+  const clearUser = () => {
+    Cookies.remove('user')
+    setCurrentUser(null)
+  }
 
   return (
-    <UserContext.Provider value={{ currentUser, loading }}>
-      {!loading && props.children}
+    <UserContext.Provider value={{ currentUser, updateUser, clearUser }}>
+      { props.children }
     </UserContext.Provider>
   );
 };

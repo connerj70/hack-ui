@@ -12,13 +12,11 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { useFirebaseAuth } from "../contexts/firebaseContext";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react"
 import { Loader2 } from "lucide-react"
 import { useNavigate, Link } from "react-router-dom"
-
+import { useUserContext } from "@/contexts/userContext"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 
@@ -34,10 +32,10 @@ const formSchema = z.object({
 });
 
 export default function Signup() {
-  const auth = useFirebaseAuth()
   const { toast } = useToast()
   const [submitting, setSubmitting] = useState(false)
   const navigate = useNavigate()
+  const { updateUser } = useUserContext()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,31 +49,47 @@ export default function Signup() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true)
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password)
-      const user = userCredential.user
-      console.log(user)
-      // TODO: Swap this out for env var
-      // const resp = await fetch(`http://localhost:3000/api/v1/user/create`, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     email: values.email,
-      //     password: values.password
-      //   }),
-      // })
-      //
-      // if (!resp.ok) {
-      //   toast({
-      //     title: "Error creating account",
-      //     description: "An error occurred while creating your account",
-      //   })
-      //   return
-      // }
-      //
-      // const body = await resp.json()
-      // console.log("user create response body: ", body)
+      const userCreateResp = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/user/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password
+        }),
+      })
+
+      if (!userCreateResp.ok) {
+        toast({
+          title: "Error creating account",
+          description: "An error occurred while creating your account",
+        })
+        return
+      }
+
+      const userLoginResp = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/user/signin`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password
+        }),
+      })
+
+      if (!userLoginResp.ok) {
+        toast({
+          title: "Error signing in",
+          description: "An error occurred while signing in",
+        })
+        return
+      }
+
+      const userLoginBody = await userLoginResp.json()
+
+      updateUser(userLoginBody.user)
         
       navigate("/dashboard")
     } catch (error) {
@@ -93,23 +107,7 @@ export default function Signup() {
 
   return (
     <div className="w-100 h-screen">
-      <div className="md:hidden">
-        <img
-          src="/examples/authentication-light.png"
-          width={1280}
-          height={843}
-          alt="Authentication"
-          className="block dark:hidden"
-        />
-        <img
-          src="/examples/authentication-dark.png"
-          width={1280}
-          height={843}
-          alt="Authentication"
-          className="hidden dark:block"
-        />
-      </div>
-      <div className="container relative hidden h-full flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+      <div className="container relative h-full flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
         <Link
           to="/login"
           className={cn(

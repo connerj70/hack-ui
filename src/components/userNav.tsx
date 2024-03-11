@@ -15,16 +15,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { auth } from "../lib/firebase/firebaseConfig"
-import { signOut } from "firebase/auth"
 import { useNavigate } from 'react-router-dom'
+import { useUserContext } from "@/contexts/userContext"
 
 export function UserNav(props: any) {
   const navigate = useNavigate()
+  const { clearUser } = useUserContext()
 
   async function logout() {
     try {
-      await signOut(auth)
+      clearUser()
       navigate("/login")
     } catch(error) {
       console.error("failed to logout", error)    
