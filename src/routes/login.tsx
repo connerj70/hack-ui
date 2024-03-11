@@ -43,8 +43,6 @@ export default function Login() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true)
     try {
-      console.log("values: ", values)
-
       const resp = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/user/signin`, {
         method: "POST",
         headers: {

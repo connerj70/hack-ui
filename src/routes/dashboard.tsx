@@ -1,6 +1,4 @@
-import { useNavigate } from 'react-router-dom'
-import { useUserContext } from "../contexts/userContext"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Toaster } from "@/components/ui/toaster"
 
 import { Button } from "@/components/ui/button"
@@ -156,21 +154,6 @@ export type SensorEvent = {
 }
 
 export default function Dashboard() {
-  const navigate = useNavigate()
-
-  const { currentUser, loading } = useUserContext()
-
-  if (loading) {
-    return <div>Loading...</div>
-  }
-
-  useEffect(() => {
-    console.log("currentUser: ", currentUser)
-    if (!currentUser) {
-      navigate("/signup")
-    }
-  }, [])
-
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     []
