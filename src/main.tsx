@@ -13,7 +13,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { UserProvider } from "./contexts/userContext";
-import DevicesPage from './routes/Device'
+
 
 const router = createBrowserRouter([
   {
