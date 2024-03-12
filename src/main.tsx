@@ -5,6 +5,7 @@ import Signup from "./routes/signup"
 import Login from "./routes/login"
 import Dashboard from "./routes/dashboard"
 import Devices from "./routes/devices"
+import Device from "./routes/device"
 import AuthenticatedLayout from './routes/authenticatedLayout'
 import ErrorPage from "./error-page"
 import "./globals.css"
@@ -27,6 +28,7 @@ const router = createBrowserRouter([
     <AuthWrapper>
       <AuthenticatedLayout />
     </AuthWrapper>,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "dashboard",
@@ -35,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: "devices",
         element: <Devices />,
+      },
+      {
+        path: "devices/:id",
+        element: <Device />,
       }
     ]
   },

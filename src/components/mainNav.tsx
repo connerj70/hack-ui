@@ -1,10 +1,12 @@
 import { cn } from "@/lib/utils"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 
 export function MainNav({
   className,
   ...props
 }: React.HTMLAttributes<HTMLElement>) {
+  const location = useLocation()
+
   return (
     <nav
       className={cn("flex items-center space-x-4 lg:space-x-6", className)}
@@ -12,13 +14,13 @@ export function MainNav({
     >
       <Link
         to="/dashboard"
-        className="text-sm font-medium transition-colors hover:text-primary"
+        className={`text-sm font-medium transition-colors hover:text-primary ${location.pathname === "/dashboard" ? "text-primary" : "text-muted-foreground"}`}
       >
-        Overview
+        Dashboard 
       </Link>
       <Link
         to="/devices"
-        className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+        className={`text-sm font-medium transition-colors hover:text-primary ${location.pathname === "/devices" ? "text-primary" : "text-muted-foreground"}`}
       >
         Devices
       </Link>

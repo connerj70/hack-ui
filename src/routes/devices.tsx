@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Toaster } from "@/components/ui/toaster"
+import { DeviceType } from "@/types/device"
 
 import { Button } from "@/components/ui/button"
 import { CalendarDateRangePicker } from "@/components/dateRangePicker"
@@ -33,37 +34,85 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Link } from "react-router-dom"
 
-const data: SensorEvent[] = [
+const data: DeviceType[] = [
   {
     id: "m5gr84i9",
     name: "Sensor 1", 
     coordinates: "41.40338, 2.17403",
     publicKey: "abc",
+    createdAt: "2021-08-01T00:00:00Z",
   },
   {
     id: "3u1reuv4",
     name: "Sensor 2",
     coordinates: "41.40338, 2.17403",
     publicKey: "abc",
+    createdAt: "2021-08-01T00:00:00Z",
   },
   {
     id: "derv1ws0",
     name: "Sensor 3",
     coordinates: "41.40338, 2.17403",
     publicKey: "abc",
+    createdAt: "2021-08-01T00:00:00Z",
   },
   {
     id: "5kma53ae",
     name: "Sensor 4",
     coordinates: "41.40338, 2.17403",
     publicKey: "abc",
+    createdAt: "2021-08-01T00:00:00Z",
   },
   {
     id: "bhqecj4p",
     name: "Sensor 5",
     coordinates: "41.40338, 2.17403",
     publicKey: "abc",
+    createdAt: "2021-08-01T00:00:00Z",
+  },
+  {
+    id: "bhqecj4p",
+    name: "Sensor 5",
+    coordinates: "41.40338, 2.17403",
+    publicKey: "abc",
+    createdAt: "2021-08-01T00:00:00Z",
+  },
+  {
+    id: "bhqecj4p",
+    name: "Sensor 5",
+    coordinates: "41.40338, 2.17403",
+    publicKey: "abc",
+    createdAt: "2021-08-01T00:00:00Z",
+  },
+  {
+    id: "bhqecj4p",
+    name: "Sensor 5",
+    coordinates: "41.40338, 2.17403",
+    publicKey: "abc",
+    createdAt: "2021-08-01T00:00:00Z",
+  },
+  {
+    id: "bhqecj4p",
+    name: "Sensor 5",
+    coordinates: "41.40338, 2.17403",
+    publicKey: "abc",
+    createdAt: "2021-08-01T00:00:00Z",
+  },
+  {
+    id: "bhqecj4p",
+    name: "Sensor 5",
+    coordinates: "41.40338, 2.17403",
+    publicKey: "abc",
+    createdAt: "2021-08-01T00:00:00Z",
+  },
+  {
+    id: "bhqecj4p",
+    name: "Sensor 5",
+    coordinates: "41.40338, 2.17403",
+    publicKey: "abc",
+    createdAt: "2021-08-01T00:00:00Z",
   },
 ]
 
@@ -107,10 +156,14 @@ export const columns: ColumnDef<Device>[] = [
     header: () => <div>Coordinates</div>,
   },
   {
+    accessorKey: "createdAt",
+    header: () => <div>Created At</div>,
+  },
+  {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original
+      const device = row.original
  
       return (
         <div className="flex justify-end">
@@ -124,13 +177,14 @@ export const columns: ColumnDef<Device>[] = [
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(payment.id)}
+                onClick={() => navigator.clipboard.writeText(device.id)}
               >
-                Copy event ID
+                Copy device ID
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>View tag</DropdownMenuItem>
-              <DropdownMenuItem>View event details</DropdownMenuItem>
+              <Link to={`/devices/${device.id}`} ><DropdownMenuItem>View details</DropdownMenuItem></Link>
+              <DropdownMenuItem>View events</DropdownMenuItem>
+              <DropdownMenuItem>Deactivate</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -138,13 +192,6 @@ export const columns: ColumnDef<Device>[] = [
     },
   },
 ]
-
-export type Device = {
-  id: string
-  name: string
-  coordinates: string
-  publicKey: string
-}
 
 export default function Devices() {
   const [sorting, setSorting] = useState<SortingState>([])
