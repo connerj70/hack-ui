@@ -49,7 +49,7 @@ export default function Signup() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true)
     console.log("values: russell", values)
-    console.log("", process.env.REACT_APP_API_URL)
+    console.log("test", process.env.REACT_APP_API_URL)
     try {
       const userCreateResp = await fetch(`${process.env.REACT_APP_API_URL}/api/v1/user/create`, {
         method: "POST",
