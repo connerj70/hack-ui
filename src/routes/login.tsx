@@ -42,10 +42,10 @@ export default function Login() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true);
     try {
-      console.log("values: ", values);
-      console.log("test", import.meta.env.VITE_API_URL);
+
 
       const resp = await fetch(`${import.meta.env.VITE_API_URL}/user/signin`, {
+
         method: "POST",
         headers: {
           "Content-Type": "application/json",

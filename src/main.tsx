@@ -13,6 +13,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { UserProvider } from "./contexts/userContext";
+import AuthWrapper from "@/components/authWrapper"
 
 
 const router = createBrowserRouter([
@@ -23,7 +24,10 @@ const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <AuthenticatedLayout />,
+    element: 
+    <AuthWrapper>
+      <AuthenticatedLayout />
+    </AuthWrapper>,
     children: [
       {
         path: "dashboard",
