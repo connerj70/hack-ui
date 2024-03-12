@@ -51,7 +51,7 @@ export default function Signup() {
     console.log("values: russell", values)
     console.log("test", import.meta.env.VITE_API_URL)
     try {
-      const userCreateResp = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/user/create`, {
+      const userCreateResp = await fetch(`${import.meta.env.VITE_API_URL}/user/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -70,7 +70,7 @@ export default function Signup() {
         return
       }
 
-      const userLoginResp = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/user/signin`, {
+      const userLoginResp = await fetch(`${import.meta.env.VITE_API_URL}/user/signin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

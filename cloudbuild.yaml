@@ -8,7 +8,7 @@ steps:
     args: ['run', 'build']
     env:
       - 'NODE_ENV=production'
-      - 'VITE_API_URL=https://api.pomerene.net'
+      - 'VITE_API_URL=https://www.pomerene.net/api/v1'
 
   # Deploy the application to App Engine
   - name: 'gcr.io/cloud-builders/gcloud'
