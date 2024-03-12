@@ -17,9 +17,9 @@ import { useState } from "react"
 import { Loader2 } from "lucide-react"
 import { useNavigate, Link } from "react-router-dom"
 import { useUserContext } from "@/contexts/userContext"
-
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
+import axios from 'axios';
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -40,48 +40,92 @@ export default function Login() {
     },
   })
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setSubmitting(true)
-    try {
-      console.log("values: ", values)
-      console.log("test", import.meta.env.VITE_API_URL)
+  // async function onSubmit(values: z.infer<typeof formSchema>) {
+  //   setSubmitting(true)
+  //   try {
+  //     console.log("values: ", values)
+  //     console.log("test", import.meta.env.VITE_API_URL)
 
-      const resp = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/user/signin`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: values.email,
-          password: values.password
-        }),
-      })
+  //     const resp = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/user/signin`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         email: values.email,
+  //         password: values.password
+  //       }),
+  //     })
 
-      if (!resp.ok) {
-        toast({
-          title: "Error signing in",
-          description: "An error occurred while signing in",
-        })
-        return
-      }
+  //     if (!resp.ok) {
+  //       toast({
+  //         title: "Error signing in",
+  //         description: "An error occurred while signing in",
+  //       })
+  //       return
+  //     }
 
-      const body = await resp.json()
+  //     const body = await resp.json()
 
-      updateUser(body.user)
+  //     updateUser(body.user)
        
-      navigate("/dashboard")
-    } catch (error) {
-      if (error instanceof Error) {
-        const errorMessage = error.message
-        toast({
-          title: "Error logging in",
-          description: errorMessage,
-        })
+  //     navigate("/dashboard")
+  //   } catch (error) {
+  //     if (error instanceof Error) {
+  //       const errorMessage = error.message
+  //       toast({
+  //         title: "Error logging in",
+  //         description: errorMessage,
+  //       })
+  //     }
+  //   } finally {
+  //     setSubmitting(false)
+  //   }
+  // }
+
+  
+
+async function onSubmit(values: z.infer<typeof formSchema>) {
+  setSubmitting(true);
+  try {
+    console.log("values: ", values);
+    console.log("test", import.meta.env.VITE_API_URL);
+
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/user/signin`, {
+      email: values.email,
+      password: values.password
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
       }
-    } finally {
-      setSubmitting(false)
+    });
+
+    if (response.status !== 200) {
+      toast({
+        title: "Error signing in",
+        description: "An error occurred while signing in",
+      });
+      return;
     }
+
+    const body = response.data;
+
+    updateUser(body.user);
+       
+    navigate("/dashboard");
+  } catch (error) {
+    if (error instanceof Error) {
+      const errorMessage = error.message;
+      toast({
+        title: "Error logging in",
+        description: errorMessage,
+      });
+    }
+  } finally {
+    setSubmitting(false);
   }
+}
+
 
   return (
     <div className="w-100 h-screen">
