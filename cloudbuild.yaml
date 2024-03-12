@@ -17,6 +17,5 @@ steps:
       - '--project'
       - '$PROJECT_ID'
       - '--quiet'
-      - 'dispatch.yaml'
 
 timeout: '1200s'
