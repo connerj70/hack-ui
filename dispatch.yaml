@@ -1,3 +1,3 @@
 dispatch:
-  - url: "www.pomerene.net/*"
-    service: www
+  - url: "www.pomerene.net/"
+    service: web
