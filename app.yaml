@@ -15,4 +15,4 @@ handlers:
 
 env_variables:
   NODE_ENV: production
-  VITE_API_URL: https://api.pomerene.net
+  _VITE_API_URL: https://api.pomerene.net
