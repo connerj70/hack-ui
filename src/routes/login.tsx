@@ -19,7 +19,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { useUserContext } from "@/contexts/userContext";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
-import axios from "axios";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -46,19 +45,16 @@ export default function Login() {
       console.log("values: ", values);
       console.log("test", import.meta.env.VITE_API_URL);
 
-      const resp = await fetch(
-        `${import.meta.env.VITE_API_URL}/user/signin`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: values.email,
-            password: values.password,
-          }),
-        }
-      );
+      const resp = await fetch(`${import.meta.env.VITE_API_URL}/user/signin`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+        }),
+      });
 
       if (!resp.ok) {
         toast({
