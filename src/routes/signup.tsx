@@ -49,6 +49,7 @@ export default function Signup() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true)
     console.log("values: russell", values)
+    console.log("vVITE_API_URL", process.env.VITE_API_URL)
     try {
       const userCreateResp = await fetch(`${process.env.VITE_API_URL}/api/v1/user/create`, {
         method: "POST",
