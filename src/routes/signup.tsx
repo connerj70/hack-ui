@@ -49,7 +49,7 @@ export default function Signup() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true)
     try {
-      const userCreateResp = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/user/create`, {
+      const userCreateResp = await fetch(`${process.env.VITE_API_URL}/api/v1/user/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -68,7 +68,7 @@ export default function Signup() {
         return
       }
 
-      const userLoginResp = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/user/signin`, {
+      const userLoginResp = await fetch(`${process.env.VITE_API_URL}/api/v1/user/signin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
