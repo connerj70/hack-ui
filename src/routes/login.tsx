@@ -45,7 +45,7 @@ export default function Login() {
     try {
       console.log("values: ", values)
 
-      const resp = await fetch(`${process.env.}/api/v1/user/signin`, {
+      const resp = await fetch(`${process.env.REACT_APP_API_URL}/api/v1/user/signin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
