@@ -9,6 +9,6 @@ steps:
 
   # Deploy the application to App Engine
   - name: 'gcr.io/cloud-builders/gcloud'
-    args: ['app', 'deploy', '--version', '$BUILD_ID', '--quiet', 'dispatch.yaml', 'app.yaml']
+    args: ['app', 'deploy', '--version', '$BUILD_ID', '--quiet', 'dispatch']
 
 timeout: '1200s'
