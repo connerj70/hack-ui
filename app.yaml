@@ -15,7 +15,3 @@ handlers:
 
 env_variables:
   NODE_ENV: production
-
-dispatch:
-  - url: "www.pomerene.net/*"
-    service: www

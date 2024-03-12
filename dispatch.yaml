@@ -1,0 +1,3 @@
+dispatch:
+  - url: "www.pomerene.net/*"
+    service: www
