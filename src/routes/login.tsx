@@ -44,9 +44,9 @@ export default function Login() {
     setSubmitting(true)
     try {
       console.log("values: ", values)
-      console.log("test", process.env.VITE_API_URL)
+      console.log("test", import.meta.env.VITE_API_URL)
 
-      const resp = await fetch(`${process.env.VITE_API_URL}/api/v1/user/signin`, {
+      const resp = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/user/signin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
