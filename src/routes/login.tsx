@@ -1,8 +1,8 @@
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { Button } from "@/components/ui/button"
-import { Toaster } from "@/components/ui/toaster"
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/toaster";
 import {
   Form,
   FormControl,
@@ -10,27 +10,26 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react"
-import { Loader2 } from "lucide-react"
-import { useNavigate, Link } from "react-router-dom"
-import { useUserContext } from "@/contexts/userContext"
-
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { useUserContext } from "@/contexts/userContext";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
 const formSchema = z.object({
   email: z.string().email(),
-  password: z.string()
-})
+  password: z.string(),
+});
 
 export default function Login() {
-  const { toast } = useToast()
-  const [submitting, setSubmitting] = useState(false)
-  const navigate = useNavigate()
-  const { updateUser } = useUserContext()
+  const { toast } = useToast();
+  const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const { updateUser } = useUserContext();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -38,45 +37,48 @@ export default function Login() {
       email: "",
       password: "",
     },
-  })
+  });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setSubmitting(true)
+    setSubmitting(true);
     try {
-      const resp = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/user/signin`, {
+
+
+      const resp = await fetch(`${import.meta.env.VITE_API_URL}/user/signin`, {
+
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: values.email,
-          password: values.password
+          password: values.password,
         }),
-      })
+      });
 
       if (!resp.ok) {
         toast({
           title: "Error signing in",
           description: "An error occurred while signing in",
-        })
-        return
+        });
+        return;
       }
 
-      const body = await resp.json()
+      const body = await resp.json();
 
-      updateUser(body.user)
-       
-      navigate("/dashboard")
+      updateUser(body.user);
+
+      navigate("/dashboard");
     } catch (error) {
       if (error instanceof Error) {
-        const errorMessage = error.message
+        const errorMessage = error.message;
         toast({
           title: "Error logging in",
           description: errorMessage,
-        })
+        });
       }
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
 
@@ -113,24 +115,23 @@ export default function Login() {
           </div>
           <div className="relative z-20 mt-auto">
             <blockquote className="space-y-2">
-              <p className="text-lg">
-                A smart network for international trade
-              </p>
+              <p className="text-lg">A smart network for international trade</p>
             </blockquote>
           </div>
         </div>
         <div className="lg:p-8">
           <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
             <div className="flex flex-col space-y-2 text-center">
-              <h1 className="text-2xl font-semibold tracking-tight">
-                Login
-              </h1>
+              <h1 className="text-2xl font-semibold tracking-tight">Login</h1>
               <p className="text-sm text-muted-foreground">
                 Enter your email below to login
               </p>
             </div>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
+              >
                 <FormField
                   control={form.control}
                   name="email"
@@ -158,11 +159,9 @@ export default function Login() {
                   )}
                 />
                 <Button disabled={submitting} type="submit" className="w-full">
-                  { submitting ? 
+                  {submitting ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    :
-                    null
-                  }
+                  ) : null}
                   Submit
                 </Button>
               </form>
@@ -172,5 +171,5 @@ export default function Login() {
       </div>
       <Toaster />
     </div>
-  )
+  );
 }

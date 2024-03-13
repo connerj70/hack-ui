@@ -16,6 +16,7 @@ import {
 import { UserProvider } from "./contexts/userContext";
 import AuthWrapper from "@/components/authWrapper"
 
+
 const router = createBrowserRouter([
   {
     path: "/",

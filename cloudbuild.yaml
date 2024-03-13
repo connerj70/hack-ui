@@ -6,9 +6,19 @@ steps:
   # Build the project
   - name: 'gcr.io/cloud-builders/npm'
     args: ['run', 'build']
+    env:
+      - 'NODE_ENV=production'
+      - 'VITE_API_URL=https://www.pomerene.net/api/v1'
 
   # Deploy the application to App Engine
   - name: 'gcr.io/cloud-builders/gcloud'
-    args: ['app', 'deploy', '--version', '$BUILD_ID', '--quiet']
+    args:
+      - 'app'
+      - 'deploy'
+      - '--version'
+      - '$BUILD_ID'
+      - '--project'
+      - '$PROJECT_ID'
+      - '--quiet'
 
 timeout: '1200s'
