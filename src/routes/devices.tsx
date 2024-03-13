@@ -242,7 +242,7 @@ export default function Devices() {
           <div className="flex items-center justify-between space-y-2">
             <h2 className="text-3xl font-bold tracking-tight">Devices</h2>
             <div className="flex items-center space-x-2">
-              <Button>Create Device</Button>
+              <Link to="/devices/create">Create Device</Link>
               <CalendarDateRangePicker />
               <Button>Download</Button>
             </div>
