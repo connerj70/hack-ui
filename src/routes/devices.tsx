@@ -1,9 +1,9 @@
-import { useState } from "react"
-import { Toaster } from "@/components/ui/toaster"
-import { DeviceType } from "@/types/device"
+import { useState } from "react";
+import { Toaster } from "@/components/ui/toaster";
+import { DeviceType } from "@/types/device";
 
-import { Button } from "@/components/ui/button"
-import { CalendarDateRangePicker } from "@/components/dateRangePicker"
+import { Button } from "@/components/ui/button";
+import { CalendarDateRangePicker } from "@/components/dateRangePicker";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -15,9 +15,9 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
-import { MoreHorizontal } from "lucide-react"
-import { Checkbox } from "@/components/ui/checkbox"
+} from "@tanstack/react-table";
+import { MoreHorizontal } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +25,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -33,14 +33,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Link, useLoaderData } from "react-router-dom"
+} from "@/components/ui/table";
+import { Link } from "react-router-dom";
 
 export async function loader(): Promise<DeviceType[]> {
   return [
     {
       id: "m5gr84i9",
-      name: "Sensor 1", 
+      name: "Sensor 1",
       coordinates: "41.40338, 2.17403",
       publicKey: "abc",
       createdAt: "2021-08-01T00:00:00Z",
@@ -126,7 +126,7 @@ export async function loader(): Promise<DeviceType[]> {
       createdAt: "2021-08-01T00:00:00Z",
       status: "active",
     },
-  ]
+  ];
 }
 
 export const columns: ColumnDef<DeviceType>[] = [
@@ -136,7 +136,7 @@ export const columns: ColumnDef<DeviceType>[] = [
       <Checkbox
         checked={
           table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
+          (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
@@ -176,7 +176,7 @@ export const columns: ColumnDef<DeviceType>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const device = row.original
+      const device = row.original;
 
       return (
         <div className="flex justify-end">
@@ -195,26 +195,48 @@ export const columns: ColumnDef<DeviceType>[] = [
                 Copy device ID
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link to={`/devices/${device.id}`} ><DropdownMenuItem>View details</DropdownMenuItem></Link>
+              <Link to={`/devices/${device.id}`}>
+                <DropdownMenuItem>View details</DropdownMenuItem>
+              </Link>
               <DropdownMenuItem>View events</DropdownMenuItem>
               <DropdownMenuItem>Deactivate</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      )
+      );
     },
   },
-]
+];
 
 export default function Devices() {
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
-    []
-  )
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = useState({})
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
 
-  const devices = useLoaderData() 
+  // const devices = useLoaderData()
+
+  const generateFakeDevices = (count = 10): DeviceType[] => {
+    const types = ["Laptop", "Phone", "Tablet", "Desktop"];
+    const statuses = ["Active", "Inactive", "Maintenance"];
+
+    return Array.from({ length: count }, (_, index) => ({
+      id: (index + 1).toString(), // Convert id to string
+      name: `Device ${index + 1}`,
+      type: types[Math.floor(Math.random() * types.length)],
+      status: statuses[Math.floor(Math.random() * statuses.length)],
+      // Convert coordinates to a string representation
+      coordinates: `Lat: ${Math.random() * 180 - 90}, Lng: ${
+        Math.random() * 360 - 180
+      }`,
+      publicKey: `publicKey${index + 1}`, // Example publicKey
+      createdAt: new Date().toISOString(), // Current timestamp in ISO format
+      // imageUrl is optional, add if necessary
+    }));
+  };
+
+  // Generate 10 fake devices with the required properties
+  const devices: DeviceType[] = generateFakeDevices(10);
 
   const table = useReactTable({
     data: devices,
@@ -233,7 +255,7 @@ export default function Devices() {
       columnVisibility,
       rowSelection,
     },
-  })
+  });
 
   return (
     <>
@@ -258,11 +280,11 @@ export default function Devices() {
                           {header.isPlaceholder
                             ? null
                             : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
                         </TableHead>
-                      )
+                      );
                     })}
                   </TableRow>
                 ))}
@@ -285,15 +307,15 @@ export default function Devices() {
                     </TableRow>
                   ))
                 ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={columns?.length}
-                        className="h-24 text-center"
-                      >
-                        No results.
-                      </TableCell>
-                    </TableRow>
-                  )}
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns?.length}
+                      className="h-24 text-center"
+                    >
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>
@@ -325,5 +347,5 @@ export default function Devices() {
         <Toaster />
       </div>
     </>
-  )
+  );
 }
