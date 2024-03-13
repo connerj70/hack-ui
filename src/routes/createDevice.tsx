@@ -16,12 +16,14 @@ import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react"
 import { Loader2 } from "lucide-react"
 import { useNavigate, useParams } from "react-router-dom"
+import Cookies from "js-cookie"
 
 const formSchema = z.object({
   deviceKey: z.string(),
   name: z.string(),
   companyName: z.string(),
-  additionalInfo: z.string()
+  key: z.string(),
+  value: z.string()
 });
 
 
@@ -37,23 +39,30 @@ export default function CreateDevice() {
       deviceKey: deviceKey,
       name: "",
       companyName: "",
-      additionalInfo: ""
+      key: "",
+      value: ""
     },
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true)
     try {
+      const user = Cookies.get("user")
+      const parsedUser = JSON.parse(user!)
+      console.log("parsedUser: ", parsedUser)
+      const metadata: any = {}
+      metadata[values.key] = values.value
       const resp = await fetch(`${import.meta.env.VITE_API_URL}/device/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${parsedUser.stsTokenManager.accessToken}`
         },
         body: JSON.stringify({
           mintSecretKey: values.deviceKey,
           name: values.name,
           symbol: values.companyName,
-          additionalMetadata: values.additionalInfo
+          additionalMetadata: metadata
         }),
       })
 
@@ -97,7 +106,7 @@ export default function CreateDevice() {
                   <FormItem>
                     <FormLabel>Device</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input disabled {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -131,10 +140,23 @@ export default function CreateDevice() {
               />
               <FormField
                 control={form.control}
-                name="additionalInfo"
+                name="key"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Additional Metadata</FormLabel>
+                    <FormLabel>Key</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="value"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Value</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
