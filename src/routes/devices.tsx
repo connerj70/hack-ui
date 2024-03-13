@@ -34,102 +34,99 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Link } from "react-router-dom"
-import { useLoaderData } from "react-router-dom"
+import { Link, useLoaderData } from "react-router-dom"
 
-export async function loader() {
-  return {
-    devices: [
-      {
-        id: "m5gr84i9",
-        name: "Sensor 1", 
-        coordinates: "41.40338, 2.17403",
-        publicKey: "abc",
-        createdAt: "2021-08-01T00:00:00Z",
-        status: "active",
-      },
-      {
-        id: "3u1reuv4",
-        name: "Sensor 2",
-        coordinates: "41.40338, 2.17403",
-        publicKey: "abc",
-        createdAt: "2021-08-01T00:00:00Z",
-        status: "active",
-      },
-      {
-        id: "derv1ws0",
-        name: "Sensor 3",
-        coordinates: "41.40338, 2.17403",
-        publicKey: "abc",
-        createdAt: "2021-08-01T00:00:00Z",
-        status: "active",
-      },
-      {
-        id: "5kma53ae",
-        name: "Sensor 4",
-        coordinates: "41.40338, 2.17403",
-        publicKey: "abc",
-        createdAt: "2021-08-01T00:00:00Z",
-        status: "active",
-      },
-      {
-        id: "bhqecj4p",
-        name: "Sensor 5",
-        coordinates: "41.40338, 2.17403",
-        publicKey: "abc",
-        createdAt: "2021-08-01T00:00:00Z",
-        status: "active",
-      },
-      {
-        id: "bhqecj4p",
-        name: "Sensor 5",
-        coordinates: "41.40338, 2.17403",
-        publicKey: "abc",
-        createdAt: "2021-08-01T00:00:00Z",
-        status: "active",
-      },
-      {
-        id: "bhqecj4p",
-        name: "Sensor 5",
-        coordinates: "41.40338, 2.17403",
-        publicKey: "abc",
-        createdAt: "2021-08-01T00:00:00Z",
-        status: "active",
-      },
-      {
-        id: "bhqecj4p",
-        name: "Sensor 5",
-        coordinates: "41.40338, 2.17403",
-        publicKey: "abc",
-        createdAt: "2021-08-01T00:00:00Z",
-        status: "active",
-      },
-      {
-        id: "bhqecj4p",
-        name: "Sensor 5",
-        coordinates: "41.40338, 2.17403",
-        publicKey: "abc",
-        createdAt: "2021-08-01T00:00:00Z",
-        status: "active",
-      },
-      {
-        id: "bhqecj4p",
-        name: "Sensor 5",
-        coordinates: "41.40338, 2.17403",
-        publicKey: "abc",
-        createdAt: "2021-08-01T00:00:00Z",
-        status: "active",
-      },
-      {
-        id: "bhqecj4p",
-        name: "Sensor 5",
-        coordinates: "41.40338, 2.17403",
-        publicKey: "abc",
-        createdAt: "2021-08-01T00:00:00Z",
-        status: "active",
-      },
-    ]
-  }
+export async function loader(): Promise<DeviceType[]> {
+  return [
+    {
+      id: "m5gr84i9",
+      name: "Sensor 1", 
+      coordinates: "41.40338, 2.17403",
+      publicKey: "abc",
+      createdAt: "2021-08-01T00:00:00Z",
+      status: "active",
+    },
+    {
+      id: "3u1reuv4",
+      name: "Sensor 2",
+      coordinates: "41.40338, 2.17403",
+      publicKey: "abc",
+      createdAt: "2021-08-01T00:00:00Z",
+      status: "active",
+    },
+    {
+      id: "derv1ws0",
+      name: "Sensor 3",
+      coordinates: "41.40338, 2.17403",
+      publicKey: "abc",
+      createdAt: "2021-08-01T00:00:00Z",
+      status: "active",
+    },
+    {
+      id: "5kma53ae",
+      name: "Sensor 4",
+      coordinates: "41.40338, 2.17403",
+      publicKey: "abc",
+      createdAt: "2021-08-01T00:00:00Z",
+      status: "active",
+    },
+    {
+      id: "bhqecj4p",
+      name: "Sensor 5",
+      coordinates: "41.40338, 2.17403",
+      publicKey: "abc",
+      createdAt: "2021-08-01T00:00:00Z",
+      status: "active",
+    },
+    {
+      id: "bhqecj4p",
+      name: "Sensor 5",
+      coordinates: "41.40338, 2.17403",
+      publicKey: "abc",
+      createdAt: "2021-08-01T00:00:00Z",
+      status: "active",
+    },
+    {
+      id: "bhqecj4p",
+      name: "Sensor 5",
+      coordinates: "41.40338, 2.17403",
+      publicKey: "abc",
+      createdAt: "2021-08-01T00:00:00Z",
+      status: "active",
+    },
+    {
+      id: "bhqecj4p",
+      name: "Sensor 5",
+      coordinates: "41.40338, 2.17403",
+      publicKey: "abc",
+      createdAt: "2021-08-01T00:00:00Z",
+      status: "active",
+    },
+    {
+      id: "bhqecj4p",
+      name: "Sensor 5",
+      coordinates: "41.40338, 2.17403",
+      publicKey: "abc",
+      createdAt: "2021-08-01T00:00:00Z",
+      status: "active",
+    },
+    {
+      id: "bhqecj4p",
+      name: "Sensor 5",
+      coordinates: "41.40338, 2.17403",
+      publicKey: "abc",
+      createdAt: "2021-08-01T00:00:00Z",
+      status: "active",
+    },
+    {
+      id: "bhqecj4p",
+      name: "Sensor 5",
+      coordinates: "41.40338, 2.17403",
+      publicKey: "abc",
+      createdAt: "2021-08-01T00:00:00Z",
+      status: "active",
+    },
+  ]
 }
 
 export const columns: ColumnDef<DeviceType>[] = [
@@ -217,12 +214,10 @@ export default function Devices() {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
 
-  const { devices } = useLoaderData()
-
-  console.log("devices: ", devices)
+  const devices = useLoaderData() 
 
   const table = useReactTable({
-    devices,
+    data: devices,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
