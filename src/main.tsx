@@ -4,8 +4,8 @@ import Root from "./routes/root"
 import Signup from "./routes/signup"
 import Login from "./routes/login"
 import Dashboard from "./routes/dashboard"
-import Devices from "./routes/devices"
-import Device from "./routes/device"
+import Devices, { loader as devicesLoader } from "./routes/devices"
+import Device, { loader as deviceLoader } from "./routes/device"
 import AuthenticatedLayout from './routes/authenticatedLayout'
 import ErrorPage from "./error-page"
 import "./globals.css"
@@ -37,10 +37,12 @@ const router = createBrowserRouter([
       {
         path: "devices",
         element: <Devices />,
+        loader: devicesLoader
       },
       {
         path: "devices/:id",
         element: <Device />,
+        loader: deviceLoader
       }
     ]
   },

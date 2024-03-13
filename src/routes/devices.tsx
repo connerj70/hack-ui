@@ -35,95 +35,111 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Link } from "react-router-dom"
+import { useLoaderData } from "react-router-dom"
 
-const data: DeviceType[] = [
-  {
-    id: "m5gr84i9",
-    name: "Sensor 1", 
-    coordinates: "41.40338, 2.17403",
-    publicKey: "abc",
-    createdAt: "2021-08-01T00:00:00Z",
-  },
-  {
-    id: "3u1reuv4",
-    name: "Sensor 2",
-    coordinates: "41.40338, 2.17403",
-    publicKey: "abc",
-    createdAt: "2021-08-01T00:00:00Z",
-  },
-  {
-    id: "derv1ws0",
-    name: "Sensor 3",
-    coordinates: "41.40338, 2.17403",
-    publicKey: "abc",
-    createdAt: "2021-08-01T00:00:00Z",
-  },
-  {
-    id: "5kma53ae",
-    name: "Sensor 4",
-    coordinates: "41.40338, 2.17403",
-    publicKey: "abc",
-    createdAt: "2021-08-01T00:00:00Z",
-  },
-  {
-    id: "bhqecj4p",
-    name: "Sensor 5",
-    coordinates: "41.40338, 2.17403",
-    publicKey: "abc",
-    createdAt: "2021-08-01T00:00:00Z",
-  },
-  {
-    id: "bhqecj4p",
-    name: "Sensor 5",
-    coordinates: "41.40338, 2.17403",
-    publicKey: "abc",
-    createdAt: "2021-08-01T00:00:00Z",
-  },
-  {
-    id: "bhqecj4p",
-    name: "Sensor 5",
-    coordinates: "41.40338, 2.17403",
-    publicKey: "abc",
-    createdAt: "2021-08-01T00:00:00Z",
-  },
-  {
-    id: "bhqecj4p",
-    name: "Sensor 5",
-    coordinates: "41.40338, 2.17403",
-    publicKey: "abc",
-    createdAt: "2021-08-01T00:00:00Z",
-  },
-  {
-    id: "bhqecj4p",
-    name: "Sensor 5",
-    coordinates: "41.40338, 2.17403",
-    publicKey: "abc",
-    createdAt: "2021-08-01T00:00:00Z",
-  },
-  {
-    id: "bhqecj4p",
-    name: "Sensor 5",
-    coordinates: "41.40338, 2.17403",
-    publicKey: "abc",
-    createdAt: "2021-08-01T00:00:00Z",
-  },
-  {
-    id: "bhqecj4p",
-    name: "Sensor 5",
-    coordinates: "41.40338, 2.17403",
-    publicKey: "abc",
-    createdAt: "2021-08-01T00:00:00Z",
-  },
-]
+export async function loader() {
+  return {
+    devices: [
+      {
+        id: "m5gr84i9",
+        name: "Sensor 1", 
+        coordinates: "41.40338, 2.17403",
+        publicKey: "abc",
+        createdAt: "2021-08-01T00:00:00Z",
+        status: "active",
+      },
+      {
+        id: "3u1reuv4",
+        name: "Sensor 2",
+        coordinates: "41.40338, 2.17403",
+        publicKey: "abc",
+        createdAt: "2021-08-01T00:00:00Z",
+        status: "active",
+      },
+      {
+        id: "derv1ws0",
+        name: "Sensor 3",
+        coordinates: "41.40338, 2.17403",
+        publicKey: "abc",
+        createdAt: "2021-08-01T00:00:00Z",
+        status: "active",
+      },
+      {
+        id: "5kma53ae",
+        name: "Sensor 4",
+        coordinates: "41.40338, 2.17403",
+        publicKey: "abc",
+        createdAt: "2021-08-01T00:00:00Z",
+        status: "active",
+      },
+      {
+        id: "bhqecj4p",
+        name: "Sensor 5",
+        coordinates: "41.40338, 2.17403",
+        publicKey: "abc",
+        createdAt: "2021-08-01T00:00:00Z",
+        status: "active",
+      },
+      {
+        id: "bhqecj4p",
+        name: "Sensor 5",
+        coordinates: "41.40338, 2.17403",
+        publicKey: "abc",
+        createdAt: "2021-08-01T00:00:00Z",
+        status: "active",
+      },
+      {
+        id: "bhqecj4p",
+        name: "Sensor 5",
+        coordinates: "41.40338, 2.17403",
+        publicKey: "abc",
+        createdAt: "2021-08-01T00:00:00Z",
+        status: "active",
+      },
+      {
+        id: "bhqecj4p",
+        name: "Sensor 5",
+        coordinates: "41.40338, 2.17403",
+        publicKey: "abc",
+        createdAt: "2021-08-01T00:00:00Z",
+        status: "active",
+      },
+      {
+        id: "bhqecj4p",
+        name: "Sensor 5",
+        coordinates: "41.40338, 2.17403",
+        publicKey: "abc",
+        createdAt: "2021-08-01T00:00:00Z",
+        status: "active",
+      },
+      {
+        id: "bhqecj4p",
+        name: "Sensor 5",
+        coordinates: "41.40338, 2.17403",
+        publicKey: "abc",
+        createdAt: "2021-08-01T00:00:00Z",
+        status: "active",
+      },
+      {
+        id: "bhqecj4p",
+        name: "Sensor 5",
+        coordinates: "41.40338, 2.17403",
+        publicKey: "abc",
+        createdAt: "2021-08-01T00:00:00Z",
+        status: "active",
+      },
+    ]
+  }
+}
 
-export const columns: ColumnDef<Device>[] = [
+export const columns: ColumnDef<DeviceType>[] = [
   {
     id: "select",
     header: ({ table }) => (
       <Checkbox
         checked={
           table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
+            (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
@@ -164,7 +180,7 @@ export const columns: ColumnDef<Device>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const device = row.original
- 
+
       return (
         <div className="flex justify-end">
           <DropdownMenu>
@@ -201,8 +217,12 @@ export default function Devices() {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
 
+  const { devices } = useLoaderData()
+
+  console.log("devices: ", devices)
+
   const table = useReactTable({
-    data,
+    devices,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -227,6 +247,7 @@ export default function Devices() {
           <div className="flex items-center justify-between space-y-2">
             <h2 className="text-3xl font-bold tracking-tight">Devices</h2>
             <div className="flex items-center space-x-2">
+              <Button>Create Device</Button>
               <CalendarDateRangePicker />
               <Button>Download</Button>
             </div>
@@ -271,7 +292,7 @@ export default function Devices() {
                 ) : (
                     <TableRow>
                       <TableCell
-                        colSpan={columns.length}
+                        colSpan={columns?.length}
                         className="h-24 text-center"
                       >
                         No results.
@@ -283,8 +304,8 @@ export default function Devices() {
           </div>
           <div className="flex items-center justify-end space-x-2 py-4">
             <div className="flex-1 text-sm text-muted-foreground">
-              {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} row(s) selected.
+              {table.getFilteredSelectedRowModel().rows?.length} of{" "}
+              {table.getFilteredRowModel().rows?.length} row(s) selected.
             </div>
             <div className="space-x-2">
               <Button
