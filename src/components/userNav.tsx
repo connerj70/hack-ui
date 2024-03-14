@@ -1,9 +1,5 @@
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,21 +8,21 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
-import { useNavigate } from 'react-router-dom'
-import { useUserContext } from "@/contexts/userContext"
+import { useNavigate } from "react-router-dom";
+import { useUserContext } from "@/contexts/userContext";
 
 export function UserNav(props: any) {
-  const navigate = useNavigate()
-  const { clearUser } = useUserContext()
+  const navigate = useNavigate();
+  const { clearUser } = useUserContext();
 
   async function logout() {
     try {
-      clearUser()
-      navigate("/login")
-    } catch(error) {
-      console.error("failed to logout", error)    
+      clearUser();
+      navigate("/login");
+    } catch (error) {
+      console.error("failed to logout", error);
     }
   }
 
@@ -40,32 +36,26 @@ export function UserNav(props: any) {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className="w-72" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{props.user?.displayName || "User" }</p>
-            <p className="text-xs leading-none text-muted-foreground">
-              { props.user?.email }
+            <p className="text-sm font-medium leading-none break-words">
+              {props.user?.email || "User"}
+            </p>
+            <p className="text-xs leading-none text-muted-foreground break-words whitespace-normal">
+              {props.user?.displayName}
             </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            Profile
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            Billing
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            Settings
-          </DropdownMenuItem>
+          <DropdownMenuItem>Profile</DropdownMenuItem>
+          <DropdownMenuItem>Billing</DropdownMenuItem>
+          <DropdownMenuItem>Settings</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={logout}>
-          Log out
-        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={logout}>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
