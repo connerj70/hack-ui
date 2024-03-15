@@ -336,7 +336,7 @@ export default function Devices() {
               </Button>
             </div>
           </div>
-          <div className="flex items-center justify-end space-x-2">
+          <div className="flex-col md:flex items-center justify-end md:space-x-2 space-y-2 md:space-y-0">
             <CalendarDateRangePicker />
             <Button disabled={loadingReport} onClick={downloadReport} variant="secondary">Download</Button>
           </div>
