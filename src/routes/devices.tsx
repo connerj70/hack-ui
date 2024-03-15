@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { DeviceType } from "@/types/device";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { CalendarDateRangePicker } from "@/components/dateRangePicker";
 import {
   ColumnDef,
@@ -16,7 +16,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Plus } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
@@ -34,7 +34,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export async function loader(): Promise<DeviceType[]> {
   return [
@@ -213,6 +213,11 @@ export default function Devices() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const [devices, setDevices] = useState<DeviceType[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [loadingReport, setLoadingReport] = useState(false);
+
+  const navigate = useNavigate()
 
   // const devices = useLoaderData()
 
@@ -235,8 +240,12 @@ export default function Devices() {
     }));
   };
 
-  // Generate 10 fake devices with the required properties
-  const devices: DeviceType[] = generateFakeDevices(10);
+  useEffect(() => {
+    // Generate 10 fake devices with the required properties
+    setDevices(generateFakeDevices(10))
+  }, [])
+
+
 
   const table = useReactTable({
     data: devices,
@@ -257,6 +266,64 @@ export default function Devices() {
     },
   });
 
+  async function newDeviceSetup() {
+    setLoading(true);
+    try {
+      const resp = await fetch(`${import.meta.env.VITE_API_URL}/solana/key`);
+
+      if (!resp.ok) {
+        console.error("Failed to create new device");
+        return;
+      }
+
+      const data = await resp.json();
+      const privateKey = data.privateKey
+
+      navigate(`/devices/create/${privateKey}`)
+    } catch (error) {
+
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const downloadFile = ({ data, fileName, fileType }) => {
+    const blob = new Blob([data], { type: fileType })
+    const a = document.createElement('a')
+    a.download = fileName
+    a.href = window.URL.createObjectURL(blob)
+    const clickEvt = new MouseEvent('click', {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    })
+    a.dispatchEvent(clickEvt)
+    a.remove()
+  }
+
+  async function downloadReport(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    setLoadingReport(true);
+    try {
+      e.preventDefault()
+      // Headers for each column
+      let headers = ['Id,Name,Coordinates,PublicKey, CreatedAt, Status']
+      let devicesCsv = devices.reduce((acc, device: any) => {
+        const { id, name, coordinates, publicKey, createdAt, status } = device 
+        acc.push([id, name, coordinates, publicKey, createdAt, status].join(','))
+        return acc
+      }, [])
+      downloadFile({
+        data: [...headers, ...devicesCsv].join('\n'),
+        fileName: 'devices.csv',
+        fileType: 'text/csv',
+      })
+    } catch (error) {
+
+    } finally {
+      setLoadingReport(false)
+    }
+  }
+
   return (
     <>
       <div className="flex-col md:flex">
@@ -264,10 +331,14 @@ export default function Devices() {
           <div className="flex items-center justify-between space-y-2">
             <h2 className="text-3xl font-bold tracking-tight">Devices</h2>
             <div className="flex items-center space-x-2">
-              <Link to="/devices/create">Create Device</Link>
-              <CalendarDateRangePicker />
-              <Button>Download</Button>
+              <Button disabled={loading} onClick={newDeviceSetup}>
+                <Plus className="mr-2 h-4 w-4" /> Create Device
+              </Button>
             </div>
+          </div>
+          <div className="flex items-center justify-end space-x-2">
+            <CalendarDateRangePicker />
+            <Button disabled={loadingReport} onClick={downloadReport} variant="secondary">Download</Button>
           </div>
           <div className="rounded-md border">
             <Table>
