@@ -40,8 +40,10 @@ export default function Root() {
       </Link>
       <div className="flex flex-col w-100 justify-start items-center">
         <img src="/pomerene-hero2.png" alt="Pomerene" className="w-full xl:w-1/2 filter grayscale hover:scale-110 transition-transform duration-500 ease-in-out" />
-        <h1 className="text-6xl font-bold">POMERENE</h1>
-        <h2 className="text-xl mt-4 font-thin"><span className="text-2xl font-bold text-green-600">Triple</span> Entry International Trade. Securing a $12 Trillion Industry</h2>
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-yellow-400 hover:text-yellow-300 bg-gradient-to-r from-green-500 to-green-600 hover:from-yellow-600 hover:to-green-500 text-white p-4 mt-2 mb-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+          Pomerene 
+        </h1>
+        <h2 className="text-xl mt-4 font-thin"><span className="text-2xl font-bold">Triple</span> Entry International Trade. Securing a $12 Trillion Industry</h2>
       </div>
       <div className="relative flex md:mt-16 space-y-10 flex-col justify-center items-center">
         <img src="/pomerene-bg2.png" alt="Background" className="absolute z-[-1] w-full h-full object-cover top-0 left-0" />
@@ -73,8 +75,38 @@ export default function Root() {
           </CardContent>
         </Card>
       </div>
-      <div className="relative flex md:mt-16 space-y-10 flex-col justify-center items-center">
-        <img src="/pomerene-bg3.png" alt="Background" className="absolute z-[-1] w-full h-full object-cover top-0 left-0" />
+      <div>
+        <h1 className="text-4xl font-bold text-center mt-16">Meet the Team</h1>
+        <div className="relative flex md:mt-16 space-y-10 flex-col md:flex-row md:space-x-6 p-6 rounded justify-center items-center">
+          <img src="/pomerene-bg3.png" alt="Background" className="absolute z-[-1] w-full h-full object-cover top-0 left-0" />
+          <Card className="max-w-sm">
+            <img src="https://placehold.co/600x400" alt="Conner Jensen" className="w-full h-56 object-cover" />
+            <div className="p-5">
+              <CardHeader className="text-lg font-semibold">Conner Jensen</CardHeader>
+              <CardContent>
+                <p>Software Dev</p>
+              </CardContent>
+            </div>
+          </Card>
+          <Card className="max-w-sm">
+            <img src="https://placehold.co/600x400" alt="Conner Jensen" className="w-full h-56 object-cover" />
+            <div className="p-5">
+              <CardHeader className="text-lg font-semibold">Tim Hobbs</CardHeader>
+              <CardContent>
+                <p>Business Development/Software Architecture</p>
+              </CardContent>
+            </div>
+          </Card>
+          <Card className="max-w-sm">
+            <img src="https://placehold.co/600x400" alt="Conner Jensen" className="w-full h-56 object-cover" />
+            <div className="p-5">
+              <CardHeader className="text-lg font-semibold">Russell Brouillard</CardHeader>
+              <CardContent>
+                <p>Software Dev</p>
+              </CardContent>
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   );
