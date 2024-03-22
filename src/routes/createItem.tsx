@@ -13,55 +13,33 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import Cookies from "js-cookie";
 
 const formSchema = z.object({
-  deviceKey: z.string(),
+  itemKey: z.string(),
   name: z.string(),
-  companyName: z.string(),
-  location: z.string(),
-  timeStamp: z.string(),
+  symbol: z.string(),
+  uri: z.string(),
 });
 
-export default function CreateDevice() {
+export default function CreateItem() {
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { deviceKey } = useParams();
+  const { itemKey } = useParams();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      deviceKey: deviceKey,
+      itemKey: itemKey,
       name: "",
-      companyName: "",
-      location: "",
-      timeStamp: new Date().toISOString(),
+      symbol: "",
+      uri: "",
     },
   });
-
-  useEffect(() => {
-    // Set the current timestamp
-    form.setValue("timeStamp", new Date().toISOString());
-
-    // Attempt to get the current position
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        form.setValue("location", `Lat: ${latitude}, Long: ${longitude}`);
-      },
-      (error) => {
-        console.error(error);
-        toast({
-          title: "Location Error",
-          description: "Unable to retrieve your location",
-        });
-      }
-    );
-  }, [form, toast]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true);
@@ -70,13 +48,8 @@ export default function CreateDevice() {
 
       const parsedUser = JSON.parse(user!);
 
-      const metadata: [string, string][] = [
-        ["location", values.location],
-        ["timeStamp", values.timeStamp],
-      ];
-
       const resp = await fetch(
-        `${import.meta.env.VITE_API_URL}/scanner/create`,
+        `${import.meta.env.VITE_API_URL}/item/create`,
         {
           method: "POST",
           headers: {
@@ -84,10 +57,10 @@ export default function CreateDevice() {
             Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
           },
           body: JSON.stringify({
-            mintSecretKey: values.deviceKey,
+            mintSecretKey: values.itemKey,
             name: values.name,
-            symbol: values.companyName,
-            additionalMetadata: metadata,
+            symbol: values.symbol,
+            uri: values.uri
           }),
         }
       );
@@ -98,8 +71,8 @@ export default function CreateDevice() {
           navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
         } else {
           toast({
-            title: "Error creating device",
-            description: "An error occurred while creating your device",
+            title: "Error creating item",
+            description: "An error occurred while creating your item",
           });
         }
         return;
@@ -110,7 +83,7 @@ export default function CreateDevice() {
       if (error instanceof Error) {
         const errorMessage = error.message;
         toast({
-          title: "Error creating device",
+          title: "Error creating item",
           description: errorMessage,
         });
       }
@@ -125,17 +98,17 @@ export default function CreateDevice() {
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
-              Create New Device
+              Create New Item
             </h1>
           </div>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
-                name="deviceKey"
+                name="itemKey"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Device</FormLabel>
+                    <FormLabel>Item</FormLabel>
                     <FormControl>
                       <Input disabled {...field} />
                     </FormControl>
@@ -158,10 +131,10 @@ export default function CreateDevice() {
               />
               <FormField
                 control={form.control}
-                name="companyName"
+                name="symbol"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Company Name</FormLabel>
+                    <FormLabel>Symbol</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -171,25 +144,12 @@ export default function CreateDevice() {
               />
               <FormField
                 control={form.control}
-                name="location"
+                name="uri"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Location</FormLabel>
+                    <FormLabel>URI</FormLabel>
                     <FormControl>
-                      <Input disabled {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="timeStamp"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Time Stamp</FormLabel>
-                    <FormControl>
-                      <Input disabled {...field} />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

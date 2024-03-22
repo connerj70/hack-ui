@@ -8,8 +8,34 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import Chart from "chart.js/auto"
+import { CategoryScale } from "chart.js";
+import { Data } from "@/utils/Data.js";
+import { useState } from "react"
+import LandingChart from "../components/landingChart.jsx";
+
+Chart.register(CategoryScale);
 
 export default function Root() {
+  const [chartData, setChartData] = useState({
+    labels: Data.map((data: any) => data.year), 
+    datasets: [
+      {
+        label: "Users Gained ",
+        data: Data.map((data: any) => data.userGain),
+        backgroundColor: [
+          "rgba(75,192,192,1)",
+          "&quot;#ecf0f1",
+          "#50AF95",
+          "#f3ba2f",
+          "#2a71d0"
+        ],
+        borderColor: "black",
+        borderWidth: 2
+      }
+    ]
+  });
+
   return (
     <div className="p-6">
       <Link
@@ -40,7 +66,7 @@ export default function Root() {
       </Link>
       <div className="flex flex-col w-100 justify-start items-center">
         <img src="/pomerene-hero2.png" alt="Pomerene" className="w-full xl:w-1/2 filter grayscale hover:scale-110 transition-transform duration-500 ease-in-out" />
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-yellow-400 hover:text-yellow-300 bg-gradient-to-r from-green-500 to-green-600 hover:from-yellow-600 hover:to-green-500 text-white p-4 mt-2 mb-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-yellow-400 hover:text-yellow-300 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-500 text-white p-4 mt-2 mb-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
           Pomerene 
         </h1>
         <h2 className="text-xl mt-4 font-thin"><span className="text-2xl font-bold">Triple</span> Entry International Trade. Securing a $12 Trillion Industry</h2>
@@ -108,6 +134,7 @@ export default function Root() {
           </Card>
         </div>
       </div>
+      <LandingChart chartData={chartData} />
     </div>
   );
 }
