@@ -6,6 +6,7 @@ import Login from "./routes/login"
 import Dashboard from "./routes/dashboard"
 import Devices, { loader as devicesLoader } from "./routes/devices"
 import Device, { loader as deviceLoader } from "./routes/device"
+import Items, { loader as itemLoader } from "./routes/items"
 import CreateItem from "./routes/createItem"
 import Profile from "./routes/profile"
 import CreateDevice from "./routes/createDevice"
@@ -53,7 +54,12 @@ const router = createBrowserRouter([
         loader: deviceLoader
       },
       {
-        path: "items/create",
+        path: "items",
+        element: <Items />,
+        loader: itemLoader
+      },
+      {
+        path: "items/create/:itemKey",
         element: <CreateItem />,
       },
       {
