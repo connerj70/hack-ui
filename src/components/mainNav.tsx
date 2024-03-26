@@ -24,6 +24,12 @@ export function MainNav({
       >
         Devices
       </Link>
+      <Link
+        to="/items"
+        className={`text-sm font-medium transition-colors hover:text-primary ${location.pathname === "/items" ? "text-primary" : "text-muted-foreground"}`}
+      >
+        Items 
+      </Link>
     </nav>
   )
 }

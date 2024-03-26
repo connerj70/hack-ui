@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
-import { DeviceType } from "@/types/device";
+import { ItemType } from "@/types/device";
 
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { CalendarDateRangePicker } from "@/components/dateRangePicker";
 import {
   ColumnDef,
@@ -34,102 +34,46 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLoaderData } from "react-router-dom";
+import Cookies from "js-cookie";
 
-export async function loader(): Promise<DeviceType[]> {
-  return [
+export async function loader(): Promise<ItemType[]> {
+  const user = Cookies.get("user");
+
+  const parsedUser = JSON.parse(user!);
+
+  const resp = await fetch(
+    `${import.meta.env.VITE_API_URL}/solana/accounts`,
     {
-      id: "m5gr84i9",
-      name: "Sensor 1",
-      coordinates: "41.40338, 2.17403",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "3u1reuv4",
-      name: "Sensor 2",
-      coordinates: "41.40338, 2.17403",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "derv1ws0",
-      name: "Sensor 3",
-      coordinates: "41.40338, 2.17403",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "5kma53ae",
-      name: "Sensor 4",
-      coordinates: "41.40338, 2.17403",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "bhqecj4p",
-      name: "Sensor 5",
-      coordinates: "41.40338, 2.17403",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "bhqecj4p",
-      name: "Sensor 5",
-      coordinates: "41.40338, 2.17403",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "bhqecj4p",
-      name: "Sensor 5",
-      coordinates: "41.40338, 2.17403",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "bhqecj4p",
-      name: "Sensor 5",
-      coordinates: "41.40338, 2.17403",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "bhqecj4p",
-      name: "Sensor 5",
-      coordinates: "41.40338, 2.17403",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "bhqecj4p",
-      name: "Sensor 5",
-      coordinates: "41.40338, 2.17403",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "bhqecj4p",
-      name: "Sensor 5",
-      coordinates: "41.40338, 2.17403",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-  ];
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
+      }
+    }
+  );
+
+  if (!resp.ok) {
+    console.error("Failed to fetch user accounts");
+    return [];
+  }
+
+  const body = await resp.json()
+
+  console.log("body: ", body)
+
+  return body.map((item: any) => {
+    return {
+      id: item.tokenAccount,
+      name: item.metadata.name,
+      publicKey: item.metadata.mint,
+      createdAt: Date.now().toString(),
+      status: item.metadata.additionalMetadata[0][1],
+    }
+  })
 }
 
-export const columns: ColumnDef<DeviceType>[] = [
+export const columns: ColumnDef<ItemType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -165,10 +109,6 @@ export const columns: ColumnDef<DeviceType>[] = [
     header: "Public Key",
   },
   {
-    accessorKey: "coordinates",
-    header: () => <div>Coordinates</div>,
-  },
-  {
     accessorKey: "createdAt",
     header: () => <div>Created At</div>,
   },
@@ -176,7 +116,7 @@ export const columns: ColumnDef<DeviceType>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const device = row.original;
+      const item = row.original;
 
       return (
         <div className="flex justify-end">
@@ -190,12 +130,12 @@ export const columns: ColumnDef<DeviceType>[] = [
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(device.id)}
+                onClick={() => navigator.clipboard.writeText(item.id)}
               >
-                Copy device ID
+                Copy item ID
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link to={`/devices/${device.id}`}>
+              <Link to={`/items/${item.id}`}>
                 <DropdownMenuItem>View details</DropdownMenuItem>
               </Link>
               <DropdownMenuItem>View events</DropdownMenuItem>
@@ -208,47 +148,18 @@ export const columns: ColumnDef<DeviceType>[] = [
   },
 ];
 
-export default function Devices() {
+export default function Items() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [devices, setDevices] = useState<DeviceType[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingReport, setLoadingReport] = useState(false);
-
   const navigate = useNavigate()
-
-  // const devices = useLoaderData()
-
-  const generateFakeDevices = (count = 10): DeviceType[] => {
-    const types = ["Laptop", "Phone", "Tablet", "Desktop"];
-    const statuses = ["Active", "Inactive", "Maintenance"];
-
-    return Array.from({ length: count }, (_, index) => ({
-      id: (index + 1).toString(), // Convert id to string
-      name: `Device ${index + 1}`,
-      type: types[Math.floor(Math.random() * types.length)],
-      status: statuses[Math.floor(Math.random() * statuses.length)],
-      // Convert coordinates to a string representation
-      coordinates: `Lat: ${Math.random() * 180 - 90}, Lng: ${
-        Math.random() * 360 - 180
-      }`,
-      publicKey: `publicKey${index + 1}`, // Example publicKey
-      createdAt: new Date().toISOString(), // Current timestamp in ISO format
-      // imageUrl is optional, add if necessary
-    }));
-  };
-
-  useEffect(() => {
-    // Generate 10 fake devices with the required properties
-    setDevices(generateFakeDevices(10))
-  }, [])
-
-
+  const items = useLoaderData()
 
   const table = useReactTable({
-    data: devices,
+    data: items,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -266,20 +177,20 @@ export default function Devices() {
     },
   });
 
-  async function newDeviceSetup() {
+  async function newItemSetup() {
     setLoading(true);
     try {
       const resp = await fetch(`${import.meta.env.VITE_API_URL}/solana/key`);
 
       if (!resp.ok) {
-        console.error("Failed to create new device");
+        console.error("Failed to create new item");
         return;
       }
 
       const data = await resp.json();
       const privateKey = data.privateKey
 
-      navigate(`/devices/create/${privateKey}`)
+      navigate(`/items/create/${privateKey}`)
     } catch (error) {
 
     } finally {
@@ -307,14 +218,14 @@ export default function Devices() {
       e.preventDefault()
       // Headers for each column
       let headers = ['Id,Name,Coordinates,PublicKey, CreatedAt, Status']
-      let devicesCsv = devices.reduce((acc, device: any) => {
-        const { id, name, coordinates, publicKey, createdAt, status } = device 
+      let itemsCsv = items.reduce((acc, item: any) => {
+        const { id, name, coordinates, publicKey, createdAt, status } = item
         acc.push([id, name, coordinates, publicKey, createdAt, status].join(','))
         return acc
       }, [])
       downloadFile({
-        data: [...headers, ...devicesCsv].join('\n'),
-        fileName: 'devices.csv',
+        data: [...headers, ...itemsCsv].join('\n'),
+        fileName: 'items.csv',
         fileType: 'text/csv',
       })
     } catch (error) {
@@ -329,10 +240,10 @@ export default function Devices() {
       <div className="flex-col md:flex">
         <div className="flex-1 space-y-4 p-8 pt-6">
           <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Devices</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Items</h2>
             <div className="flex items-center space-x-2">
-              <Button disabled={loading} onClick={newDeviceSetup}>
-                <Plus className="mr-2 h-4 w-4" /> Create Device
+              <Button disabled={loading} onClick={newItemSetup}>
+                <Plus className="mr-2 h-4 w-4" /> Create Item 
               </Button>
             </div>
           </div>
