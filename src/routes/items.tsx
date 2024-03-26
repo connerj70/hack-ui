@@ -40,88 +40,77 @@ export async function loader(): Promise<ItemType[]> {
   return [
     {
       id: "m5gr84i9",
-      name: "Sensor 1",
-      coordinates: "41.40338, 2.17403",
+      name: "Item 1",
       publicKey: "abc",
       createdAt: "2021-08-01T00:00:00Z",
       status: "active",
     },
     {
       id: "3u1reuv4",
-      name: "Sensor 2",
-      coordinates: "41.40338, 2.17403",
+      name: "Item 2",
       publicKey: "abc",
       createdAt: "2021-08-01T00:00:00Z",
       status: "active",
     },
     {
       id: "derv1ws0",
-      name: "Sensor 3",
-      coordinates: "41.40338, 2.17403",
+      name: "Item 3",
       publicKey: "abc",
       createdAt: "2021-08-01T00:00:00Z",
       status: "active",
     },
     {
       id: "5kma53ae",
-      name: "Sensor 4",
-      coordinates: "41.40338, 2.17403",
+      name: "Item 4",
       publicKey: "abc",
       createdAt: "2021-08-01T00:00:00Z",
       status: "active",
     },
     {
       id: "bhqecj4p",
-      name: "Sensor 5",
-      coordinates: "41.40338, 2.17403",
+      name: "Item 5",
       publicKey: "abc",
       createdAt: "2021-08-01T00:00:00Z",
       status: "active",
     },
     {
       id: "bhqecj4p",
-      name: "Sensor 5",
-      coordinates: "41.40338, 2.17403",
+      name: "Item 5",
       publicKey: "abc",
       createdAt: "2021-08-01T00:00:00Z",
       status: "active",
     },
     {
       id: "bhqecj4p",
-      name: "Sensor 5",
-      coordinates: "41.40338, 2.17403",
+      name: "Item 5",
       publicKey: "abc",
       createdAt: "2021-08-01T00:00:00Z",
       status: "active",
     },
     {
       id: "bhqecj4p",
-      name: "Sensor 5",
-      coordinates: "41.40338, 2.17403",
+      name: "Item 5",
       publicKey: "abc",
       createdAt: "2021-08-01T00:00:00Z",
       status: "active",
     },
     {
       id: "bhqecj4p",
-      name: "Sensor 5",
-      coordinates: "41.40338, 2.17403",
+      name: "Item 5",
       publicKey: "abc",
       createdAt: "2021-08-01T00:00:00Z",
       status: "active",
     },
     {
       id: "bhqecj4p",
-      name: "Sensor 5",
-      coordinates: "41.40338, 2.17403",
+      name: "Item 5",
       publicKey: "abc",
       createdAt: "2021-08-01T00:00:00Z",
       status: "active",
     },
     {
       id: "bhqecj4p",
-      name: "Sensor 5",
-      coordinates: "41.40338, 2.17403",
+      name: "Item 5",
       publicKey: "abc",
       createdAt: "2021-08-01T00:00:00Z",
       status: "active",
@@ -163,10 +152,6 @@ export const columns: ColumnDef<ItemType>[] = [
   {
     accessorKey: "publicKey",
     header: "Public Key",
-  },
-  {
-    accessorKey: "coordinates",
-    header: () => <div>Coordinates</div>,
   },
   {
     accessorKey: "createdAt",
@@ -222,21 +207,14 @@ export default function Items() {
   // const items = useLoaderData()
 
   const generateFakeItems = (count = 10): ItemType[] => {
-    const types = ["Laptop", "Phone", "Tablet", "Desktop"];
     const statuses = ["Active", "Inactive", "Maintenance"];
 
     return Array.from({ length: count }, (_, index) => ({
       id: (index + 1).toString(), // Convert id to string
       name: `Item ${index + 1}`,
-      type: types[Math.floor(Math.random() * types.length)],
       status: statuses[Math.floor(Math.random() * statuses.length)],
-      // Convert coordinates to a string representation
-      coordinates: `Lat: ${Math.random() * 180 - 90}, Lng: ${
-        Math.random() * 360 - 180
-      }`,
       publicKey: `publicKey${index + 1}`, // Example publicKey
       createdAt: new Date().toISOString(), // Current timestamp in ISO format
-      // imageUrl is optional, add if necessary
     }));
   };
 
