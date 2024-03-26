@@ -60,6 +60,7 @@ export default function CreateItem() {
             mintSecretKey: values.itemKey,
             name: values.name,
             symbol: values.symbol,
+            additionalMetadata: [["test", "test"]],
             uri: values.uri
           }),
         }
@@ -78,7 +79,7 @@ export default function CreateItem() {
         return;
       }
 
-      navigate("/devices");
+      navigate("/items");
     } catch (error) {
       if (error instanceof Error) {
         const errorMessage = error.message;

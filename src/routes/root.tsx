@@ -134,7 +134,6 @@ export default function Root() {
           </Card>
         </div>
       </div>
-      <LandingChart chartData={chartData} />
     </div>
   );
 }

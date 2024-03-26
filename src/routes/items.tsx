@@ -34,88 +34,43 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLoaderData } from "react-router-dom";
+import Cookies from "js-cookie";
 
 export async function loader(): Promise<ItemType[]> {
-  return [
+  const user = Cookies.get("user");
+
+  const parsedUser = JSON.parse(user!);
+
+  const resp = await fetch(
+    `${import.meta.env.VITE_API_URL}/solana/accounts`,
     {
-      id: "m5gr84i9",
-      name: "Item 1",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "3u1reuv4",
-      name: "Item 2",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "derv1ws0",
-      name: "Item 3",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "5kma53ae",
-      name: "Item 4",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "bhqecj4p",
-      name: "Item 5",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "bhqecj4p",
-      name: "Item 5",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "bhqecj4p",
-      name: "Item 5",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "bhqecj4p",
-      name: "Item 5",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "bhqecj4p",
-      name: "Item 5",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "bhqecj4p",
-      name: "Item 5",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-    {
-      id: "bhqecj4p",
-      name: "Item 5",
-      publicKey: "abc",
-      createdAt: "2021-08-01T00:00:00Z",
-      status: "active",
-    },
-  ];
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
+      }
+    }
+  );
+
+  if (!resp.ok) {
+    console.error("Failed to fetch user accounts");
+    return [];
+  }
+
+  const body = await resp.json()
+
+  console.log("body: ", body)
+
+  return body.map((item: any) => {
+    return {
+      id: item.tokenAccount,
+      name: item.metadata.name,
+      publicKey: item.metadata.mint,
+      createdAt: Date.now().toString(),
+      status: item.metadata.additionalMetadata[0][1],
+    }
+  })
 }
 
 export const columns: ColumnDef<ItemType>[] = [
@@ -198,32 +153,10 @@ export default function Items() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [items, setItems] = useState<ItemType[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingReport, setLoadingReport] = useState(false);
-
   const navigate = useNavigate()
-
-  // const items = useLoaderData()
-
-  const generateFakeItems = (count = 10): ItemType[] => {
-    const statuses = ["Active", "Inactive", "Maintenance"];
-
-    return Array.from({ length: count }, (_, index) => ({
-      id: (index + 1).toString(), // Convert id to string
-      name: `Item ${index + 1}`,
-      status: statuses[Math.floor(Math.random() * statuses.length)],
-      publicKey: `publicKey${index + 1}`, // Example publicKey
-      createdAt: new Date().toISOString(), // Current timestamp in ISO format
-    }));
-  };
-
-  useEffect(() => {
-    // Generate 10 fake items with the required properties
-    setItems(generateFakeItems(10))
-  }, [])
-
-
+  const items = useLoaderData()
 
   const table = useReactTable({
     data: items,
