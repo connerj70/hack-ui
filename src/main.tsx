@@ -10,6 +10,8 @@ import Items, { loader as itemLoader } from "./routes/items"
 import CreateItem from "./routes/createItem"
 import Profile from "./routes/profile"
 import CreateDevice from "./routes/createDevice"
+import Events, { loader as eventsLoader } from "./routes/events"
+import CreateEvent from "./routes/createEvent"
 import AuthenticatedLayout from './routes/authenticatedLayout'
 import ErrorPage from "./error-page"
 import "./globals.css"
@@ -45,7 +47,7 @@ const router = createBrowserRouter([
         loader: devicesLoader
       },
       {
-        path: "devices/create/:deviceKey",
+        path: "devices/create",
         element: <CreateDevice />,
       },
       {
@@ -59,8 +61,17 @@ const router = createBrowserRouter([
         loader: itemLoader
       },
       {
-        path: "items/create/:itemKey",
+        path: "items/create",
         element: <CreateItem />,
+      },
+      {
+        path: "events",
+        element: <Events />,
+        loader: eventsLoader
+      },
+      {
+        path: "events/create",
+        element: <CreateEvent />,
       },
       {
         path: "profile",
