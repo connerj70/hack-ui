@@ -13,55 +13,37 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 const formSchema = z.object({
-  deviceKey: z.string(),
-  name: z.string(),
-  companyName: z.string(),
-  location: z.string(),
-  timeStamp: z.string(),
+  description: z.string(),
 });
 
 export default function CreateDevice() {
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { deviceKey } = useParams();
+  const [open, setOpen] = useState(false);
+  const [scannerSecret, setScannerSecret] = useState("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      deviceKey: deviceKey,
-      name: "",
-      companyName: "",
-      location: "",
-      timeStamp: new Date().toISOString(),
+      description: ""
     },
   });
-
-  useEffect(() => {
-    // Set the current timestamp
-    form.setValue("timeStamp", new Date().toISOString());
-
-    // Attempt to get the current position
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        form.setValue("location", `Lat: ${latitude}, Long: ${longitude}`);
-      },
-      (error) => {
-        console.error(error);
-        toast({
-          title: "Location Error",
-          description: "Unable to retrieve your location",
-        });
-      }
-    );
-  }, [form, toast]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true);
@@ -69,11 +51,6 @@ export default function CreateDevice() {
       const user = Cookies.get("user");
 
       const parsedUser = JSON.parse(user!);
-
-      const metadata: [string, string][] = [
-        ["location", values.location],
-        ["timeStamp", values.timeStamp],
-      ];
 
       const resp = await fetch(
         `${import.meta.env.VITE_API_URL}/scanner/create`,
@@ -84,10 +61,7 @@ export default function CreateDevice() {
             Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
           },
           body: JSON.stringify({
-            mintSecretKey: values.deviceKey,
-            name: values.name,
-            symbol: values.companyName,
-            additionalMetadata: metadata,
+            description: values.description
           }),
         }
       );
@@ -99,18 +73,23 @@ export default function CreateDevice() {
         } else {
           toast({
             title: "Error creating device",
-            description: "An error occurred while creating your device",
+            description: "An error occurred while creating your scanner",
           });
         }
         return;
       }
 
-      navigate("/devices");
+      const respBody = await resp.json()
+
+      console.log("respBody: ", respBody)
+
+      setScannerSecret(respBody.scanner.scannerSecret)
+      setOpen(true)
     } catch (error) {
       if (error instanceof Error) {
         const errorMessage = error.message;
         toast({
-          title: "Error creating device",
+          title: "Error creating scanner",
           description: errorMessage,
         });
       }
@@ -119,9 +98,28 @@ export default function CreateDevice() {
     }
   }
 
+  function handleClose() {
+    setOpen(false)
+    navigate("/devices")
+  }
+
   return (
     <>
       <div className="lg:p-8 p-4">
+        <AlertDialog open={open}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Scanner secret</AlertDialogTitle>
+              <AlertDialogDescription className="text-wrap">
+                Save your scanner secret key
+                {scannerSecret}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction onClick={handleClose}>I've saved my secret key</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
@@ -132,64 +130,12 @@ export default function CreateDevice() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
-                name="deviceKey"
+                name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Device</FormLabel>
-                    <FormControl>
-                      <Input disabled {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="companyName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Company Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="location"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Location</FormLabel>
-                    <FormControl>
-                      <Input disabled {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="timeStamp"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Time Stamp</FormLabel>
-                    <FormControl>
-                      <Input disabled {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

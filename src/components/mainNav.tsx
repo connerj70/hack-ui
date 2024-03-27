@@ -22,7 +22,7 @@ export function MainNav({
         to="/devices"
         className={`text-sm font-medium transition-colors hover:text-primary ${location.pathname === "/devices" ? "text-primary" : "text-muted-foreground"}`}
       >
-        Devices
+        Scanners 
       </Link>
       <Link
         to="/items"

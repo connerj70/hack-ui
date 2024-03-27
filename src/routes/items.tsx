@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { ItemType } from "@/types/device";
 
@@ -43,7 +43,7 @@ export async function loader(): Promise<ItemType[]> {
   const parsedUser = JSON.parse(user!);
 
   const resp = await fetch(
-    `${import.meta.env.VITE_API_URL}/solana/accounts`,
+    `${import.meta.env.VITE_API_URL}/item/user`,
     {
       method: "GET",
       headers: {
@@ -62,13 +62,9 @@ export async function loader(): Promise<ItemType[]> {
 
   console.log("body: ", body)
 
-  return body.map((item: any) => {
+  return body.items.map((item: any) => {
     return {
-      id: item.tokenAccount,
-      name: item.metadata.name,
-      publicKey: item.metadata.mint,
-      createdAt: Date.now().toString(),
-      status: item.metadata.additionalMetadata[0][1],
+      description: item.metadata.additionalMetadata[0][1],
     }
   })
 }
@@ -97,20 +93,8 @@ export const columns: ColumnDef<ItemType>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "id",
-    header: "ID",
-  },
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    accessorKey: "publicKey",
-    header: "Public Key",
-  },
-  {
-    accessorKey: "createdAt",
-    header: () => <div>Created At</div>,
+    accessorKey: "description",
+    header: "Description",
   },
   {
     id: "actions",
@@ -153,9 +137,7 @@ export default function Items() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [loading, setLoading] = useState(false);
   const [loadingReport, setLoadingReport] = useState(false);
-  const navigate = useNavigate()
   const items = useLoaderData()
 
   const table = useReactTable({
@@ -176,27 +158,6 @@ export default function Items() {
       rowSelection,
     },
   });
-
-  async function newItemSetup() {
-    setLoading(true);
-    try {
-      const resp = await fetch(`${import.meta.env.VITE_API_URL}/solana/key`);
-
-      if (!resp.ok) {
-        console.error("Failed to create new item");
-        return;
-      }
-
-      const data = await resp.json();
-      const privateKey = data.privateKey
-
-      navigate(`/items/create/${privateKey}`)
-    } catch (error) {
-
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const downloadFile = ({ data, fileName, fileType }) => {
     const blob = new Blob([data], { type: fileType })
@@ -242,9 +203,9 @@ export default function Items() {
           <div className="flex items-center justify-between space-y-2">
             <h2 className="text-3xl font-bold tracking-tight">Items</h2>
             <div className="flex items-center space-x-2">
-              <Button disabled={loading} onClick={newItemSetup}>
+              <Link to="/items/create">
                 <Plus className="mr-2 h-4 w-4" /> Create Item 
-              </Button>
+              </Link>
             </div>
           </div>
           <div className="flex flex-col md:flex-row items-end justify-end md:space-x-2 space-y-2 md:space-y-0">
