@@ -1,6 +1,7 @@
-import { Button } from "@/components/ui/button";
-import { useState } from "react"
+import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
+import { ScannerType } from "@/types/scannerTypes";
+import { Button } from "@/components/ui/button";
 import { CalendarDateRangePicker } from "@/components/dateRangePicker";
 import {
   ColumnDef,
@@ -32,28 +33,39 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link, useNavigate, useLoaderData } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import Cookies from "js-cookie";
-import { ItemType } from "@/types/device";
 
-export function loader() {
-  return [
-    {
-      publicKey: "abc",
-      name: "Test",
-      type: "Scanner",
-      lastEvent: {lat: 1, lng: 2, status: "scan"}
+export async function loader(): Promise<DeviceType[]> {
+  const user = Cookies.get("user");
+
+  const parsedUser = JSON.parse(user!);
+
+  const resp = await fetch(`${import.meta.env.VITE_API_URL}/scanner/user`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
     },
-    {
-      publicKey: "def",
-      name: "Test 2",
-      type: "Item",
-      lastEvent: {lat: 1, lng: 2, status: "scan"}
-    }
-  ]
+  });
+
+  if (!resp.ok) {
+    console.error("Failed to fetch user accounts");
+    return [];
+  }
+
+  const body = await resp.json();
+
+  console.log("body: ", body);
+
+  return body.scanners.map((scanner: any) => {
+    return {
+      secretKey: scanner.metadata.additionalMetadata[0][1],
+    };
+  });
 }
 
-export const columns: ColumnDef<ItemType>[] = [
+export const columns: ColumnDef<ScannerType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -77,31 +89,14 @@ export const columns: ColumnDef<ItemType>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "publicKey",
-    header: "Public Key",
-  },
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    accessorKey: "type",
-    header: "Type",
-  },
-  {
-    accessorKey: "lastEvent",
-    header: "Last Event",
-    cell: ({ row }) => {
-      const item = row.original
-
-      return <div>{JSON.stringify(item.lastEvent)}</div>
-    }
+    accessorKey: "secretKey",
+    header: "Secret Key",
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const item = row.original;
+      const device = row.original;
 
       return (
         <div className="flex justify-end">
@@ -115,12 +110,12 @@ export const columns: ColumnDef<ItemType>[] = [
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(item.id)}
+                onClick={() => navigator.clipboard.writeText(device.id)}
               >
-                Copy item ID
+                Copy device ID
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link to={`/items/${item.id}`}>
+              <Link to={`/devices/${device.id}`}>
                 <DropdownMenuItem>View details</DropdownMenuItem>
               </Link>
               <DropdownMenuItem>View events</DropdownMenuItem>
@@ -133,16 +128,17 @@ export const columns: ColumnDef<ItemType>[] = [
   },
 ];
 
-export default function Events() {
+export default function Scanners() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [loadingReport, setLoadingReport] = useState(false);
-  const items = useLoaderData()
+  const [loadingReport] = useState(false);
+
+  const devices = useLoaderData();
 
   const table = useReactTable({
-    data: items,
+    data: devices,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -160,58 +156,81 @@ export default function Events() {
     },
   });
 
-  const downloadFile = ({ data, fileName, fileType }) => {
-    const blob = new Blob([data], { type: fileType })
-    const a = document.createElement('a')
-    a.download = fileName
-    a.href = window.URL.createObjectURL(blob)
-    const clickEvt = new MouseEvent('click', {
-      view: window,
-      bubbles: true,
-      cancelable: true,
-    })
-    a.dispatchEvent(clickEvt)
-    a.remove()
-  }
+  // async function newDeviceSetup() {
+  //   setLoading(true);
+  //   try {
+  //     const resp = await fetch(`${import.meta.env.VITE_API_URL}/solana/key`);
 
-  async function downloadReport(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    setLoadingReport(true);
-    try {
-      e.preventDefault()
-      // Headers for each column
-      let headers = ['Id,Name,Coordinates,PublicKey, CreatedAt, Status']
-      let itemsCsv = items.reduce((acc, item: any) => {
-        const { id, name, coordinates, publicKey, createdAt, status } = item
-        acc.push([id, name, coordinates, publicKey, createdAt, status].join(','))
-        return acc
-      }, [])
-      downloadFile({
-        data: [...headers, ...itemsCsv].join('\n'),
-        fileName: 'items.csv',
-        fileType: 'text/csv',
-      })
-    } catch (error) {
+  //     if (!resp.ok) {
+  //       console.error("Failed to create new device");
+  //       return;
+  //     }
 
-    } finally {
-      setLoadingReport(false)
-    }
-  }
+  //     const data = await resp.json();
+  //     const privateKey = data.privateKey;
+
+  //     navigate(`/devices/create/${privateKey}`);
+  //   } catch (error) {
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
+
+  // const downloadFile = ({ data, fileName, fileType }) => {
+  //   const blob = new Blob([data], { type: fileType })
+  //   const a = document.createElement('a')
+  //   a.download = fileName
+  //   a.href = window.URL.createObjectURL(blob)
+  //   const clickEvt = new MouseEvent('click', {
+  //     view: window,
+  //     bubbles: true,
+  //     cancelable: true,
+  //   })
+  //   a.dispatchEvent(clickEvt)
+  //   a.remove()
+  // }
+
+  // async function downloadReport(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  //   setLoadingReport(true);
+  //   try {
+  //     e.preventDefault()
+  //     // Headers for each column
+  //     let headers = ['Id,Name,Coordinates,PublicKey, CreatedAt, Status']
+  //     let devicesCsv = devices.reduce((acc, device: any) => {
+  //       const { id, name, coordinates, publicKey, createdAt, status } = device
+  //       acc.push([id, name, coordinates, publicKey, createdAt, status].join(','))
+  //       return acc
+  //     }, [])
+  //     downloadFile({
+  //       data: [...headers, ...devicesCsv].join('\n'),
+  //       fileName: 'devices.csv',
+  //       fileType: 'text/csv',
+  //     })
+  //   } catch (error) {
+
+  //   } finally {
+  //     setLoadingReport(false)
+  //   }
+  // }
 
   return (
     <>
       <div className="flex-col md:flex">
         <div className="flex-1 space-y-4 p-8 pt-6">
           <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Devices</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Scanners</h2>
             <div className="flex items-center space-x-2">
-              <Link to="/events/create">
-                <Plus className="mr-2 h-4 w-4" /> Create Scan
+              <Link to="/devices/create">
+                <Plus className="mr-2 h-4 w-4" /> Create Device
               </Link>
             </div>
           </div>
           <div className="flex flex-col md:flex-row items-end justify-end md:space-x-2 space-y-2 md:space-y-0">
             <CalendarDateRangePicker />
-            <Button disabled={loadingReport} onClick={downloadReport} variant="secondary">Download</Button>
+            {/* <Button disabled={loadingReport} onClick={downloadReport} variant="secondary">Download</Button> */}
+            <Button disabled={loadingReport} variant="secondary">
+              Download
+            </Button>
           </div>
           <div className="rounded-md border">
             <Table>

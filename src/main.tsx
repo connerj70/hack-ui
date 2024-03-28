@@ -3,15 +3,15 @@ import ReactDOM from 'react-dom/client'
 import Root from "./routes/root"
 import Signup from "./routes/signup"
 import Login from "./routes/login"
-import Dashboard from "./routes/dashboard"
-import Devices, { loader as devicesLoader } from "./routes/devices"
-import Device, { loader as deviceLoader } from "./routes/device"
-import Items, { loader as itemLoader } from "./routes/items"
-import CreateItem from "./routes/createItem"
+import Dashboard from "./routes/dashboard/dashboard"
+import Scanners, { loader as devicesLoader } from "./routes/scanner/scanners"
+import Device, { loader as deviceLoader } from "./routes/dashboard/device"
+import Items, { loader as itemLoader } from "./routes/items/items"
+import CreateItem from "./routes/items/createItem"
 import Profile from "./routes/profile"
-import CreateDevice from "./routes/createDevice"
-import Events, { loader as eventsLoader } from "./routes/events"
-import CreateEvent from "./routes/createEvent"
+import CreateDevice from "./routes/scanner/createScanner"
+import Events, { loader as eventsLoader } from "./routes/events/events"
+import CreateEvent from "./routes/events/createEvent"
 import AuthenticatedLayout from './routes/authenticatedLayout'
 import ErrorPage from "./error-page"
 import "./globals.css"
@@ -21,6 +21,7 @@ import {
 } from "react-router-dom";
 import { UserProvider } from "./contexts/userContext";
 import AuthWrapper from "@/components/authWrapper"
+
 
 
 const router = createBrowserRouter([
@@ -42,8 +43,8 @@ const router = createBrowserRouter([
         element: <Dashboard />,
       },
       {
-        path: "devices",
-        element: <Devices />,
+        path: "scanners",
+        element: <Scanners />,
         loader: devicesLoader
       },
       {

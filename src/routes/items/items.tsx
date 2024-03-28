@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
-import { ItemType } from "@/types/device";
+import { ItemType } from "@/types/scannerTypes";
 
 import { Button } from "@/components/ui/button";
 import { CalendarDateRangePicker } from "@/components/dateRangePicker";

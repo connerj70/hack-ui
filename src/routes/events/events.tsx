@@ -1,8 +1,6 @@
-import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { useState } from "react"
 import { Toaster } from "@/components/ui/toaster";
-import { DeviceType } from "@/types/device";
-
-import { Button, buttonVariants } from "@/components/ui/button";
 import { CalendarDateRangePicker } from "@/components/dateRangePicker";
 import {
   ColumnDef,
@@ -35,42 +33,27 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Link, useNavigate, useLoaderData } from "react-router-dom";
-import Cookies from 'js-cookie'
+import Cookies from "js-cookie";
+import { ItemType } from "@/types/scannerTypes";
 
-export async function loader(): Promise<DeviceType[]> {
-
-  const user = Cookies.get("user");
-
-  const parsedUser = JSON.parse(user!);
-
-  const resp = await fetch(
-    `${import.meta.env.VITE_API_URL}/scanner/user`,
+export function loader() {
+  return [
     {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
-      }
+      publicKey: "abc",
+      name: "Test",
+      type: "Scanner",
+      lastEvent: {lat: 1, lng: 2, status: "scan"}
+    },
+    {
+      publicKey: "def",
+      name: "Test 2",
+      type: "Item",
+      lastEvent: {lat: 1, lng: 2, status: "scan"}
     }
-  );
-
-  if (!resp.ok) {
-    console.error("Failed to fetch user accounts");
-    return [];
-  }
-
-  const body = await resp.json()
-
-  console.log("body: ", body)
-
-  return body.scanners.map((scanner: any) => {
-    return {
-      secretKey: scanner.metadata.additionalMetadata[0][1],
-    }
-  })
+  ]
 }
 
-export const columns: ColumnDef<DeviceType>[] = [
+export const columns: ColumnDef<ItemType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -94,14 +77,31 @@ export const columns: ColumnDef<DeviceType>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "secretKey",
-    header: "Secret Key",
+    accessorKey: "publicKey",
+    header: "Public Key",
+  },
+  {
+    accessorKey: "name",
+    header: "Name",
+  },
+  {
+    accessorKey: "type",
+    header: "Type",
+  },
+  {
+    accessorKey: "lastEvent",
+    header: "Last Event",
+    cell: ({ row }) => {
+      const item = row.original
+
+      return <div>{JSON.stringify(item.lastEvent)}</div>
+    }
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const device = row.original;
+      const item = row.original;
 
       return (
         <div className="flex justify-end">
@@ -115,12 +115,12 @@ export const columns: ColumnDef<DeviceType>[] = [
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(device.id)}
+                onClick={() => navigator.clipboard.writeText(item.id)}
               >
-                Copy device ID
+                Copy item ID
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link to={`/devices/${device.id}`}>
+              <Link to={`/items/${item.id}`}>
                 <DropdownMenuItem>View details</DropdownMenuItem>
               </Link>
               <DropdownMenuItem>View events</DropdownMenuItem>
@@ -133,20 +133,16 @@ export const columns: ColumnDef<DeviceType>[] = [
   },
 ];
 
-export default function Devices() {
+export default function Events() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [loading, setLoading] = useState(false);
   const [loadingReport, setLoadingReport] = useState(false);
-
-  const navigate = useNavigate()
-
-  const devices = useLoaderData()
+  const items = useLoaderData()
 
   const table = useReactTable({
-    data: devices,
+    data: items,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -163,27 +159,6 @@ export default function Devices() {
       rowSelection,
     },
   });
-
-  async function newDeviceSetup() {
-    setLoading(true);
-    try {
-      const resp = await fetch(`${import.meta.env.VITE_API_URL}/solana/key`);
-
-      if (!resp.ok) {
-        console.error("Failed to create new device");
-        return;
-      }
-
-      const data = await resp.json();
-      const privateKey = data.privateKey
-
-      navigate(`/devices/create/${privateKey}`)
-    } catch (error) {
-
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const downloadFile = ({ data, fileName, fileType }) => {
     const blob = new Blob([data], { type: fileType })
@@ -205,14 +180,14 @@ export default function Devices() {
       e.preventDefault()
       // Headers for each column
       let headers = ['Id,Name,Coordinates,PublicKey, CreatedAt, Status']
-      let devicesCsv = devices.reduce((acc, device: any) => {
-        const { id, name, coordinates, publicKey, createdAt, status } = device 
+      let itemsCsv = items.reduce((acc, item: any) => {
+        const { id, name, coordinates, publicKey, createdAt, status } = item
         acc.push([id, name, coordinates, publicKey, createdAt, status].join(','))
         return acc
       }, [])
       downloadFile({
-        data: [...headers, ...devicesCsv].join('\n'),
-        fileName: 'devices.csv',
+        data: [...headers, ...itemsCsv].join('\n'),
+        fileName: 'items.csv',
         fileType: 'text/csv',
       })
     } catch (error) {
@@ -227,10 +202,10 @@ export default function Devices() {
       <div className="flex-col md:flex">
         <div className="flex-1 space-y-4 p-8 pt-6">
           <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Devices</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Event</h2>
             <div className="flex items-center space-x-2">
-              <Link to="/devices/create">
-                <Plus className="mr-2 h-4 w-4" /> Create Device
+              <Link to="/events/create">
+                <Plus className="mr-2 h-4 w-4" /> Create Scan
               </Link>
             </div>
           </div>

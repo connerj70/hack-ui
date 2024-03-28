@@ -15,7 +15,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import { CalendarDateRangePicker } from "@/components/dateRangePicker"
-import { SensorEvent } from "@/types/sensorEvent"
+import { SensorEvent } from "@/types/eventTypes"
 
 const data: SensorEvent[] = [
   {

@@ -25,13 +25,13 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 
 const formSchema = z.object({
   description: z.string(),
 });
 
-export default function CreateDevice() {
+export default function CreateScanner() {
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ export default function CreateDevice() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      description: ""
+      description: "",
     },
   });
 
@@ -61,7 +61,7 @@ export default function CreateDevice() {
             Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
           },
           body: JSON.stringify({
-            description: values.description
+            description: values.description,
           }),
         }
       );
@@ -79,12 +79,12 @@ export default function CreateDevice() {
         return;
       }
 
-      const respBody = await resp.json()
+      const respBody = await resp.json();
 
-      console.log("respBody: ", respBody)
+      console.log("respBody: ", respBody);
 
-      setScannerSecret(respBody.scanner.scannerSecret)
-      setOpen(true)
+      setScannerSecret(respBody.scanner.scannerSecret);
+      setOpen(true);
     } catch (error) {
       if (error instanceof Error) {
         const errorMessage = error.message;
@@ -99,31 +99,53 @@ export default function CreateDevice() {
   }
 
   function handleClose() {
-    setOpen(false)
-    navigate("/devices")
+    setOpen(false);
+    navigate("/devices");
   }
 
   return (
     <>
       <div className="lg:p-8 p-4">
         <AlertDialog open={open}>
-          <AlertDialogContent>
+          <AlertDialogContent style={{ textAlign: "center" }}>
+            {" "}
+            {/* Center text and possibly content */}
             <AlertDialogHeader>
-              <AlertDialogTitle>Scanner secret</AlertDialogTitle>
-              <AlertDialogDescription className="text-wrap">
+              <AlertDialogTitle style={{ textAlign: "center" }}>Scanner secret</AlertDialogTitle>
+              <AlertDialogDescription
+                className="text-wrap"
+                style={{ textAlign: "center" }}
+              >
                 Save your scanner secret key
-                {scannerSecret}
+                <div
+                  style={{
+                    display:
+                      "inline-block" /* Change to inline-block for better center alignment */,
+                    fontWeight: "bold",
+                    marginTop: "8px",
+                    whiteSpace: "pre-wrap",
+                  }}
+                >
+                  {scannerSecret.match(/.{1,40}/g).join("\n")}
+                </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogAction onClick={handleClose}>I've saved my secret key</AlertDialogAction>
+            <AlertDialogFooter style={{ justifyContent: "center" }}>
+              
+              <AlertDialogAction
+                onClick={handleClose}
+                style={{ textAlign: "center" }}
+              >
+                I've saved my secret key
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
-              Create New Device
+              Create New Scanner
             </h1>
           </div>
           <Form {...form}>

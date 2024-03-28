@@ -1,11 +1,11 @@
-import { cn } from "@/lib/utils"
-import { Link, useLocation } from "react-router-dom"
+import { cn } from "@/lib/utils";
+import { Link, useLocation } from "react-router-dom";
 
 export function MainNav({
   className,
   ...props
 }: React.HTMLAttributes<HTMLElement>) {
-  const location = useLocation()
+  const location = useLocation();
 
   return (
     <nav
@@ -14,22 +14,44 @@ export function MainNav({
     >
       <Link
         to="/dashboard"
-        className={`text-sm font-medium transition-colors hover:text-primary ${location.pathname === "/dashboard" ? "text-primary" : "text-muted-foreground"}`}
+        className={`text-sm font-medium transition-colors hover:text-primary ${
+          location.pathname === "/dashboard"
+            ? "text-primary"
+            : "text-muted-foreground"
+        }`}
       >
-        Dashboard 
+        Dashboard
       </Link>
       <Link
-        to="/devices"
-        className={`text-sm font-medium transition-colors hover:text-primary ${location.pathname === "/devices" ? "text-primary" : "text-muted-foreground"}`}
+        to="/scanners"
+        className={`text-sm font-medium transition-colors hover:text-primary ${
+          location.pathname === "/scanners"
+            ? "text-primary"
+            : "text-muted-foreground"
+        }`}
       >
-        Scanners 
+        Scanners
       </Link>
       <Link
         to="/items"
-        className={`text-sm font-medium transition-colors hover:text-primary ${location.pathname === "/items" ? "text-primary" : "text-muted-foreground"}`}
+        className={`text-sm font-medium transition-colors hover:text-primary ${
+          location.pathname === "/items"
+            ? "text-primary"
+            : "text-muted-foreground"
+        }`}
       >
-        Items 
+        Items
+      </Link>
+      <Link
+        to="/events"
+        className={`text-sm font-medium transition-colors hover:text-primary ${
+          location.pathname === "/items"
+            ? "text-primary"
+            : "text-muted-foreground"
+        }`}
+      >
+        Events
       </Link>
     </nav>
-  )
+  );
 }
