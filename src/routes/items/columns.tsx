@@ -40,8 +40,8 @@ export const columns: ColumnDef<ItemType>[] = [
       header: "Description",
     },
     {
-      accessorKey: "address",
-      header: "Address",
+      accessorKey: "secretKey",
+      header: "Secret Key",
     },
     {
       id: "actions",
