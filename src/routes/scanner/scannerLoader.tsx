@@ -1,16 +1,12 @@
 import { GetScannerResponseType, ScannerType } from "@/types/scannerTypes";
-import Cookies from "js-cookie";
+import { User } from "firebase/auth";
 
-export async function scannerLoader(): Promise<ScannerType[]> {
-  const user = Cookies.get("user");
-
-  const parsedUser = JSON.parse(user!);
-
+export async function scannerLoader(currentUser: User): Promise<ScannerType[]> {
   const resp = await fetch(`${import.meta.env.VITE_API_URL}/scanner/user`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
+      Authorization: `Bearer ${currentUser.getIdToken()}`,
     },
   });
 

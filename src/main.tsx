@@ -3,9 +3,7 @@ import ReactDOM from "react-dom/client";
 import Root from "./routes/root";
 import Signup from "./routes/signup";
 import Login from "./routes/login";
-
 import Scanners from "./routes/scanner/scanners";
-// import Device, { loader as deviceLoader } from "./routes/dashboard/device";
 import Items from "./routes/items/items";
 import CreateItem from "./routes/items/createItem";
 import Profile from "./routes/profile";
@@ -15,10 +13,7 @@ import AuthenticatedLayout from "./routes/authenticatedLayout";
 import ErrorPage from "./error-page";
 import "./globals.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-
 import CreateScanner from "./routes/scanner/createScanner";
-import { itemLoader } from "./routes/items/itemLoader";
-import { scannerLoader } from "./routes/scanner/scannerLoader";
 import { eventLoader } from "./routes/events/eventLoader";
 import Dashboard from "./routes/dashboard/dashboard";
 import { AuthProvider } from "./contexts/AuthProvider";
@@ -46,7 +41,6 @@ const router = createBrowserRouter([
       {
         path: "scanners",
         element: <Scanners />,
-        loader: scannerLoader,
       },
       {
         path: "scanners/create",
@@ -54,8 +48,7 @@ const router = createBrowserRouter([
       },
       {
         path: "items",
-        element: <Items />,
-        loader: itemLoader,
+        element: <Items />
       },
       {
         path: "items/create",
