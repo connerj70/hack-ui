@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
-import { ScannerType } from "@/types/scannerTypes";
+import { GetScannerResponseType, ScannerType } from "@/types/scannerTypes";
 import { Button } from "@/components/ui/button";
 import { CalendarDateRangePicker } from "@/components/dateRangePicker";
 import {
@@ -36,7 +36,7 @@ import {
 import { Link, useLoaderData } from "react-router-dom";
 import Cookies from "js-cookie";
 
-export async function loader(): Promise<DeviceType[]> {
+export async function loader(): Promise<ScannerType[]> {
   const user = Cookies.get("user");
 
   const parsedUser = JSON.parse(user!);
@@ -58,9 +58,11 @@ export async function loader(): Promise<DeviceType[]> {
 
   console.log("body: ", body);
 
-  return body.scanners.map((scanner: any) => {
+  return body.scanners.map((scanner: GetScannerResponseType) => {
     return {
       secretKey: scanner.metadata.additionalMetadata[0][1],
+      mint: scanner.mint,
+
     };
   });
 }
@@ -91,6 +93,10 @@ export const columns: ColumnDef<ScannerType>[] = [
   {
     accessorKey: "secretKey",
     header: "Secret Key",
+  },
+  {
+    accessorKey: "mint",
+    header: "Mint",
   },
   {
     id: "actions",
@@ -135,10 +141,10 @@ export default function Scanners() {
   const [rowSelection, setRowSelection] = useState({});
   const [loadingReport] = useState(false);
 
-  const devices = useLoaderData();
+  const scanners: ScannerType[] = useLoaderData();
 
   const table = useReactTable({
-    data: devices,
+    data: scanners,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

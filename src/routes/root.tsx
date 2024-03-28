@@ -10,31 +10,31 @@ import {
 } from "@/components/ui/card"
 import Chart from "chart.js/auto"
 import { CategoryScale } from "chart.js";
-import { Data } from "@/utils/Data.js";
-import { useState } from "react"
-import LandingChart from "../components/landingChart.jsx";
+// import { Data } from "@/utils/Data.js";
+// import { useState } from "react"
+// import LandingChart from "../components/landingChart.jsx";
 
 Chart.register(CategoryScale);
 
 export default function Root() {
-  const [chartData, setChartData] = useState({
-    labels: Data.map((data: any) => data.year), 
-    datasets: [
-      {
-        label: "Users Gained ",
-        data: Data.map((data: any) => data.userGain),
-        backgroundColor: [
-          "rgba(75,192,192,1)",
-          "&quot;#ecf0f1",
-          "#50AF95",
-          "#f3ba2f",
-          "#2a71d0"
-        ],
-        borderColor: "black",
-        borderWidth: 2
-      }
-    ]
-  });
+  // const [chartData, setChartData] = useState({
+  //   labels: Data.map((data: any) => data.year), 
+  //   datasets: [
+  //     {
+  //       label: "Users Gained ",
+  //       data: Data.map((data: any) => data.userGain),
+  //       backgroundColor: [
+  //         "rgba(75,192,192,1)",
+  //         "&quot;#ecf0f1",
+  //         "#50AF95",
+  //         "#f3ba2f",
+  //         "#2a71d0"
+  //       ],
+  //       borderColor: "black",
+  //       borderWidth: 2
+  //     }
+  //   ]
+  // });
 
   return (
     <div className="p-6">
