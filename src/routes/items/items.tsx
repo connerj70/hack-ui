@@ -14,7 +14,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {  Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 // import { Checkbox } from "@/components/ui/checkbox";
 // import {
 //   DropdownMenu,
@@ -37,38 +37,7 @@ import { Link, useNavigate } from "react-router-dom";
 // import { ItemType } from "@/types/itemTypes";
 import { columns } from "./columns";
 import { ItemType } from "@/types/itemTypes";
-import { itemLoader } from "./loader";
-
-// export async function loader(): Promise<ItemType[]> {
-//   const user = Cookies.get("user");
-
-//   const parsedUser = JSON.parse(user!);
-
-//   const resp = await fetch(`${import.meta.env.VITE_API_URL}/item/user`, {
-//     method: "GET",
-//     headers: {
-//       "Content-Type": "application/json",
-//       Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
-//     },
-//   });
-
-//   if (!resp.ok) {
-//     console.error("Failed to fetch user accounts");
-//     return [];
-//   }
-
-//   const body = await resp.json();
-
-//   console.log("body: ", body);
-
-//   return body.items.map((item: any) => {
-//     return {
-//       description: item.metadata.additionalMetadata[0][1],
-//     };
-//   });
-// }
-
-
+import { itemLoader } from "./itemLoader";
 
 export default function Items() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -78,6 +47,7 @@ export default function Items() {
   // const [loadingReport, setLoadingReport] = useState(false);
   // const items = useLoaderData() as ItemType[];
   // const items =  itemLoader();
+  const [loadingReport] = useState(false);
   const [items, setItems] = useState<ItemType[]>([]);
 
   const navigate = useNavigate();
@@ -87,12 +57,11 @@ export default function Items() {
       try {
         const loadedItems = await itemLoader();
 
-        console.log("loadedItems: ", loadedItems);
         setItems(loadedItems);
       } catch (error) {
         if (error instanceof Error && error.message === "403 Forbidden") {
           // Redirect to login page
-          navigate('/login');
+          navigate("/login");
         } else {
           console.error("An unexpected error occurred:", error);
         }
@@ -173,8 +142,9 @@ export default function Items() {
           <div className="flex flex-col md:flex-row items-end justify-end md:space-x-2 space-y-2 md:space-y-0">
             <CalendarDateRangePicker />
             {/* <Button disabled={loadingReport} onClick={downloadReport} variant="secondary">Download</Button> */}
-            {/* <Button disabled={loadingReport} variant="secondary">Download</Button> */}
-            <Button variant="secondary">Download</Button>
+            <Button disabled={loadingReport} variant="secondary">
+              Download
+            </Button>
           </div>
           <div className="rounded-md border">
             <Table>

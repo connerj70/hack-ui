@@ -35,7 +35,7 @@ const formSchema = z.object({
 });
 
 export default function CreateEvent() {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
   const [open, setOpen] = useState(false);

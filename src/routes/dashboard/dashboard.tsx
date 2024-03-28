@@ -1,23 +1,12 @@
-import { Toaster } from "@/components/ui/toaster"
-import EventsTable from "@/components/eventsTable"
+import { Toaster } from "@/components/ui/toaster";
+import EventsTable from "@/routes/dashboard/DashboardTable";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CalendarDateRangePicker } from "@/components/dateRangePicker";
+import { SensorEventDashboard } from "@/types/eventTypes";
 
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
-import { CalendarDateRangePicker } from "@/components/dateRangePicker"
-import { SensorEvent } from "@/types/eventTypes"
-
-const data: SensorEvent[] = [
+const data: SensorEventDashboard[] = [
   {
     id: "m5gr84i9",
     coordinates: "41.40338, 2.17403",
@@ -43,10 +32,9 @@ const data: SensorEvent[] = [
     coordinates: "41.40338, 2.17403",
     status: "checkpoint",
   },
-]
+];
 
 export default function Dashboard() {
-
   return (
     <>
       <div className="flex-col md:flex">
@@ -97,9 +85,7 @@ export default function Dashboard() {
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Users 
-                    </CardTitle>
+                    <CardTitle className="text-sm font-medium">Users</CardTitle>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -124,7 +110,9 @@ export default function Dashboard() {
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Active Tags</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Active Tags
+                    </CardTitle>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -179,5 +167,5 @@ export default function Dashboard() {
         <Toaster />
       </div>
     </>
-  )
+  );
 }

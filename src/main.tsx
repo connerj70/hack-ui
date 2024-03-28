@@ -3,13 +3,13 @@ import ReactDOM from "react-dom/client";
 import Root from "./routes/root";
 import Signup from "./routes/signup";
 import Login from "./routes/login";
-import Dashboard from "./routes/dashboard/dashboard";
-import Scanners, { loader as devicesLoader } from "./routes/scanner/scanners";
-import Device, { loader as deviceLoader } from "./routes/dashboard/device";
+import Dashboard from "./routes/dashboard/Dashboard";
+import Scanners from "./routes/scanner/scanners";
+// import Device, { loader as deviceLoader } from "./routes/dashboard/device";
 import Items from "./routes/items/items";
 import CreateItem from "./routes/items/createItem";
 import Profile from "./routes/profile";
-import Events, { loader as eventsLoader } from "./routes/events/events";
+import Events from "./routes/events/events";
 import CreateEvent from "./routes/events/createEvent";
 import AuthenticatedLayout from "./routes/authenticatedLayout";
 import ErrorPage from "./error-page";
@@ -18,7 +18,10 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { UserProvider } from "./contexts/userContext";
 import AuthWrapper from "@/components/authWrapper";
 import CreateScanner from "./routes/scanner/createScanner";
-import { itemLoader } from "./routes/items/loader";
+import { itemLoader } from "./routes/items/itemLoader";
+import { scannerLoader } from "./routes/scanner/scannerLoader";
+import { eventLoader } from "./routes/events/eventLoader";
+
 
 const router = createBrowserRouter([
   {
@@ -42,17 +45,17 @@ const router = createBrowserRouter([
       {
         path: "scanners",
         element: <Scanners />,
-        loader: devicesLoader,
+        loader: scannerLoader,
       },
       {
         path: "scanners/create",
         element: <CreateScanner />,
       },
-      {
-        path: "scanners/:id",
-        element: <Device />,
-        loader: deviceLoader,
-      },
+      // {
+      //   path: "scanners/:id",
+      //   element: <Device />,
+      //   loader: deviceLoader,
+      // },
       {
         path: "items",
         element: <Items />,
@@ -65,7 +68,7 @@ const router = createBrowserRouter([
       {
         path: "events",
         element: <Events />,
-        loader: eventsLoader,
+        loader: eventLoader,
       },
       {
         path: "events/create",

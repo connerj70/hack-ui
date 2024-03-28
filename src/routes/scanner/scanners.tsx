@@ -1,10 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
-import { GetScannerResponseType, ScannerType } from "@/types/scannerTypes";
 import { Button } from "@/components/ui/button";
 import { CalendarDateRangePicker } from "@/components/dateRangePicker";
 import {
-  ColumnDef,
   ColumnFiltersState,
   SortingState,
   VisibilityState,
@@ -15,16 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { MoreHorizontal, Plus } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Plus } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -33,106 +22,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link, useLoaderData } from "react-router-dom";
-import Cookies from "js-cookie";
-
-export async function loader(): Promise<ScannerType[]> {
-  const user = Cookies.get("user");
-
-  const parsedUser = JSON.parse(user!);
-
-  const resp = await fetch(`${import.meta.env.VITE_API_URL}/scanner/user`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
-    },
-  });
-
-  if (!resp.ok) {
-    console.error("Failed to fetch user accounts");
-    return [];
-  }
-
-  const body = await resp.json();
-
-  console.log("body: ", body);
-
-  return body.scanners.map((scanner: GetScannerResponseType) => {
-    return {
-      secretKey: scanner.metadata.additionalMetadata[0][1],
-      mint: scanner.mint,
-
-    };
-  });
-}
-
-export const columns: ColumnDef<ScannerType>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "secretKey",
-    header: "Secret Key",
-  },
-  {
-    accessorKey: "mint",
-    header: "Mint",
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const device = row.original;
-
-      return (
-        <div className="flex justify-end">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(device.id)}
-              >
-                Copy device ID
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <Link to={`/devices/${device.id}`}>
-                <DropdownMenuItem>View details</DropdownMenuItem>
-              </Link>
-              <DropdownMenuItem>View events</DropdownMenuItem>
-              <DropdownMenuItem>Deactivate</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      );
-    },
-  },
-];
+import { Link, useNavigate } from "react-router-dom";
+import { columns } from "./ScannerColumns";
+import { scannerLoader } from "./scannerLoader";
+import { ScannerType } from "@/types/scannerTypes";
 
 export default function Scanners() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -140,8 +33,27 @@ export default function Scanners() {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [loadingReport] = useState(false);
+  const [scanners, setScanners] = useState<ScannerType[]>([]);
+  const navigate = useNavigate();
 
-  const scanners: ScannerType[] = useLoaderData();
+  useEffect(() => {
+    const fetchScanners = async () => {
+      try {
+        const scannerItems = await scannerLoader();
+
+        setScanners(scannerItems);
+      } catch (error) {
+        if (error instanceof Error && error.message === "403 Forbidden") {
+          // Redirect to login page
+          navigate("/login");
+        } else {
+          console.error("An unexpected error occurred:", error);
+        }
+      }
+    };
+
+    fetchScanners();
+  }, [navigate]);
 
   const table = useReactTable({
     data: scanners,

@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { useState } from "react"
+import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { CalendarDateRangePicker } from "@/components/dateRangePicker";
 import {
-  ColumnDef,
   ColumnFiltersState,
   SortingState,
   VisibilityState,
@@ -14,16 +13,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { MoreHorizontal, Plus } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Plus } from "lucide-react";
+
 import {
   Table,
   TableBody,
@@ -32,117 +23,45 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link, useNavigate, useLoaderData } from "react-router-dom";
-import Cookies from "js-cookie";
-import { ItemType } from "@/types/scannerTypes";
+import { Link, useNavigate} from "react-router-dom";
+import { columns } from "./EventColumn";
+import { eventLoader } from "./eventLoader";
+import { SensorEvent } from "@/types/eventTypes";
 
-export function loader() {
-  return [
-    {
-      publicKey: "abc",
-      name: "Test",
-      type: "Scanner",
-      lastEvent: {lat: 1, lng: 2, status: "scan"}
-    },
-    {
-      publicKey: "def",
-      name: "Test 2",
-      type: "Item",
-      lastEvent: {lat: 1, lng: 2, status: "scan"}
-    }
-  ]
-}
 
-export const columns: ColumnDef<ItemType>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "publicKey",
-    header: "Public Key",
-  },
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    accessorKey: "type",
-    header: "Type",
-  },
-  {
-    accessorKey: "lastEvent",
-    header: "Last Event",
-    cell: ({ row }) => {
-      const item = row.original
-
-      return <div>{JSON.stringify(item.lastEvent)}</div>
-    }
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const item = row.original;
-
-      return (
-        <div className="flex justify-end">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(item.id)}
-              >
-                Copy item ID
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <Link to={`/items/${item.id}`}>
-                <DropdownMenuItem>View details</DropdownMenuItem>
-              </Link>
-              <DropdownMenuItem>View events</DropdownMenuItem>
-              <DropdownMenuItem>Deactivate</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      );
-    },
-  },
-];
 
 export default function Events() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [loadingReport, setLoadingReport] = useState(false);
-  const items = useLoaderData()
+  const [loadingReport] = useState(false);
+
+  const [events, setEvents] = useState<SensorEvent[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchScanners = async () => {
+      try {
+        const loadedEvents = eventLoader();
+
+        
+        setEvents(loadedEvents);
+      } catch (error) {
+        if (error instanceof Error && error.message === "403 Forbidden") {
+          // Redirect to login page
+          navigate("/login");
+        } else {
+          console.error("An unexpected error occurred:", error);
+        }
+      }
+    };
+
+    fetchScanners();
+  }, [navigate]);
 
   const table = useReactTable({
-    data: items,
+    data: events,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -160,42 +79,42 @@ export default function Events() {
     },
   });
 
-  const downloadFile = ({ data, fileName, fileType }) => {
-    const blob = new Blob([data], { type: fileType })
-    const a = document.createElement('a')
-    a.download = fileName
-    a.href = window.URL.createObjectURL(blob)
-    const clickEvt = new MouseEvent('click', {
-      view: window,
-      bubbles: true,
-      cancelable: true,
-    })
-    a.dispatchEvent(clickEvt)
-    a.remove()
-  }
+  // const downloadFile = ({ data, fileName, fileType }) => {
+  //   const blob = new Blob([data], { type: fileType })
+  //   const a = document.createElement('a')
+  //   a.download = fileName
+  //   a.href = window.URL.createObjectURL(blob)
+  //   const clickEvt = new MouseEvent('click', {
+  //     view: window,
+  //     bubbles: true,
+  //     cancelable: true,
+  //   })
+  //   a.dispatchEvent(clickEvt)
+  //   a.remove()
+  // }
 
-  async function downloadReport(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    setLoadingReport(true);
-    try {
-      e.preventDefault()
-      // Headers for each column
-      let headers = ['Id,Name,Coordinates,PublicKey, CreatedAt, Status']
-      let itemsCsv = items.reduce((acc, item: any) => {
-        const { id, name, coordinates, publicKey, createdAt, status } = item
-        acc.push([id, name, coordinates, publicKey, createdAt, status].join(','))
-        return acc
-      }, [])
-      downloadFile({
-        data: [...headers, ...itemsCsv].join('\n'),
-        fileName: 'items.csv',
-        fileType: 'text/csv',
-      })
-    } catch (error) {
+  // async function downloadReport(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  //   setLoadingReport(true);
+  //   try {
+  //     e.preventDefault()
+  //     // Headers for each column
+  //     let headers = ['Id,Name,Coordinates,PublicKey, CreatedAt, Status']
+  //     let itemsCsv = items.reduce((acc, item: any) => {
+  //       const { id, name, coordinates, publicKey, createdAt, status } = item
+  //       acc.push([id, name, coordinates, publicKey, createdAt, status].join(','))
+  //       return acc
+  //     }, [])
+  //     downloadFile({
+  //       data: [...headers, ...itemsCsv].join('\n'),
+  //       fileName: 'items.csv',
+  //       fileType: 'text/csv',
+  //     })
+  //   } catch (error) {
 
-    } finally {
-      setLoadingReport(false)
-    }
-  }
+  //   } finally {
+  //     setLoadingReport(false)
+  //   }
+  // }
 
   return (
     <>
@@ -211,7 +130,10 @@ export default function Events() {
           </div>
           <div className="flex flex-col md:flex-row items-end justify-end md:space-x-2 space-y-2 md:space-y-0">
             <CalendarDateRangePicker />
-            <Button disabled={loadingReport} onClick={downloadReport} variant="secondary">Download</Button>
+            {/* <Button disabled={loadingReport} onClick={downloadReport} variant="secondary">Download</Button> */}
+            <Button disabled={loadingReport} variant="secondary">
+              Download
+            </Button>
           </div>
           <div className="rounded-md border">
             <Table>

@@ -2,7 +2,7 @@ import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { SensorEvent } from "@/types/eventTypes"
+import { SensorEventDashboard } from "@/types/eventTypes"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -35,7 +35,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-export const columns: ColumnDef<SensorEvent>[] = [
+export const columns: ColumnDef<SensorEventDashboard>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -106,7 +106,7 @@ export const columns: ColumnDef<SensorEvent>[] = [
   },
 ]
 
-export default function EventsTable({ data }: { data: SensorEvent[] }) {
+export default function EventsTable({ data }: { data: SensorEventDashboard[] }) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     []
