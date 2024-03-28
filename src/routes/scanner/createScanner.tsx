@@ -100,7 +100,7 @@ export default function CreateScanner() {
 
   function handleClose() {
     setOpen(false);
-    navigate("/devices");
+    navigate("/scanners");
   }
 
   return (
@@ -111,7 +111,9 @@ export default function CreateScanner() {
             {" "}
             {/* Center text and possibly content */}
             <AlertDialogHeader>
-              <AlertDialogTitle style={{ textAlign: "center" }}>Scanner secret</AlertDialogTitle>
+              <AlertDialogTitle style={{ textAlign: "center" }}>
+                Scanner secret
+              </AlertDialogTitle>
               <AlertDialogDescription
                 className="text-wrap"
                 style={{ textAlign: "center" }}
@@ -119,19 +121,17 @@ export default function CreateScanner() {
                 Save your scanner secret key
                 <div
                   style={{
-                    display:
-                      "inline-block" /* Change to inline-block for better center alignment */,
+                    display: "inline-block",
                     fontWeight: "bold",
                     marginTop: "8px",
                     whiteSpace: "pre-wrap",
                   }}
                 >
-                  {scannerSecret.match(/.{1,40}/g).join("\n")}
+                  {scannerSecret && scannerSecret.match(/.{1,40}/g)?.join("\n")}
                 </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter style={{ justifyContent: "center" }}>
-              
               <AlertDialogAction
                 onClick={handleClose}
                 style={{ textAlign: "center" }}
