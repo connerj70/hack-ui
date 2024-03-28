@@ -1,3 +1,4 @@
+import { useSearchParams } from "react-router-dom"
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -28,20 +29,26 @@ import {
 } from "@/components/ui/alert-dialog"
 
 const formSchema = z.object({
-  description: z.string(),
+  scannerSecret: z.string(),
+  itemSecret: z.string(),
+  message: z.string(),
 });
 
-export default function CreateDevice() {
+export default function CreateEvent() {
+  const [searchParams] = useSearchParams()
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
-  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [scannerSecret, setScannerSecret] = useState("");
+  const navigate = useNavigate();
+
+  const itemSecret = searchParams.get("itemSecret")
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      description: ""
+      scannerSecret: "",
+      itemSecret: itemSecret || "",
+      message: "",
     },
   });
 
@@ -51,9 +58,10 @@ export default function CreateDevice() {
       const user = Cookies.get("user");
 
       const parsedUser = JSON.parse(user!);
+      console.log("parsedUser: ", parsedUser)
 
       const resp = await fetch(
-        `${import.meta.env.VITE_API_URL}/scanner/create`,
+        `${import.meta.env.VITE_API_URL}/event/scan`,
         {
           method: "POST",
           headers: {
@@ -61,7 +69,9 @@ export default function CreateDevice() {
             Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
           },
           body: JSON.stringify({
-            description: values.description
+            scannerSecret: values.scannerSecret,
+            itemSecret: values.itemSecret,
+            message: values.message
           }),
         }
       );
@@ -72,24 +82,21 @@ export default function CreateDevice() {
           navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
         } else {
           toast({
-            title: "Error creating device",
-            description: "An error occurred while creating your scanner",
+            title: "Error creating item",
+            description: "An error occurred while creating your item",
           });
         }
         return;
       }
 
-      const respBody = await resp.json()
-
-      console.log("respBody: ", respBody)
-
-      setScannerSecret(respBody.scanner.scannerSecret)
-      setOpen(true)
+      const respUrl = await resp.text()
+      console.log("respUrl: ", respUrl)
+      // TODO: Open a new tab with this url
     } catch (error) {
       if (error instanceof Error) {
         const errorMessage = error.message;
         toast({
-          title: "Error creating scanner",
+          title: "Error creating item",
           description: errorMessage,
         });
       }
@@ -100,7 +107,7 @@ export default function CreateDevice() {
 
   function handleClose() {
     setOpen(false)
-    navigate("/devices")
+    navigate("/items") 
   }
 
   return (
@@ -109,10 +116,10 @@ export default function CreateDevice() {
         <AlertDialog open={open}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Scanner secret</AlertDialogTitle>
+              <AlertDialogTitle>Item secret</AlertDialogTitle>
               <AlertDialogDescription className="text-wrap">
-                Save your scanner secret key
-                {scannerSecret}
+                Save your item secret key
+                {itemSecret}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -123,17 +130,43 @@ export default function CreateDevice() {
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
-              Create New Device
+              Create New Scan
             </h1>
           </div>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
-                name="description"
+                name="scannerSecret"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>Scanner Secret</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="itemSecret"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Item Secret</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Message</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>

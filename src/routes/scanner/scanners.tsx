@@ -1,11 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
-import { ItemType } from "@/types/device";
-
 import { Button } from "@/components/ui/button";
 import { CalendarDateRangePicker } from "@/components/dateRangePicker";
 import {
-  ColumnDef,
   ColumnFiltersState,
   SortingState,
   VisibilityState,
@@ -16,16 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { MoreHorizontal, Plus } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Plus } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -34,114 +22,41 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link, useNavigate, useLoaderData } from "react-router-dom";
-import Cookies from "js-cookie";
+import { Link, useNavigate } from "react-router-dom";
+import { columns } from "./ScannerColumns";
+import { scannerLoader } from "./scannerLoader";
+import { ScannerType } from "@/types/scannerTypes";
 
-export async function loader(): Promise<ItemType[]> {
-  const user = Cookies.get("user");
-
-  const parsedUser = JSON.parse(user!);
-
-  const resp = await fetch(
-    `${import.meta.env.VITE_API_URL}/item/user`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
-      }
-    }
-  );
-
-  if (!resp.ok) {
-    console.error("Failed to fetch user accounts");
-    return [];
-  }
-
-  const body = await resp.json()
-
-  console.log("body: ", body)
-
-  return body.items.map((item: any) => {
-    return {
-      description: item.metadata.additionalMetadata[0][1],
-    }
-  })
-}
-
-export const columns: ColumnDef<ItemType>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "description",
-    header: "Description",
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const item = row.original;
-
-      return (
-        <div className="flex justify-end">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(item.id)}
-              >
-                Copy item ID
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <Link to={`/items/${item.id}`}>
-                <DropdownMenuItem>View details</DropdownMenuItem>
-              </Link>
-              <DropdownMenuItem>View events</DropdownMenuItem>
-              <DropdownMenuItem>Deactivate</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      );
-    },
-  },
-];
-
-export default function Items() {
+export default function Scanners() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [loadingReport, setLoadingReport] = useState(false);
-  const items = useLoaderData()
+  const [loadingReport] = useState(false);
+  const [scanners, setScanners] = useState<ScannerType[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchScanners = async () => {
+      try {
+        const scannerItems = await scannerLoader();
+
+        setScanners(scannerItems);
+      } catch (error) {
+        if (error instanceof Error && error.message === "403 Forbidden") {
+          // Redirect to login page
+          navigate("/login");
+        } else {
+          console.error("An unexpected error occurred:", error);
+        }
+      }
+    };
+
+    fetchScanners();
+  }, [navigate]);
 
   const table = useReactTable({
-    data: items,
+    data: scanners,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -159,58 +74,81 @@ export default function Items() {
     },
   });
 
-  const downloadFile = ({ data, fileName, fileType }) => {
-    const blob = new Blob([data], { type: fileType })
-    const a = document.createElement('a')
-    a.download = fileName
-    a.href = window.URL.createObjectURL(blob)
-    const clickEvt = new MouseEvent('click', {
-      view: window,
-      bubbles: true,
-      cancelable: true,
-    })
-    a.dispatchEvent(clickEvt)
-    a.remove()
-  }
+  // async function newDeviceSetup() {
+  //   setLoading(true);
+  //   try {
+  //     const resp = await fetch(`${import.meta.env.VITE_API_URL}/solana/key`);
 
-  async function downloadReport(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    setLoadingReport(true);
-    try {
-      e.preventDefault()
-      // Headers for each column
-      let headers = ['Id,Name,Coordinates,PublicKey, CreatedAt, Status']
-      let itemsCsv = items.reduce((acc, item: any) => {
-        const { id, name, coordinates, publicKey, createdAt, status } = item
-        acc.push([id, name, coordinates, publicKey, createdAt, status].join(','))
-        return acc
-      }, [])
-      downloadFile({
-        data: [...headers, ...itemsCsv].join('\n'),
-        fileName: 'items.csv',
-        fileType: 'text/csv',
-      })
-    } catch (error) {
+  //     if (!resp.ok) {
+  //       console.error("Failed to create new device");
+  //       return;
+  //     }
 
-    } finally {
-      setLoadingReport(false)
-    }
-  }
+  //     const data = await resp.json();
+  //     const privateKey = data.privateKey;
+
+  //     navigate(`/devices/create/${privateKey}`);
+  //   } catch (error) {
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
+
+  // const downloadFile = ({ data, fileName, fileType }) => {
+  //   const blob = new Blob([data], { type: fileType })
+  //   const a = document.createElement('a')
+  //   a.download = fileName
+  //   a.href = window.URL.createObjectURL(blob)
+  //   const clickEvt = new MouseEvent('click', {
+  //     view: window,
+  //     bubbles: true,
+  //     cancelable: true,
+  //   })
+  //   a.dispatchEvent(clickEvt)
+  //   a.remove()
+  // }
+
+  // async function downloadReport(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  //   setLoadingReport(true);
+  //   try {
+  //     e.preventDefault()
+  //     // Headers for each column
+  //     let headers = ['Id,Name,Coordinates,PublicKey, CreatedAt, Status']
+  //     let devicesCsv = devices.reduce((acc, device: any) => {
+  //       const { id, name, coordinates, publicKey, createdAt, status } = device
+  //       acc.push([id, name, coordinates, publicKey, createdAt, status].join(','))
+  //       return acc
+  //     }, [])
+  //     downloadFile({
+  //       data: [...headers, ...devicesCsv].join('\n'),
+  //       fileName: 'devices.csv',
+  //       fileType: 'text/csv',
+  //     })
+  //   } catch (error) {
+
+  //   } finally {
+  //     setLoadingReport(false)
+  //   }
+  // }
 
   return (
     <>
       <div className="flex-col md:flex">
         <div className="flex-1 space-y-4 p-8 pt-6">
           <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Items</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Scanners</h2>
             <div className="flex items-center space-x-2">
-              <Link to="/items/create">
-                <Plus className="mr-2 h-4 w-4" /> Create Item 
+              <Link to="/scanners/create">
+                <Plus className="mr-2 h-4 w-4" /> Create Device
               </Link>
             </div>
           </div>
           <div className="flex flex-col md:flex-row items-end justify-end md:space-x-2 space-y-2 md:space-y-0">
             <CalendarDateRangePicker />
-            <Button disabled={loadingReport} onClick={downloadReport} variant="secondary">Download</Button>
+            {/* <Button disabled={loadingReport} onClick={downloadReport} variant="secondary">Download</Button> */}
+            <Button disabled={loadingReport} variant="secondary">
+              Download
+            </Button>
           </div>
           <div className="rounded-md border">
             <Table>

@@ -1,4 +1,3 @@
-import { useSearchParams } from "react-router-dom"
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -26,29 +25,23 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 
 const formSchema = z.object({
-  scannerSecret: z.string(),
-  itemSecret: z.string(),
-  message: z.string(),
+  description: z.string(),
 });
 
-export default function CreateEvent() {
-  const [searchParams, setSearchParams] = useSearchParams()
+export default function CreateScanner() {
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
-  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-
-  const itemSecret = searchParams.get("itemSecret")
+  const [open, setOpen] = useState(false);
+  const [scannerSecret, setScannerSecret] = useState("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      scannerSecret: "",
-      itemSecret: itemSecret || "",
-      message: "",
+      description: "",
     },
   });
 
@@ -58,10 +51,9 @@ export default function CreateEvent() {
       const user = Cookies.get("user");
 
       const parsedUser = JSON.parse(user!);
-      console.log("parsedUser: ", parsedUser)
 
       const resp = await fetch(
-        `${import.meta.env.VITE_API_URL}/event/scan`,
+        `${import.meta.env.VITE_API_URL}/scanner/create`,
         {
           method: "POST",
           headers: {
@@ -69,9 +61,7 @@ export default function CreateEvent() {
             Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
           },
           body: JSON.stringify({
-            scannerSecret: values.scannerSecret,
-            itemSecret: values.itemSecret,
-            message: values.message
+            description: values.description,
           }),
         }
       );
@@ -82,21 +72,24 @@ export default function CreateEvent() {
           navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
         } else {
           toast({
-            title: "Error creating item",
-            description: "An error occurred while creating your item",
+            title: "Error creating device",
+            description: "An error occurred while creating your scanner",
           });
         }
         return;
       }
 
-      const respUrl = await resp.text()
-      console.log("respUrl: ", respUrl)
-      // TODO: Open a new tab with this url
+      const respBody = await resp.json();
+
+      console.log("respBody: ", respBody);
+
+      setScannerSecret(respBody.scanner.scannerSecret);
+      setOpen(true);
     } catch (error) {
       if (error instanceof Error) {
         const errorMessage = error.message;
         toast({
-          title: "Error creating item",
+          title: "Error creating scanner",
           description: errorMessage,
         });
       }
@@ -106,67 +99,63 @@ export default function CreateEvent() {
   }
 
   function handleClose() {
-    setOpen(false)
-    navigate("/items") 
+    setOpen(false);
+    navigate("/scanners");
   }
 
   return (
     <>
       <div className="lg:p-8 p-4">
         <AlertDialog open={open}>
-          <AlertDialogContent>
+          <AlertDialogContent style={{ textAlign: "center" }}>
+            {" "}
+            {/* Center text and possibly content */}
             <AlertDialogHeader>
-              <AlertDialogTitle>Item secret</AlertDialogTitle>
-              <AlertDialogDescription className="text-wrap">
-                Save your item secret key
-                {itemSecret}
+              <AlertDialogTitle style={{ textAlign: "center" }}>
+                Scanner secret
+              </AlertDialogTitle>
+              <AlertDialogDescription
+                className="text-wrap"
+                style={{ textAlign: "center" }}
+              >
+                Save your scanner secret key
+                <div
+                  style={{
+                    display: "inline-block",
+                    fontWeight: "bold",
+                    marginTop: "8px",
+                    whiteSpace: "pre-wrap",
+                  }}
+                >
+                  {scannerSecret && scannerSecret.match(/.{1,40}/g)?.join("\n")}
+                </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogAction onClick={handleClose}>I've saved my secret key</AlertDialogAction>
+            <AlertDialogFooter style={{ justifyContent: "center" }}>
+              <AlertDialogAction
+                onClick={handleClose}
+                style={{ textAlign: "center" }}
+              >
+                I've saved my secret key
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
-              Create New Scan
+              Create New Scanner
             </h1>
           </div>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
-                name="scannerSecret"
+                name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Scanner Secret</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="itemSecret"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Item Secret</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="message"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Message</FormLabel>
+                    <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>

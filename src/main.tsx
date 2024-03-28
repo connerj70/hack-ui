@@ -1,26 +1,26 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import Root from "./routes/root"
-import Signup from "./routes/signup"
-import Login from "./routes/login"
-import Dashboard from "./routes/dashboard"
-import Devices, { loader as devicesLoader } from "./routes/devices"
-import Device, { loader as deviceLoader } from "./routes/device"
-import Items, { loader as itemLoader } from "./routes/items"
-import CreateItem from "./routes/createItem"
-import Profile from "./routes/profile"
-import CreateDevice from "./routes/createDevice"
-import Events, { loader as eventsLoader } from "./routes/events"
-import CreateEvent from "./routes/createEvent"
-import AuthenticatedLayout from './routes/authenticatedLayout'
-import ErrorPage from "./error-page"
-import "./globals.css"
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import Root from "./routes/root";
+import Signup from "./routes/signup";
+import Login from "./routes/login";
+import Dashboard from "./routes/dashboard/Dashboard";
+import Scanners from "./routes/scanner/scanners";
+// import Device, { loader as deviceLoader } from "./routes/dashboard/device";
+import Items from "./routes/items/items";
+import CreateItem from "./routes/items/createItem";
+import Profile from "./routes/profile";
+import Events from "./routes/events/events";
+import CreateEvent from "./routes/events/createEvent";
+import AuthenticatedLayout from "./routes/authenticatedLayout";
+import ErrorPage from "./error-page";
+import "./globals.css";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { UserProvider } from "./contexts/userContext";
-import AuthWrapper from "@/components/authWrapper"
+import AuthWrapper from "@/components/authWrapper";
+import CreateScanner from "./routes/scanner/createScanner";
+import { itemLoader } from "./routes/items/itemLoader";
+import { scannerLoader } from "./routes/scanner/scannerLoader";
+import { eventLoader } from "./routes/events/eventLoader";
 
 
 const router = createBrowserRouter([
@@ -31,10 +31,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: 
-    <AuthWrapper>
-      <AuthenticatedLayout />
-    </AuthWrapper>,
+    element: (
+      <AuthWrapper>
+        <AuthenticatedLayout />
+      </AuthWrapper>
+    ),
     errorElement: <ErrorPage />,
     children: [
       {
@@ -42,23 +43,23 @@ const router = createBrowserRouter([
         element: <Dashboard />,
       },
       {
-        path: "devices",
-        element: <Devices />,
-        loader: devicesLoader
+        path: "scanners",
+        element: <Scanners />,
+        loader: scannerLoader,
       },
       {
-        path: "devices/create",
-        element: <CreateDevice />,
+        path: "scanners/create",
+        element: <CreateScanner />,
       },
-      {
-        path: "devices/:id",
-        element: <Device />,
-        loader: deviceLoader
-      },
+      // {
+      //   path: "scanners/:id",
+      //   element: <Device />,
+      //   loader: deviceLoader,
+      // },
       {
         path: "items",
         element: <Items />,
-        loader: itemLoader
+        loader: itemLoader,
       },
       {
         path: "items/create",
@@ -67,7 +68,7 @@ const router = createBrowserRouter([
       {
         path: "events",
         element: <Events />,
-        loader: eventsLoader
+        loader: eventLoader,
       },
       {
         path: "events/create",
@@ -77,7 +78,7 @@ const router = createBrowserRouter([
         path: "profile",
         element: <Profile />,
       },
-    ]
+    ],
   },
   {
     path: "signup",
@@ -89,10 +90,10 @@ const router = createBrowserRouter([
   },
 ]);
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <UserProvider>
       <RouterProvider router={router} />
     </UserProvider>
-  </React.StrictMode>,
-)
+  </React.StrictMode>
+);
