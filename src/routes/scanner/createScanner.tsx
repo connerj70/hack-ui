@@ -81,8 +81,6 @@ export default function CreateScanner() {
 
       const respBody = await resp.json();
 
-      console.log("respBody: ", respBody);
-
       setScannerSecret(respBody.scanner.scannerSecret);
       setOpen(true);
     } catch (error) {

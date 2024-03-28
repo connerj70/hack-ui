@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import Root from "./routes/root";
 import Signup from "./routes/signup";
 import Login from "./routes/login";
-import Dashboard from "./routes/dashboard/Dashboard";
+
 import Scanners from "./routes/scanner/scanners";
 // import Device, { loader as deviceLoader } from "./routes/dashboard/device";
 import Items from "./routes/items/items";
@@ -21,6 +21,7 @@ import CreateScanner from "./routes/scanner/createScanner";
 import { itemLoader } from "./routes/items/itemLoader";
 import { scannerLoader } from "./routes/scanner/scannerLoader";
 import { eventLoader } from "./routes/events/eventLoader";
+import Dashboard from "./routes/dashboard/dashboard";
 
 
 const router = createBrowserRouter([
