@@ -75,8 +75,11 @@ export default function CreateEvent() {
         return;
       }
 
-      const respUrl = await resp.text();
-      console.log("respUrl: ", respUrl);
+      let respUrl = await resp.text();
+      // Remove any unwanted quotation marks that might be surrounding the URL
+      respUrl = respUrl.replace(/^"(.*)"$/, "$1");
+      console.log("Cleaned URL: ", respUrl);
+
       window.open(respUrl, "_blank");
       navigate("/events");
     } catch (error) {
