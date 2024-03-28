@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom"
+import { useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -26,7 +26,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 
 const formSchema = z.object({
   scannerSecret: z.string(),
@@ -35,13 +35,13 @@ const formSchema = z.object({
 });
 
 export default function CreateEvent() {
-  const [searchParams] = useSearchParams()
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
-  const itemSecret = searchParams.get("itemSecret")
+  const itemSecret = searchParams.get("itemSecret");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -58,23 +58,20 @@ export default function CreateEvent() {
       const user = Cookies.get("user");
 
       const parsedUser = JSON.parse(user!);
-      console.log("parsedUser: ", parsedUser)
+      console.log("parsedUser: ", parsedUser);
 
-      const resp = await fetch(
-        `${import.meta.env.VITE_API_URL}/event/scan`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
-          },
-          body: JSON.stringify({
-            scannerSecret: values.scannerSecret,
-            itemSecret: values.itemSecret,
-            message: values.message
-          }),
-        }
-      );
+      const resp = await fetch(`${import.meta.env.VITE_API_URL}/event/scan`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
+        },
+        body: JSON.stringify({
+          scannerSecret: values.scannerSecret,
+          itemSecret: values.itemSecret,
+          message: values.message,
+        }),
+      });
 
       if (!resp.ok) {
         if (resp.status === 403) {
@@ -89,9 +86,10 @@ export default function CreateEvent() {
         return;
       }
 
-      const respUrl = await resp.text()
-      console.log("respUrl: ", respUrl)
-      // TODO: Open a new tab with this url
+      const respUrl = await resp.text();
+      console.log("respUrl: ", respUrl);
+      window.open(respUrl, "_blank");
+      navigate("/events");
     } catch (error) {
       if (error instanceof Error) {
         const errorMessage = error.message;
@@ -106,8 +104,8 @@ export default function CreateEvent() {
   }
 
   function handleClose() {
-    setOpen(false)
-    navigate("/items") 
+    setOpen(false);
+    navigate("/events");
   }
 
   return (
@@ -123,7 +121,9 @@ export default function CreateEvent() {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogAction onClick={handleClose}>I've saved my secret key</AlertDialogAction>
+              <AlertDialogAction onClick={handleClose}>
+                I've saved my secret key
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

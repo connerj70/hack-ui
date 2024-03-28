@@ -25,8 +25,6 @@ export async function scannerLoader(): Promise<ScannerType[]> {
 
   const body = await resp.json();
 
-  console.log("body: ", body);
-
   return body.scanners.map((scanner: GetScannerResponseType) => {
     return {
       secretKey: scanner.metadata.additionalMetadata[0][1],
