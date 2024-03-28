@@ -14,6 +14,6 @@ export type ItemTypeRes = {
     name: "string";
     symbol: "string";
     uri: "string";
-    additionalMetadata: [["item", "potatoes"]];
+    additionalMetadata: [["secret", "potatoes"], ["description", "potatoes"]];
   };
 };

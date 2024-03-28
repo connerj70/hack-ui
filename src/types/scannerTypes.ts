@@ -1,6 +1,6 @@
 export type ScannerType = {
   id: string;
-  secretKey:string;
+  secretKey: string;
   mint: string;
 };
 
@@ -21,9 +21,11 @@ export type GetScannerResponseType = {
     uri: "string";
     additionalMetadata: [
       [
-        "scanner",
+        "secret",
         "jTW2SfoRecY4eaShFpq5M7qEFUVSEPaS5drhyj7Tnk54S2A6yAPu8r5qxWrormLd1Anbw5aBYhNDe3eebPuXVHC"
-      ]
+      ],
+      ["description", "test"]
+
     ];
   };
 };

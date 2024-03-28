@@ -25,7 +25,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
   description: z.string(),
@@ -51,21 +52,18 @@ export default function CreateItem() {
       const user = Cookies.get("user");
 
       const parsedUser = JSON.parse(user!);
-      console.log("parsedUser: ", parsedUser)
+      console.log("parsedUser: ", parsedUser);
 
-      const resp = await fetch(
-        `${import.meta.env.VITE_API_URL}/item/create`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
-          },
-          body: JSON.stringify({
-            description: values.description
-          }),
-        }
-      );
+      const resp = await fetch(`${import.meta.env.VITE_API_URL}/item/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
+        },
+        body: JSON.stringify({
+          description: values.description,
+        }),
+      });
 
       if (!resp.ok) {
         if (resp.status === 403) {
@@ -80,12 +78,10 @@ export default function CreateItem() {
         return;
       }
 
-      const respBody = await resp.json()
+      const respBody = await resp.json();
 
-      setItemSecret(respBody.item.itemSecret) 
-      setOpen(true)
-
-
+      setItemSecret(respBody.item.itemSecret);
+      setOpen(true);
     } catch (error) {
       if (error instanceof Error) {
         const errorMessage = error.message;
@@ -100,8 +96,8 @@ export default function CreateItem() {
   }
 
   function handleClose() {
-    setOpen(false)
-    navigate("/items") 
+    setOpen(false);
+    navigate("/items");
   }
 
   return (
@@ -111,12 +107,15 @@ export default function CreateItem() {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Item secret</AlertDialogTitle>
-              <AlertDialogDescription className="text-wrap">
-                Save your item secret key {itemSecret}
+              <AlertDialogDescription>
+                Save your item secret key
+                <Textarea value={itemSecret}/>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogAction onClick={handleClose}>I've saved my secret key</AlertDialogAction>
+              <AlertDialogAction onClick={handleClose}>
+                I've saved my secret key
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

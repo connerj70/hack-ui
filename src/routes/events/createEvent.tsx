@@ -18,15 +18,6 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 const formSchema = z.object({
   scannerSecret: z.string(),
@@ -38,9 +29,7 @@ export default function CreateEvent() {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
-  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-
   const itemSecret = searchParams.get("itemSecret");
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -103,15 +92,10 @@ export default function CreateEvent() {
     }
   }
 
-  function handleClose() {
-    setOpen(false);
-    navigate("/events");
-  }
-
   return (
     <>
       <div className="lg:p-8 p-4">
-        <AlertDialog open={open}>
+        {/* <AlertDialog open={open}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Item secret</AlertDialogTitle>
@@ -126,7 +110,7 @@ export default function CreateEvent() {
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
-        </AlertDialog>
+        </AlertDialog> */}
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">

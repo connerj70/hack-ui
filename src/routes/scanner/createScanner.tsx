@@ -26,6 +26,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
   description: z.string(),
@@ -117,16 +118,7 @@ export default function CreateScanner() {
                 style={{ textAlign: "center" }}
               >
                 Save your scanner secret key
-                <div
-                  style={{
-                    display: "inline-block",
-                    fontWeight: "bold",
-                    marginTop: "8px",
-                    whiteSpace: "pre-wrap",
-                  }}
-                >
-                  {scannerSecret && scannerSecret.match(/.{1,40}/g)?.join("\n")}
-                </div>
+                <Textarea value={scannerSecret}/>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter style={{ justifyContent: "center" }}>

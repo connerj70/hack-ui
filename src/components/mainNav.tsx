@@ -45,7 +45,7 @@ export function MainNav({
       <Link
         to="/events"
         className={`text-sm font-medium transition-colors hover:text-primary ${
-          location.pathname === "/items"
+          location.pathname === "/events"
             ? "text-primary"
             : "text-muted-foreground"
         }`}

@@ -27,8 +27,8 @@ export async function scannerLoader(): Promise<ScannerType[]> {
 
   return body.scanners.map((scanner: GetScannerResponseType) => {
     return {
-      secretKey: scanner.metadata.additionalMetadata[0][1],
-      mint: scanner.mint,
+      secretKey: scanner.metadata?.additionalMetadata?.[0]?.[1] ?? "",
+      description: scanner.metadata?.additionalMetadata?.[1]?.[1] ?? "",
     };
   });
 }

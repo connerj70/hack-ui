@@ -22,7 +22,7 @@ export async function itemLoader(): Promise<ItemType[]> {
 
   const body = await resp.json();
   return body.items.map((item: ItemTypeRes) => ({
-    description: item.metadata.additionalMetadata[0][1],
-    mint: item.mint,
+    secretKey: item.metadata?.additionalMetadata?.[0]?.[1] ?? "",
+    description: item.metadata?.additionalMetadata?.[1]?.[1] ?? "",
   }));
 }
