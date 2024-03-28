@@ -32,12 +32,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link, useNavigate } from "react-router-dom";
-// import Cookies from "js-cookie";
-// import { ItemType } from "@/types/itemTypes";
+import { Link} from "react-router-dom";
 import { columns } from "./columns";
-import { ItemType } from "@/types/itemTypes";
-import { itemLoader } from "./itemLoader";
+import { ItemType, ItemTypeRes } from "@/types/itemTypes";
+
+import { useAuth } from "@/contexts/useAuth";
 
 export default function Items() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -49,27 +48,51 @@ export default function Items() {
   // const items =  itemLoader();
   const [loadingReport] = useState(false);
   const [items, setItems] = useState<ItemType[]>([]);
-
-  const navigate = useNavigate();
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const loadedItems = await itemLoader();
-
-        setItems(loadedItems);
-      } catch (error) {
-        if (error instanceof Error && error.message === "403 Forbidden") {
-          // Redirect to login page
-          navigate("/login");
-        } else {
-          console.error("An unexpected error occurred:", error);
+        // Assuming currentUser comes from your authentication context
+        // and it might be null initially until the auth state is resolved.
+        if (!currentUser) {
+          console.log("No current user. Skipping fetch.");
+          return;
         }
+
+        const jwt = await currentUser.getIdToken(); // Ensure currentUser is not null before calling this
+
+        const resp = await fetch(`${import.meta.env.VITE_API_URL}/item/user`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
+
+        if (!resp.ok) {
+          // Handle HTTP errors here, for example:
+          throw new Error(`Failed to fetch items: ${resp.statusText}`);
+        }
+
+        const body = await resp.json();
+
+        console.log("body", body);
+
+        const userItems = await body?.items.map((item: ItemTypeRes) => {
+          return {
+            secretKey: item.metadata?.additionalMetadata?.[0]?.[1] ?? "",
+            description: item.metadata?.additionalMetadata?.[1]?.[1] ?? "",
+          };
+        });
+        setItems(userItems);
+      } catch (error) {
+        console.error("An unexpected error occurred:", error);
       }
     };
 
-    fetchItems();
-  }, [navigate]);
+    fetchItems(); // Correctly call fetchItems here
+  }, [currentUser]); // Add currentUser to the dependency array if it's expected to change over time
 
   const table = useReactTable({
     data: items,

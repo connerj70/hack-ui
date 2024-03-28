@@ -1,8 +1,8 @@
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { Button } from "@/components/ui/button"
-import { Toaster } from "@/components/ui/toaster"
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/toaster";
 import {
   Form,
   FormControl,
@@ -10,110 +10,115 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react"
-import { Loader2 } from "lucide-react"
-import { useNavigate, Link } from "react-router-dom"
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
-import { useAuth } from "@/contexts/useAuth"
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { useAuth } from "@/contexts/useAuth";
 
-
-const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8, {
-    message: "Password must be at least 8 characters long",
-  }),
-  passwordConfirm: z.string().min(8)
-}).refine((data) => data.password === data.passwordConfirm, {
-  message: "Passwords don't match",
-  path: ["passwordConfirm"],
-});
+const formSchema = z
+  .object({
+    email: z.string().email(),
+    password: z.string().min(8, {
+      message: "Password must be at least 8 characters long",
+    }),
+    passwordConfirm: z.string().min(8),
+  })
+  .refine((data) => data.password === data.passwordConfirm, {
+    message: "Passwords don't match",
+    path: ["passwordConfirm"],
+  });
 
 export default function Signup() {
-  const { toast } = useToast()
-  const [submitting, setSubmitting] = useState(false)
-  const navigate = useNavigate()
-  const { setCurrentUser } = useAuth();
-  
+  const { toast } = useToast();
+  const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
-      passwordConfirm: ""
+      passwordConfirm: "",
     },
-  })
+  });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setSubmitting(true)
+    setSubmitting(true);
     try {
-      const userCreateResp = await fetch(`${import.meta.env.VITE_API_URL}/user/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: values.email,
-          password: values.password
-        }),
-      })
+      const userCreateResp = await fetch(
+        `${import.meta.env.VITE_API_URL}/user/create`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: values.email,
+            password: values.password,
+          }),
+        }
+      );
 
       if (!userCreateResp.ok) {
         toast({
           title: "Error creating account",
           description: "An error occurred while creating your account",
-        })
-        return
+        });
+        return;
       }
 
-      const userLoginResp = await fetch(`${import.meta.env.VITE_API_URL}/user/signin`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: values.email,
-          password: values.password
-        }),
-      })
+      const userLoginResp = await fetch(
+        `${import.meta.env.VITE_API_URL}/user/signin`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: values.email,
+            password: values.password,
+          }),
+        }
+      );
 
       if (!userLoginResp.ok) {
         toast({
           title: "Error signing in",
           description: "An error occurred while signing in",
-        })
-        return
+        });
+        return;
       }
 
-      const userLoginBody = await userLoginResp.json()
+      // const userLoginBody = await userLoginResp.json();
 
-      setCurrentUser(userLoginBody.user)
-        
-      navigate("/dashboard")
+      // setCurrentUser(userLoginBody.user);
+
+      login(values.email, values.password);
+
+      navigate("/dashboard");
     } catch (error) {
       if (error instanceof Error) {
-        const errorMessage = error.message
+        const errorMessage = error.message;
         toast({
           title: "Error creating account",
           description: errorMessage,
-        })
+        });
       }
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
 
   return (
     <div className="w-100 h-screen">
       <div className="container relative h-full flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-        <Link
-          to="/"
-          className="absolute left-4 top-4 md:left-8 md:top-8 z-10"
-        >
+        <Link to="/" className="absolute left-4 top-4 md:left-8 md:top-8 z-10">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -157,9 +162,7 @@ export default function Signup() {
           </div>
           <div className="relative z-20 mt-auto">
             <blockquote className="space-y-2">
-              <p className="text-lg">
-                A smart network for international trade
-              </p>
+              <p className="text-lg">A smart network for international trade</p>
             </blockquote>
           </div>
         </div>
@@ -174,7 +177,10 @@ export default function Signup() {
               </p>
             </div>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
+              >
                 <FormField
                   control={form.control}
                   name="email"
@@ -215,11 +221,9 @@ export default function Signup() {
                   )}
                 />
                 <Button disabled={submitting} type="submit" className="w-full">
-                  { submitting ? 
+                  {submitting ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    :
-                    null
-                  }
+                  ) : null}
                   Submit
                 </Button>
               </form>
@@ -247,5 +251,5 @@ export default function Signup() {
       </div>
       <Toaster />
     </div>
-  )
+  );
 }

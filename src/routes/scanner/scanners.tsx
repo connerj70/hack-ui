@@ -24,8 +24,8 @@ import {
 } from "@/components/ui/table";
 import { useNavigate } from "react-router-dom";
 import { columns } from "./ScannerColumns";
-import { scannerLoader } from "./scannerLoader";
-import { ScannerType } from "@/types/scannerTypes";
+import { useAuth } from "@/contexts/useAuth";
+import { GetScannerResponseType, ScannerType } from "@/types/scannerTypes";
 
 export default function Scanners() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -35,12 +35,44 @@ export default function Scanners() {
   const [loadingReport] = useState(false);
   const [scanners, setScanners] = useState<ScannerType[]>([]);
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
+  console.log("currentUser", currentUser);
 
   useEffect(() => {
     const fetchScanners = async () => {
       try {
-        const scannerItems = await scannerLoader();
+        const jwt = await currentUser?.getIdToken();
 
+        const resp = await fetch(
+          `${import.meta.env.VITE_API_URL}/scanner/user`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${jwt}`,
+            },
+          }
+        );
+
+        if (!resp.ok) {
+          if (resp.status === 403) {
+            // Redirect the user to the login page with a redirect back to the current page after login
+            throw new Error("403 Forbidden");
+          }
+          console.error("Failed to fetch user accounts");
+          return [];
+        }
+
+        const body = await resp.json();
+
+        const scannerItems = body.scanners.map(
+          (scanner: GetScannerResponseType) => {
+            return {
+              secretKey: scanner.metadata?.additionalMetadata?.[0]?.[1] ?? "",
+              description: scanner.metadata?.additionalMetadata?.[1]?.[1] ?? "",
+            };
+          }
+        );
         setScanners(scannerItems);
       } catch (error) {
         console.error("An unexpected error occurred:", error);
@@ -48,7 +80,7 @@ export default function Scanners() {
     };
 
     fetchScanners();
-  }, [navigate]);
+  }, [currentUser]);
 
   const table = useReactTable({
     data: scanners,
