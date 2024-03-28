@@ -16,9 +16,10 @@ import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
-import { useUserContext } from "@/contexts/userContext";
+
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { useAuth } from "@/contexts/useAuth";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -29,7 +30,8 @@ export default function Login() {
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { updateUser } = useUserContext();
+  const { setCurrentUser } = useAuth();
+  
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -66,7 +68,7 @@ export default function Login() {
 
       const body = await resp.json();
 
-      updateUser(body.user);
+      setCurrentUser(body.user);
 
       navigate("/dashboard");
     } catch (error) {
@@ -187,3 +189,5 @@ export default function Login() {
     </div>
   );
 }
+
+

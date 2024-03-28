@@ -138,9 +138,9 @@ export default function Scanners() {
           <div className="flex items-center justify-between space-y-2">
             <h2 className="text-3xl font-bold tracking-tight">Scanners</h2>
             <div className="flex items-center space-x-2">
-              <Link to="/scanners/create">
-                <Plus className="mr-2 h-4 w-4" /> Create Device
-              </Link>
+              <Button onClick={() => navigate("/scanners/create")}>
+                Create Device
+              </Button>
             </div>
           </div>
           <div className="flex flex-col md:flex-row items-end justify-end md:space-x-2 space-y-2 md:space-y-0">
