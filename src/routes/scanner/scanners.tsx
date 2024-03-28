@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Plus } from "lucide-react";
+// import { Plus } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { columns } from "./ScannerColumns";
 import { scannerLoader } from "./scannerLoader";
 import { ScannerType } from "@/types/scannerTypes";
@@ -43,12 +43,7 @@ export default function Scanners() {
 
         setScanners(scannerItems);
       } catch (error) {
-        if (error instanceof Error && error.message === "403 Forbidden") {
-          // Redirect to login page
-          navigate("/login");
-        } else {
-          console.error("An unexpected error occurred:", error);
-        }
+        console.error("An unexpected error occurred:", error);
       }
     };
 
