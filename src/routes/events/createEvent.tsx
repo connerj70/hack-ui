@@ -75,9 +75,12 @@ export default function CreateEvent() {
         return;
       }
 
-      const respUrl = await resp.text();
-      console.log("respUrl: ", respUrl);
-      window.open(respUrl, "_blank");
+      let respUrl = await resp.text();
+      // Remove any unwanted quotation marks that might be surrounding the URL
+      respUrl = respUrl.replace(/^"(.*)"$/, "$1");
+      console.log("Cleaned URL: ", respUrl);
+
+      window.open(respUrl);
       navigate("/events");
     } catch (error) {
       if (error instanceof Error) {
@@ -95,22 +98,6 @@ export default function CreateEvent() {
   return (
     <>
       <div className="lg:p-8 p-4">
-        {/* <AlertDialog open={open}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Item secret</AlertDialogTitle>
-              <AlertDialogDescription className="text-wrap">
-                Save your item secret key
-                {itemSecret}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogAction onClick={handleClose}>
-                I've saved my secret key
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog> */}
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
