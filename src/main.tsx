@@ -15,14 +15,14 @@ import AuthenticatedLayout from "./routes/authenticatedLayout";
 import ErrorPage from "./error-page";
 import "./globals.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { UserProvider } from "./contexts/userContext";
-import AuthWrapper from "@/components/authWrapper";
+
 import CreateScanner from "./routes/scanner/createScanner";
 import { itemLoader } from "./routes/items/itemLoader";
 import { scannerLoader } from "./routes/scanner/scannerLoader";
 import { eventLoader } from "./routes/events/eventLoader";
 import Dashboard from "./routes/dashboard/dashboard";
-
+import { AuthProvider } from "./contexts/AuthProvider";
+import RequireAuth from "./routes/RequireAuth";
 
 const router = createBrowserRouter([
   {
@@ -33,9 +33,9 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <AuthWrapper>
+      <RequireAuth>
         <AuthenticatedLayout />
-      </AuthWrapper>
+      </RequireAuth>
     ),
     errorElement: <ErrorPage />,
     children: [
@@ -52,11 +52,6 @@ const router = createBrowserRouter([
         path: "scanners/create",
         element: <CreateScanner />,
       },
-      // {
-      //   path: "scanners/:id",
-      //   element: <Device />,
-      //   loader: deviceLoader,
-      // },
       {
         path: "items",
         element: <Items />,
@@ -93,8 +88,10 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <UserProvider>
+    <AuthProvider>
+      {/* <UserProvider> */}
       <RouterProvider router={router} />
-    </UserProvider>
+      {/* </UserProvider> */}
+    </AuthProvider>
   </React.StrictMode>
 );

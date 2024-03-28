@@ -63,15 +63,11 @@ export default function CreateEvent() {
       });
 
       if (!resp.ok) {
-        if (resp.status === 403) {
-          // Redirect the user to the login page with a redirect back to the current page after login
-          navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
-        } else {
-          toast({
-            title: "Error creating item",
-            description: "An error occurred while creating your item",
-          });
-        }
+        toast({
+          title: "Error creating item",
+          description: "An error occurred while creating your item",
+        });
+
         return;
       }
 

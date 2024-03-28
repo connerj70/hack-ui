@@ -2,11 +2,12 @@ import { Outlet } from 'react-router-dom';
 import { MainNav } from '@/components/mainNav';
 import { Search } from '@/components/search';
 import { UserNav } from '@/components/userNav';
-import { useUserContext } from '@/contexts/userContext';
+import { useAuth } from '@/contexts/useAuth';
+
 
 const AuthenticatedLayout = () => {
   
-  const { currentUser } = useUserContext()
+  const { currentUser } = useAuth()
 
   return (
     <div>

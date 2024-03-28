@@ -23,12 +23,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link, useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { columns } from "./EventColumn";
 import { eventLoader } from "./eventLoader";
 import { SensorEvent } from "@/types/eventTypes";
-
-
 
 export default function Events() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -45,15 +43,9 @@ export default function Events() {
       try {
         const loadedEvents = eventLoader();
 
-        
         setEvents(loadedEvents);
       } catch (error) {
-        if (error instanceof Error && error.message === "403 Forbidden") {
-          // Redirect to login page
-          navigate("/login");
-        } else {
-          console.error("An unexpected error occurred:", error);
-        }
+        console.error("An unexpected error occurred:", error);
       }
     };
 

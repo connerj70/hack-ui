@@ -63,7 +63,7 @@ export const columns: ColumnDef<ScannerType>[] = [
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(device.id)}
+                onClick={() => navigator.clipboard.writeText(device.secretKey)}
               >
                 Copy device ID
               </DropdownMenuItem>
