@@ -6,7 +6,7 @@ import Login from "./routes/login";
 import Dashboard from "./routes/dashboard/dashboard";
 import Scanners, { loader as devicesLoader } from "./routes/scanner/scanners";
 import Device, { loader as deviceLoader } from "./routes/dashboard/device";
-import Items, { loader as itemLoader } from "./routes/items/items";
+import Items from "./routes/items/items";
 import CreateItem from "./routes/items/createItem";
 import Profile from "./routes/profile";
 import Events, { loader as eventsLoader } from "./routes/events/events";
@@ -18,6 +18,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { UserProvider } from "./contexts/userContext";
 import AuthWrapper from "@/components/authWrapper";
 import CreateScanner from "./routes/scanner/createScanner";
+import { itemLoader } from "./routes/items/loader";
 
 const router = createBrowserRouter([
   {
