@@ -32,6 +32,7 @@ export default function CreateEvent() {
   const navigate = useNavigate();
   const itemSecret = searchParams.get("itemSecret");
   const { currentUser, selectedScanner } = useAuth();
+  const [autoSubmitted, setAutoSubmitted] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -43,10 +44,12 @@ export default function CreateEvent() {
   });
 
   useEffect(() => {
-    if (itemSecret && selectedScanner) {
-      form.handleSubmit(onSubmit)(); // Programmatically submit the form
+    // Check if conditions for auto submission are met and it hasn't been submitted already
+    if (itemSecret && selectedScanner && !autoSubmitted) {
+      form.handleSubmit(onSubmit)();
+      setAutoSubmitted(true); // Prevent future submissions
     }
-  });
+  }, [itemSecret, selectedScanner, autoSubmitted, form]); // Added autoSubmitted to dependencies
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true);
