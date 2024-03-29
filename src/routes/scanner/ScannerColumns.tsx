@@ -117,9 +117,9 @@ export const columns = (
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(scanner.secretKey)}
+                onClick={() => navigator.clipboard.writeText(scanner.public)}
               >
-                Copy device ID
+                Copy Public key
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSelectScanner}>

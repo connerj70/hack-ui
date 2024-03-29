@@ -111,9 +111,9 @@ export const columns = (toast: any): ColumnDef<ItemType>[] => [
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(item.secretKey)}
+                onClick={() => navigator.clipboard.writeText(item.public)}
               >
-                Copy item ID
+                Copy Public key
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleDemoCopy}>
