@@ -1,4 +1,3 @@
-import { MoreHorizontal } from "lucide-react";
 // import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
@@ -8,18 +7,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ItemType } from "@/types/itemTypes";
 import { ColumnDef } from "@tanstack/react-table";
-import { ScannerType } from "@/types/scannerTypes";
+import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { ScannerInfo } from "@/contexts/AuthProvider";
 
-type SetSelectedScannerFunc = (scanner: ScannerInfo | null) => void;
-
-export const columns = (
-  setSelectedScanner: SetSelectedScannerFunc,
-  toast: any
-): ColumnDef<ScannerType>[] => [
+export const columns = (toast: any): ColumnDef<ItemType>[] => [
   // {
   //   id: "select",
   //   header: ({ table }) => (
@@ -50,12 +43,12 @@ export const columns = (
     accessorKey: "secretKey",
     header: "Secret Key",
     cell: ({ row }) => {
-      const scanner = row.original;
-      const displayKey = `${scanner.secretKey.slice(0, 15)}...`; // Truncate the key for display
+      const item = row.original;
+      const displayKey = `${item.secretKey.slice(0, 15)}...`; // Truncate the key for display
 
       return (
         <div
-          title={scanner.secretKey} // Show full key on hover
+          title={item.secretKey} // Show full key on hover
           className="text-ellipsis overflow-hidden"
           style={{
             maxWidth: "150px", // Limit the width of the cell
@@ -70,24 +63,22 @@ export const columns = (
       );
     },
   },
-
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const scanner = row.original;
+      const item = row.original;
 
-      const handleSelectScanner = () => {
+      const handleDemoCopy = () => {
         // Assuming `useScannerContext` is your custom hook to access the scanner context
 
-        setSelectedScanner({
-          description: scanner.description,
-          secretKey: scanner.secretKey,
-        });
+        navigator.clipboard.writeText(
+          `https://www.pomerene.net/events/create/?itemSecret=${item.secretKey}`
+        );
 
         toast({
-          title: "Scanner selected",
-          description: scanner.description,
+          title: "NFC Address copied",
+          description: item.description,
         });
       };
 
@@ -103,18 +94,18 @@ export const columns = (
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(scanner.secretKey)}
+                onClick={() => navigator.clipboard.writeText(item.secretKey)}
               >
-                Copy device ID
+                Copy item ID
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSelectScanner}>
-                Select This Scanner
+              <DropdownMenuItem onClick={handleDemoCopy}>
+                Copy Demo Address
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link to={`/devices/${scanner.id}`}>
-                <DropdownMenuItem>View details</DropdownMenuItem>
-              </Link>
+              {/* <Link to={`/items/${item.id}`}>
+                  <DropdownMenuItem>View details</DropdownMenuItem>
+                </Link> */}
               <DropdownMenuItem>View events</DropdownMenuItem>
               <DropdownMenuItem>Deactivate</DropdownMenuItem>
             </DropdownMenuContent>

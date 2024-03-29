@@ -14,10 +14,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
+import { useAuth } from "@/contexts/useAuth";
 
 const formSchema = z.object({
   scannerSecret: z.string(),
@@ -31,29 +31,41 @@ export default function CreateEvent() {
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
   const itemSecret = searchParams.get("itemSecret");
+  const { currentUser, selectedScanner } = useAuth();
+  const [autoSubmitted, setAutoSubmitted] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      scannerSecret: "",
+      scannerSecret: selectedScanner?.secretKey || "",
       itemSecret: itemSecret || "",
-      message: "",
+      message: "HACKER HOUSE DEMO",
     },
   });
+
+  useEffect(() => {
+    // Check if conditions for auto submission are met and it hasn't been submitted already
+    if (itemSecret && selectedScanner && !autoSubmitted) {
+      form.handleSubmit(onSubmit)();
+      setAutoSubmitted(true); // Prevent future submissions
+    }
+  }, [itemSecret, selectedScanner, autoSubmitted, form]); // Added autoSubmitted to dependencies
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true);
     try {
-      const user = Cookies.get("user");
+      if (!currentUser) {
+        console.log("No current user. Skipping fetch.");
+        return;
+      }
 
-      const parsedUser = JSON.parse(user!);
-      console.log("parsedUser: ", parsedUser);
+      const jwt = await currentUser.getIdToken();
 
       const resp = await fetch(`${import.meta.env.VITE_API_URL}/event/scan`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
+          Authorization: `Bearer ${jwt}`,
         },
         body: JSON.stringify({
           scannerSecret: values.scannerSecret,

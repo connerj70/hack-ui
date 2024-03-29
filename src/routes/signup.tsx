@@ -37,7 +37,7 @@ export default function Signup() {
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, setCurrentUser } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -95,9 +95,9 @@ export default function Signup() {
         return;
       }
 
-      // const userLoginBody = await userLoginResp.json();
+      const userLoginBody = await userLoginResp.json();
 
-      // setCurrentUser(userLoginBody.user);
+      setCurrentUser(userLoginBody.user);
 
       login(values.email, values.password);
 

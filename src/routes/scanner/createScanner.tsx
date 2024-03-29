@@ -16,7 +16,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +27,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/contexts/useAuth";
 
 const formSchema = z.object({
   description: z.string(),
@@ -38,6 +39,7 @@ export default function CreateScanner() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [scannerSecret, setScannerSecret] = useState("");
+  const { currentUser } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,9 +51,12 @@ export default function CreateScanner() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true);
     try {
-      const user = Cookies.get("user");
+      if (!currentUser) {
+        console.log("No current user. Skipping fetch.");
+        return;
+      }
 
-      const parsedUser = JSON.parse(user!);
+      const jwt = await currentUser.getIdToken();
 
       const resp = await fetch(
         `${import.meta.env.VITE_API_URL}/scanner/create`,
@@ -59,7 +64,7 @@ export default function CreateScanner() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
+            Authorization: `Bearer ${jwt}`,
           },
           body: JSON.stringify({
             description: values.description,
@@ -118,7 +123,7 @@ export default function CreateScanner() {
                 style={{ textAlign: "center" }}
               >
                 Save your scanner secret key
-                <Textarea value={scannerSecret}/>
+                <Textarea value={scannerSecret} />
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter style={{ justifyContent: "center" }}>

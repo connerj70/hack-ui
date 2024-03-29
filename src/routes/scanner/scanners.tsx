@@ -26,6 +26,8 @@ import { useNavigate } from "react-router-dom";
 import { columns } from "./ScannerColumns";
 import { useAuth } from "@/contexts/useAuth";
 import { GetScannerResponseType, ScannerType } from "@/types/scannerTypes";
+import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function Scanners() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -36,7 +38,14 @@ export default function Scanners() {
   const [scanners, setScanners] = useState<ScannerType[]>([]);
   const navigate = useNavigate();
   const { currentUser } = useAuth();
-  console.log("currentUser", currentUser);
+  const [progress, setProgress] = useState(13);
+  const { setSelectedScanner } = useAuth();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const timer = setTimeout(() => setProgress(66), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const fetchScanners = async () => {
@@ -84,7 +93,7 @@ export default function Scanners() {
 
   const table = useReactTable({
     data: scanners,
-    columns,
+    columns: columns(setSelectedScanner, toast),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -158,6 +167,8 @@ export default function Scanners() {
   //   }
   // }
 
+  
+
   return (
     <>
       <div className="flex-col md:flex">
@@ -166,7 +177,7 @@ export default function Scanners() {
             <h2 className="text-3xl font-bold tracking-tight">Scanners</h2>
             <div className="flex items-center space-x-2">
               <Button onClick={() => navigate("/scanners/create")}>
-                Create Device
+                Create Scanner
               </Button>
             </div>
           </div>
@@ -220,7 +231,7 @@ export default function Scanners() {
                       colSpan={columns?.length}
                       className="h-24 text-center"
                     >
-                      No results.
+                      <Progress value={progress} className="w-[60%]" />
                     </TableCell>
                   </TableRow>
                 )}

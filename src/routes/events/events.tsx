@@ -13,8 +13,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Plus } from "lucide-react";
-
 import {
   Table,
   TableBody,
@@ -23,7 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { columns } from "./EventColumn";
 import { eventLoader } from "./eventLoader";
 import { SensorEvent } from "@/types/eventTypes";
@@ -113,11 +111,11 @@ export default function Events() {
       <div className="flex-col md:flex">
         <div className="flex-1 space-y-4 p-8 pt-6">
           <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Event</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Events</h2>
             <div className="flex items-center space-x-2">
-              <Link to="/events/create">
-                <Plus className="mr-2 h-4 w-4" /> Create Scan
-              </Link>
+              <Button onClick={() => navigate("/events/create")}>
+                Scan Item
+              </Button>
             </div>
           </div>
           <div className="flex flex-col md:flex-row items-end justify-end md:space-x-2 space-y-2 md:space-y-0">

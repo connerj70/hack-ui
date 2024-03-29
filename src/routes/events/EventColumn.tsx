@@ -77,7 +77,7 @@ export const columns: ColumnDef<SensorEvent>[] = [
               <DropdownMenuItem
                 onClick={() => navigator.clipboard.writeText(item.id)}
               >
-                Copy item ID
+                Copy transaction
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <Link to={`/items/${item.id}`}>
