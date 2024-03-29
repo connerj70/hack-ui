@@ -12,7 +12,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export const columns: ColumnDef<ItemType>[] = [
+export const columns = (toast: any): ColumnDef<ItemType>[] => [
   // {
   //   id: "select",
   //   header: ({ table }) => (
@@ -69,6 +69,19 @@ export const columns: ColumnDef<ItemType>[] = [
     cell: ({ row }) => {
       const item = row.original;
 
+      const handleDemoCopy = () => {
+        // Assuming `useScannerContext` is your custom hook to access the scanner context
+
+        navigator.clipboard.writeText(
+          `https://www.pomerene.net/events/create/?itemSecret=${item.secretKey}`
+        );
+
+        toast({
+          title: "NFC Address copied",
+          description: item.description,
+        });
+      };
+
       return (
         <div className="flex justify-end">
           <DropdownMenu>
@@ -84,6 +97,10 @@ export const columns: ColumnDef<ItemType>[] = [
                 onClick={() => navigator.clipboard.writeText(item.secretKey)}
               >
                 Copy item ID
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleDemoCopy}>
+                Copy Demo Address
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               {/* <Link to={`/items/${item.id}`}>

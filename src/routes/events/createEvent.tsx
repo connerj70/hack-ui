@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/useAuth";
@@ -40,6 +40,12 @@ export default function CreateEvent() {
       itemSecret: itemSecret || "",
       message: "HACKER HOUSE DEMO",
     },
+  });
+
+  useEffect(() => {
+    if (itemSecret && selectedScanner) {
+      form.handleSubmit(onSubmit)(); // Programmatically submit the form
+    }
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {

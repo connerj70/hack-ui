@@ -36,6 +36,7 @@ import { columns } from "./itemColumns";
 import { ItemType, ItemTypeRes } from "@/types/itemTypes";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/useAuth";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function Items() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -50,6 +51,7 @@ export default function Items() {
   const { currentUser } = useAuth();
   const [progress, setProgress] = useState(13);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const timer = setTimeout(() => setProgress(66), 500);
@@ -100,7 +102,7 @@ export default function Items() {
 
   const table = useReactTable({
     data: items,
-    columns,
+    columns: columns(toast),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
