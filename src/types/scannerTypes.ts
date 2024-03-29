@@ -1,7 +1,7 @@
 export type ScannerType = {
   id: string;
   secretKey: string;
-  mint: string;
+  description: string;
 };
 
 export type ScannerCreateType = {

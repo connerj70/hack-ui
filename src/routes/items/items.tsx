@@ -83,8 +83,6 @@ export default function Items() {
 
         const body = await resp.json();
 
-        console.log("body", body);
-
         const userItems = await body?.items.map((item: ItemTypeRes) => {
           return {
             secretKey: item.metadata?.additionalMetadata?.[0]?.[1] ?? "",

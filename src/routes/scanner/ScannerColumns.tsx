@@ -12,8 +12,14 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ScannerType } from "@/types/scannerTypes";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { ScannerInfo } from "@/contexts/AuthProvider";
 
-export const columns: ColumnDef<ScannerType>[] = [
+type SetSelectedScannerFunc = (scanner: ScannerInfo | null) => void;
+
+export const columns = (
+  setSelectedScanner: SetSelectedScannerFunc,
+  toast: any
+): ColumnDef<ScannerType>[] => [
   // {
   //   id: "select",
   //   header: ({ table }) => (
@@ -71,6 +77,20 @@ export const columns: ColumnDef<ScannerType>[] = [
     cell: ({ row }) => {
       const scanner = row.original;
 
+      const handleSelectScanner = () => {
+        // Assuming `useScannerContext` is your custom hook to access the scanner context
+
+        setSelectedScanner({
+          description: scanner.description,
+          secretKey: scanner.secretKey,
+        });
+
+        toast({
+          title: "Scanner selected",
+          description: scanner.description,
+        });
+      };
+
       return (
         <div className="flex justify-end">
           <DropdownMenu>
@@ -86,6 +106,10 @@ export const columns: ColumnDef<ScannerType>[] = [
                 onClick={() => navigator.clipboard.writeText(scanner.secretKey)}
               >
                 Copy device ID
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleSelectScanner}>
+                Select This Scanner
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <Link to={`/devices/${scanner.id}`}>

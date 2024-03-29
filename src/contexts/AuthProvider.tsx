@@ -7,11 +7,18 @@ import {
 } from "firebase/auth";
 import { auth } from "@/firebase-config"; // Make sure this is the correct path to your Firebase configuration
 
+export interface ScannerInfo {
+  description: string;
+  secretKey: string;
+}
+
 interface AuthContextType {
   currentUser: User | null;
   setCurrentUser: (user: User | null) => void;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  selectedScanner: ScannerInfo | null; // Add this line
+  setSelectedScanner: (scanner: ScannerInfo | null) => void; // And this line
 }
 
 interface AuthProviderProps {
@@ -24,6 +31,9 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [selectedScanner, setSelectedScanner] = useState<ScannerInfo | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -48,6 +58,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setCurrentUser,
     login,
     logout,
+    selectedScanner,
+    setSelectedScanner,
   };
 
   return (
