@@ -1,6 +1,7 @@
 export type ItemType = {
   id: string;
   description: string;
+  secretKey: string;
 };
 
 export type ItemTypeRes = {

@@ -26,6 +26,7 @@ import { useNavigate } from "react-router-dom";
 import { columns } from "./ScannerColumns";
 import { useAuth } from "@/contexts/useAuth";
 import { GetScannerResponseType, ScannerType } from "@/types/scannerTypes";
+import { Progress } from "@/components/ui/progress";
 
 export default function Scanners() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -36,7 +37,12 @@ export default function Scanners() {
   const [scanners, setScanners] = useState<ScannerType[]>([]);
   const navigate = useNavigate();
   const { currentUser } = useAuth();
-  console.log("currentUser", currentUser);
+  const [progress, setProgress] = useState(13);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setProgress(66), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const fetchScanners = async () => {
@@ -220,7 +226,7 @@ export default function Scanners() {
                       colSpan={columns?.length}
                       className="h-24 text-center"
                     >
-                      No results.
+                      <Progress value={progress} className="w-[60%]" />
                     </TableCell>
                   </TableRow>
                 )}

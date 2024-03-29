@@ -1,4 +1,3 @@
-import { MoreHorizontal } from "lucide-react";
 // import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
@@ -8,12 +7,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ItemType } from "@/types/itemTypes";
 import { ColumnDef } from "@tanstack/react-table";
-import { ScannerType } from "@/types/scannerTypes";
+import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 
-export const columns: ColumnDef<ScannerType>[] = [
+export const columns: ColumnDef<ItemType>[] = [
   // {
   //   id: "select",
   //   header: ({ table }) => (
@@ -44,12 +43,12 @@ export const columns: ColumnDef<ScannerType>[] = [
     accessorKey: "secretKey",
     header: "Secret Key",
     cell: ({ row }) => {
-      const scanner = row.original;
-      const displayKey = `${scanner.secretKey.slice(0, 15)}...`; // Truncate the key for display
+      const item = row.original;
+      const displayKey = `${item.secretKey.slice(0, 15)}...`; // Truncate the key for display
 
       return (
         <div
-          title={scanner.secretKey} // Show full key on hover
+          title={item.secretKey} // Show full key on hover
           className="text-ellipsis overflow-hidden"
           style={{
             maxWidth: "150px", // Limit the width of the cell
@@ -64,12 +63,11 @@ export const columns: ColumnDef<ScannerType>[] = [
       );
     },
   },
-
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const scanner = row.original;
+      const item = row.original;
 
       return (
         <div className="flex justify-end">
@@ -83,14 +81,14 @@ export const columns: ColumnDef<ScannerType>[] = [
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(scanner.secretKey)}
+                onClick={() => navigator.clipboard.writeText(item.secretKey)}
               >
-                Copy device ID
+                Copy item ID
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link to={`/devices/${scanner.id}`}>
-                <DropdownMenuItem>View details</DropdownMenuItem>
-              </Link>
+              {/* <Link to={`/items/${item.id}`}>
+                  <DropdownMenuItem>View details</DropdownMenuItem>
+                </Link> */}
               <DropdownMenuItem>View events</DropdownMenuItem>
               <DropdownMenuItem>Deactivate</DropdownMenuItem>
             </DropdownMenuContent>

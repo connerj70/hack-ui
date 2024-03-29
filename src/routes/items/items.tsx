@@ -14,7 +14,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Plus } from "lucide-react";
 // import { Checkbox } from "@/components/ui/checkbox";
 // import {
 //   DropdownMenu,
@@ -32,10 +31,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link} from "react-router-dom";
-import { columns } from "./columns";
+import { useNavigate } from "react-router-dom";
+import { columns } from "./itemColumns";
 import { ItemType, ItemTypeRes } from "@/types/itemTypes";
-
+import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/useAuth";
 
 export default function Items() {
@@ -49,6 +48,13 @@ export default function Items() {
   const [loadingReport] = useState(false);
   const [items, setItems] = useState<ItemType[]>([]);
   const { currentUser } = useAuth();
+  const [progress, setProgress] = useState(13);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const timer = setTimeout(() => setProgress(66), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -157,9 +163,9 @@ export default function Items() {
           <div className="flex items-center justify-between space-y-2">
             <h2 className="text-3xl font-bold tracking-tight">Items</h2>
             <div className="flex items-center space-x-2">
-              <Link to="/items/create">
-                <Plus className="mr-2 h-4 w-4" /> Create Item
-              </Link>
+              <Button onClick={() => navigate("/items/create")}>
+                Create Item
+              </Button>
             </div>
           </div>
           <div className="flex flex-col md:flex-row items-end justify-end md:space-x-2 space-y-2 md:space-y-0">
@@ -212,7 +218,7 @@ export default function Items() {
                       colSpan={columns?.length}
                       className="h-24 text-center"
                     >
-                      No results.
+                      <Progress value={progress} className="w-[60%]" />
                     </TableCell>
                   </TableRow>
                 )}
