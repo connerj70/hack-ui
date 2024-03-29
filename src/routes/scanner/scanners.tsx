@@ -41,6 +41,7 @@ export default function Scanners() {
   const [progress, setProgress] = useState(13);
   const { setSelectedScanner } = useAuth();
   const { toast } = useToast();
+  const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => setProgress(66), 500);
@@ -49,7 +50,9 @@ export default function Scanners() {
 
   useEffect(() => {
     const fetchScanners = async () => {
+
       try {
+        setLoadingData(true);
         const jwt = await currentUser?.getIdToken();
 
         const resp = await fetch(
@@ -83,6 +86,7 @@ export default function Scanners() {
           }
         );
         setScanners(scannerItems);
+        setLoadingData(false);
       } catch (error) {
         console.error("An unexpected error occurred:", error);
       }
@@ -231,7 +235,11 @@ export default function Scanners() {
                       colSpan={columns?.length}
                       className="h-24 text-center"
                     >
-                      <Progress value={progress} className="w-[60%]" />
+                      {!loadingData ? (
+                        <p>No Items Click add Item to Create Pallet Tag</p>
+                      ) : (
+                        <Progress value={progress} className="w-[60%]" />
+                      )}
                     </TableCell>
                   </TableRow>
                 )}

@@ -52,6 +52,7 @@ export default function Items() {
   const [progress, setProgress] = useState(13);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => setProgress(66), 500);
@@ -60,6 +61,7 @@ export default function Items() {
 
   useEffect(() => {
     const fetchItems = async () => {
+      setLoadingData(true);
       try {
         // Assuming currentUser comes from your authentication context
         // and it might be null initially until the auth state is resolved.
@@ -92,6 +94,7 @@ export default function Items() {
           };
         });
         setItems(userItems);
+        setLoadingData(false);
       } catch (error) {
         console.error("An unexpected error occurred:", error);
       }
@@ -218,7 +221,11 @@ export default function Items() {
                       colSpan={columns?.length}
                       className="h-24 text-center"
                     >
-                      <Progress value={progress} className="w-[60%]" />
+                      {!loadingData ? (
+                        <p>No Items Click add Item to Create Pallet Tag</p>
+                      ) : (
+                        <Progress value={progress} className="w-[60%]" />
+                      )}
                     </TableCell>
                   </TableRow>
                 )}
