@@ -1,42 +1,6 @@
 import { Link } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
-<<<<<<< Updated upstream
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import Chart from "chart.js/auto"
-import { CategoryScale } from "chart.js";
-import { Data } from "@/utils/Data.js";
-import { useState } from "react"
-import LandingChart from "../components/landingChart.jsx";
-
-Chart.register(CategoryScale);
-
-export default function Root() {
-  const [chartData, setChartData] = useState({
-    labels: Data.map((data: any) => data.year), 
-    datasets: [
-      {
-        label: "Users Gained ",
-        data: Data.map((data: any) => data.userGain),
-        backgroundColor: [
-          "rgba(75,192,192,1)",
-          "&quot;#ecf0f1",
-          "#50AF95",
-          "#f3ba2f",
-          "#2a71d0"
-        ],
-        borderColor: "black",
-        borderWidth: 2
-      }
-    ]
-  });
-=======
 
 export default function Root() {
   const items = [
@@ -45,7 +9,6 @@ export default function Root() {
     "Authenticated Inventory Tracking System",
     "Base Layer for a Smart Economic Stack",
   ];
->>>>>>> Stashed changes
 
   return (
     <div className="p-6 min-h-screen">

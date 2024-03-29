@@ -16,18 +16,18 @@ import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
+
 import {
   AlertDialog,
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/contexts/useAuth";
 
 const formSchema = z.object({
   description: z.string(),
@@ -39,6 +39,7 @@ export default function CreateItem() {
   const [open, setOpen] = useState(false);
   const [itemSecret, setItemSecret] = useState("");
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -50,24 +51,24 @@ export default function CreateItem() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true);
     try {
-      const user = Cookies.get("user");
+      
+      if (!currentUser) {
+        console.log("No current user. Skipping fetch.");
+        return;
+      }
 
-      const parsedUser = JSON.parse(user!);
-      console.log("parsedUser: ", parsedUser)
+      const jwt = await currentUser.getIdToken();
 
-      const resp = await fetch(
-        `${import.meta.env.VITE_API_URL}/item/create`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
-          },
-          body: JSON.stringify({
-            description: values.description
-          }),
-        }
-      );
+      const resp = await fetch(`${import.meta.env.VITE_API_URL}/item/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+        },
+        body: JSON.stringify({
+          description: values.description,
+        }),
+      });
 
       if (!resp.ok) {
         if (resp.status === 403) {
@@ -82,12 +83,10 @@ export default function CreateItem() {
         return;
       }
 
-      const respBody = await resp.json()
+      const respBody = await resp.json();
 
-      setItemSecret(respBody.item.itemSecret) 
-      setOpen(true)
-
-
+      setItemSecret(respBody.item.itemSecret);
+      setOpen(true);
     } catch (error) {
       if (error instanceof Error) {
         const errorMessage = error.message;
@@ -102,8 +101,8 @@ export default function CreateItem() {
   }
 
   function handleClose() {
-    setOpen(false)
-    navigate("/items") 
+    setOpen(false);
+    navigate("/items");
   }
 
   return (
@@ -113,12 +112,15 @@ export default function CreateItem() {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Item secret</AlertDialogTitle>
-              <AlertDialogDescription className="text-wrap">
-                Save your item secret key {itemSecret}
+              <AlertDialogDescription>
+                Save your item secret key
+                <Textarea value={itemSecret}/>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogAction onClick={handleClose}>I've saved my secret key</AlertDialogAction>
+              <AlertDialogAction onClick={handleClose}>
+                I've saved my secret key
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

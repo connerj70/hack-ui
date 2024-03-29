@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom"
+import { Link } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,17 +10,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import { useNavigate } from "react-router-dom";
-import { useUserContext } from "@/contexts/userContext";
+import { useAuth } from "@/contexts/useAuth";
 
 export function UserNav(props: any) {
   const navigate = useNavigate();
-  const { clearUser } = useUserContext();
+  const { logout } = useAuth();
 
-  async function logout() {
+  async function logoutUser() {
     try {
-      clearUser();
+      logout();
       navigate("/login");
     } catch (error) {
       console.error("failed to logout", error);
@@ -50,12 +49,14 @@ export function UserNav(props: any) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <Link to="/profile"><DropdownMenuItem>Profile</DropdownMenuItem></Link>
+          <Link to="/profile">
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+          </Link>
           <DropdownMenuItem>Billing</DropdownMenuItem>
           <DropdownMenuItem>Settings</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={logout}>Log out</DropdownMenuItem>
+        <DropdownMenuItem onSelect={logoutUser}>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

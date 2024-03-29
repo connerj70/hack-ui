@@ -1,11 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
-import { ItemType } from "@/types/device";
-
+// import { ItemType } from "@/types/scannerTypes";
 import { Button } from "@/components/ui/button";
 import { CalendarDateRangePicker } from "@/components/dateRangePicker";
 import {
-  ColumnDef,
   ColumnFiltersState,
   SortingState,
   VisibilityState,
@@ -16,16 +14,15 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { MoreHorizontal, Plus } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+// import { Checkbox } from "@/components/ui/checkbox";
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuLabel,
+//   DropdownMenuSeparator,
+//   DropdownMenuTrigger,
+// } from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -34,115 +31,81 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link, useNavigate, useLoaderData } from "react-router-dom";
-import Cookies from "js-cookie";
-
-export async function loader(): Promise<ItemType[]> {
-  const user = Cookies.get("user");
-
-  const parsedUser = JSON.parse(user!);
-
-  const resp = await fetch(
-    `${import.meta.env.VITE_API_URL}/item/user`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
-      }
-    }
-  );
-
-  if (!resp.ok) {
-    console.error("Failed to fetch user accounts");
-    return [];
-  }
-
-  const body = await resp.json()
-
-  console.log("body: ", body)
-
-  return body.items.map((item: any) => {
-    return {
-      description: item.metadata.additionalMetadata[0][1],
-    }
-  })
-}
-
-export const columns: ColumnDef<ItemType>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "description",
-    header: "Description",
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const item = row.original;
-
-      return (
-        <div className="flex justify-end">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(item.id)}
-              >
-                Copy item ID
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <Link to={`/items/${item.id}`}>
-                <DropdownMenuItem>View details</DropdownMenuItem>
-              </Link>
-              <DropdownMenuItem>View events</DropdownMenuItem>
-              <DropdownMenuItem>Deactivate</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      );
-    },
-  },
-];
+import { useNavigate } from "react-router-dom";
+import { columns } from "./itemColumns";
+import { ItemType, ItemTypeRes } from "@/types/itemTypes";
+import { Progress } from "@/components/ui/progress";
+import { useAuth } from "@/contexts/useAuth";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function Items() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [loadingReport, setLoadingReport] = useState(false);
-  const items = useLoaderData()
+  // const [loadingReport, setLoadingReport] = useState(false);
+  // const items = useLoaderData() as ItemType[];
+  // const items =  itemLoader();
+  const [loadingReport] = useState(false);
+  const [items, setItems] = useState<ItemType[]>([]);
+  const { currentUser } = useAuth();
+  const [progress, setProgress] = useState(13);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [loadingData, setLoadingData] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setProgress(66), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      setLoadingData(true);
+      try {
+        // Assuming currentUser comes from your authentication context
+        // and it might be null initially until the auth state is resolved.
+        if (!currentUser) {
+          console.log("No current user. Skipping fetch.");
+          return;
+        }
+
+        const jwt = await currentUser.getIdToken(); // Ensure currentUser is not null before calling this
+
+        const resp = await fetch(`${import.meta.env.VITE_API_URL}/item/user`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
+
+        if (!resp.ok) {
+          // Handle HTTP errors here, for example:
+          throw new Error(`Failed to fetch items: ${resp.statusText}`);
+        }
+
+        const body = await resp.json();
+
+        const userItems = await body?.items.map((item: ItemTypeRes) => {
+          return {
+            secretKey: item.metadata?.additionalMetadata?.[0]?.[1] ?? "",
+            description: item.metadata?.additionalMetadata?.[1]?.[1] ?? "",
+          };
+        });
+        setItems(userItems);
+        setLoadingData(false);
+      } catch (error) {
+        console.error("An unexpected error occurred:", error);
+      }
+    };
+
+    fetchItems(); // Correctly call fetchItems here
+  }, [currentUser]); // Add currentUser to the dependency array if it's expected to change over time
 
   const table = useReactTable({
     data: items,
-    columns,
+    columns: columns(toast),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -159,42 +122,42 @@ export default function Items() {
     },
   });
 
-  const downloadFile = ({ data, fileName, fileType }) => {
-    const blob = new Blob([data], { type: fileType })
-    const a = document.createElement('a')
-    a.download = fileName
-    a.href = window.URL.createObjectURL(blob)
-    const clickEvt = new MouseEvent('click', {
-      view: window,
-      bubbles: true,
-      cancelable: true,
-    })
-    a.dispatchEvent(clickEvt)
-    a.remove()
-  }
+  // const downloadFile = ({ data, fileName, fileType }) => {
+  //   const blob = new Blob([data], { type: fileType })
+  //   const a = document.createElement('a')
+  //   a.download = fileName
+  //   a.href = window.URL.createObjectURL(blob)
+  //   const clickEvt = new MouseEvent('click', {
+  //     view: window,
+  //     bubbles: true,
+  //     cancelable: true,
+  //   })
+  //   a.dispatchEvent(clickEvt)
+  //   a.remove()
+  // }
 
-  async function downloadReport(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    setLoadingReport(true);
-    try {
-      e.preventDefault()
-      // Headers for each column
-      let headers = ['Id,Name,Coordinates,PublicKey, CreatedAt, Status']
-      let itemsCsv = items.reduce((acc, item: any) => {
-        const { id, name, coordinates, publicKey, createdAt, status } = item
-        acc.push([id, name, coordinates, publicKey, createdAt, status].join(','))
-        return acc
-      }, [])
-      downloadFile({
-        data: [...headers, ...itemsCsv].join('\n'),
-        fileName: 'items.csv',
-        fileType: 'text/csv',
-      })
-    } catch (error) {
+  // async function downloadReport(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  //   setLoadingReport(true);
+  //   try {
+  //     e.preventDefault()
+  //     // Headers for each column
+  //     let headers = ['Id,Name,Coordinates,PublicKey, CreatedAt, Status']
+  //     let itemsCsv = items.reduce((acc, item: any) => {
+  //       const { id, name, coordinates, publicKey, createdAt, status } = item
+  //       acc.push([id, name, coordinates, publicKey, createdAt, status].join(','))
+  //       return acc
+  //     }, [])
+  //     downloadFile({
+  //       data: [...headers, ...itemsCsv].join('\n'),
+  //       fileName: 'items.csv',
+  //       fileType: 'text/csv',
+  //     })
+  //   } catch (error) {
 
-    } finally {
-      setLoadingReport(false)
-    }
-  }
+  //   } finally {
+  //     setLoadingReport(false)
+  //   }
+  // }
 
   return (
     <>
@@ -203,14 +166,17 @@ export default function Items() {
           <div className="flex items-center justify-between space-y-2">
             <h2 className="text-3xl font-bold tracking-tight">Items</h2>
             <div className="flex items-center space-x-2">
-              <Link to="/items/create">
-                <Plus className="mr-2 h-4 w-4" /> Create Item 
-              </Link>
+              <Button onClick={() => navigate("/items/create")}>
+                Create Item
+              </Button>
             </div>
           </div>
           <div className="flex flex-col md:flex-row items-end justify-end md:space-x-2 space-y-2 md:space-y-0">
             <CalendarDateRangePicker />
-            <Button disabled={loadingReport} onClick={downloadReport} variant="secondary">Download</Button>
+            {/* <Button disabled={loadingReport} onClick={downloadReport} variant="secondary">Download</Button> */}
+            <Button disabled={loadingReport} variant="secondary">
+              Download
+            </Button>
           </div>
           <div className="rounded-md border">
             <Table>
@@ -255,7 +221,11 @@ export default function Items() {
                       colSpan={columns?.length}
                       className="h-24 text-center"
                     >
-                      No results.
+                      {!loadingData ? (
+                        <p>No Items Click add Item to Create Pallet Tag</p>
+                      ) : (
+                        <Progress value={progress} className="w-[60%]" />
+                      )}
                     </TableCell>
                   </TableRow>
                 )}
