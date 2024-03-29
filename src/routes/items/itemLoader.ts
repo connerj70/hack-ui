@@ -1,14 +1,12 @@
 import { ItemType, ItemTypeRes } from "@/types/itemTypes";
-import Cookies from "js-cookie";
+import { User } from "firebase/auth";
 
-export async function itemLoader(): Promise<ItemType[]> {
-  const user = Cookies.get("user");
-  const parsedUser = JSON.parse(user!);
+export async function itemLoader(currentUser: User): Promise<ItemType[]> {
   const resp = await fetch(`${import.meta.env.VITE_API_URL}/item/user`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${parsedUser.stsTokenManager.accessToken}`,
+      Authorization: `Bearer ${currentUser.getIdToken()}`,
     },
   });
 
