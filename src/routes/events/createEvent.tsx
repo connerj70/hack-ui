@@ -16,7 +16,6 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/useAuth";
 
 const formSchema = z.object({
@@ -114,11 +113,52 @@ export default function CreateEvent() {
               Create New Scan
             </h1>
           </div>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              {/* Your existing fields here */}
 
-              {!scanned ? (
+          {!scanned ? (
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
+              >
+                <FormField
+                  control={form.control}
+                  name="scannerSecret"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Scanner Secret</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="itemSecret"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Item Secret</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="message"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Message</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <Button disabled={submitting} type="submit" className="w-full">
                   {submitting ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -126,23 +166,23 @@ export default function CreateEvent() {
                     "Create"
                   )}
                 </Button>
-              ) : (
-                <div className="text-center">
-                  {/* Placeholder for checkmark animation */}
-                  <div className="text-green-500">✓ Scan Successful</div>
-                  {/* Display the link */}
-                  <a
-                    href={respUrl} // Make sure respUrl is stored in the component state
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline"
-                  >
-                    View Scan
-                  </a>
-                </div>
-              )}
-            </form>
-          </Form>
+              </form>
+            </Form>
+          ) : (
+            <div className="text-center">
+              {/* Placeholder for checkmark animation */}
+              <div className="text-green-500">✓ Scan Successful</div>
+              {/* Display the link */}
+              <a
+                href={respUrl} // Make sure respUrl is stored in the component state
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline"
+              >
+                View Scan
+              </a>
+            </div>
+          )}
         </div>
       </div>
       <Toaster />
