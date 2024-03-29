@@ -2,11 +2,13 @@ import { ItemType, ItemTypeRes } from "@/types/itemTypes";
 import { User } from "firebase/auth";
 
 export async function itemLoader(currentUser: User): Promise<ItemType[]> {
+
+  const jwt = await currentUser.getIdToken();
   const resp = await fetch(`${import.meta.env.VITE_API_URL}/item/user`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${currentUser.getIdToken()}`,
+      Authorization: `Bearer ${jwt}`,
     },
   });
 
