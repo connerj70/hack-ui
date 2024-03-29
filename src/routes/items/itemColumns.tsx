@@ -11,6 +11,7 @@ import { ItemType } from "@/types/itemTypes";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 
 export const columns = (toast: any): ColumnDef<ItemType>[] => [
   // {
@@ -40,29 +41,43 @@ export const columns = (toast: any): ColumnDef<ItemType>[] => [
     header: "Description",
   },
   {
-    accessorKey: "secretKey",
-    header: "Secret Key",
+    accessorKey: "public",
+    header: "Public",
     cell: ({ row }) => {
       const item = row.original;
-      const displayKey = `${item.secretKey.slice(0, 15)}...`; // Truncate the key for display
 
       return (
-        <div
-          title={item.secretKey} // Show full key on hover
-          className="text-ellipsis overflow-hidden"
-          style={{
-            maxWidth: "150px", // Limit the width of the cell
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {displayKey}
-          {/* You can also add a button or icon here to click and copy or view the full key */}
+        <div>
+          <Textarea value={item.public}></Textarea>
         </div>
       );
     },
+    
   },
+  // {
+  //   accessorKey: "secretKey",
+  //   header: "Secret Key",
+  //   cell: ({ row }) => {
+  //     const item = row.original;
+  //     const displayKey = `${item.secretKey.slice(0, 3)}...`; // Truncate the key for display
+
+  //     return (
+  //       <div
+  //         title={item.secretKey} // Show full key on hover
+  //         className="text-ellipsis overflow-hidden"
+  //         style={{
+  //           maxWidth: "150px", // Limit the width of the cell
+  //           whiteSpace: "nowrap",
+  //           overflow: "hidden",
+  //           textOverflow: "ellipsis",
+  //         }}
+  //       >
+  //         {displayKey}
+  //         {/* You can also add a button or icon here to click and copy or view the full key */}
+  //       </div>
+  //     );
+  //   },
+  // },
   {
     id: "actions",
     enableHiding: false,
@@ -73,7 +88,9 @@ export const columns = (toast: any): ColumnDef<ItemType>[] => [
         // Assuming `useScannerContext` is your custom hook to access the scanner context
 
         navigator.clipboard.writeText(
-          `${import.meta.env.VITE_BROWSER_URL}/events/create?itemSecret=${item.secretKey}`
+          `${import.meta.env.VITE_BROWSER_URL}/events/create?itemSecret=${
+            item.secretKey
+          }`
         );
 
         toast({

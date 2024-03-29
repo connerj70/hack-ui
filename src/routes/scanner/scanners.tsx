@@ -82,6 +82,7 @@ export default function Scanners() {
             return {
               secretKey: scanner.metadata?.additionalMetadata?.[0]?.[1] ?? "",
               description: scanner.metadata?.additionalMetadata?.[1]?.[1] ?? "",
+              public: scanner.metadata?.additionalMetadata?.[2]?.[1] ?? "",
             };
           }
         );
@@ -192,7 +193,7 @@ export default function Scanners() {
               Download
             </Button>
           </div>
-          <div className="rounded-md border">
+          {/* <div className="rounded-md border"> */}
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -272,7 +273,7 @@ export default function Scanners() {
           </div>
         </div>
         <Toaster />
-      </div>
+      {/* </div> */}
     </>
   );
 }

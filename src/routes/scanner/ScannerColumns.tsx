@@ -13,6 +13,7 @@ import { ScannerType } from "@/types/scannerTypes";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ScannerInfo } from "@/contexts/AuthProvider";
+import { Textarea } from "@/components/ui/textarea";
 
 type SetSelectedScannerFunc = (scanner: ScannerInfo | null) => void;
 
@@ -47,29 +48,42 @@ export const columns = (
     header: "Description",
   },
   {
-    accessorKey: "secretKey",
-    header: "Secret Key",
+    accessorKey: "public",
+    header: "Public",
     cell: ({ row }) => {
       const scanner = row.original;
-      const displayKey = `${scanner.secretKey.slice(0, 15)}...`; // Truncate the key for display
 
       return (
-        <div
-          title={scanner.secretKey} // Show full key on hover
-          className="text-ellipsis overflow-hidden"
-          style={{
-            maxWidth: "150px", // Limit the width of the cell
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {displayKey}
-          {/* You can also add a button or icon here to click and copy or view the full key */}
+        <div>
+          <Textarea value={scanner.public}></Textarea>
         </div>
       );
     },
   },
+  // {
+  //   accessorKey: "secretKey",
+  //   header: "Secret Key",
+  //   cell: ({ row }) => {
+  //     const scanner = row.original;
+  //     const displayKey = `${scanner.secretKey.slice(0, 15)}...`; // Truncate the key for display
+
+  //     return (
+  //       <div
+  //         title={scanner.secretKey} // Show full key on hover
+  //         className="text-ellipsis overflow-hidden"
+  //         style={{
+  //           maxWidth: "150px", // Limit the width of the cell
+  //           whiteSpace: "nowrap",
+  //           overflow: "hidden",
+  //           textOverflow: "ellipsis",
+  //         }}
+  //       >
+  //         {displayKey}
+  //         {/* You can also add a button or icon here to click and copy or view the full key */}
+  //       </div>
+  //     );
+  //   },
+  // },
 
   {
     id: "actions",
