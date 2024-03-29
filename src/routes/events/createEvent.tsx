@@ -29,10 +29,12 @@ export default function CreateEvent() {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const itemSecret = searchParams.get("itemSecret");
   const { currentUser, selectedScanner } = useAuth();
   const [autoSubmitted, setAutoSubmitted] = useState(false);
+  const [scanned, setScanned] = useState(false);
+  const [respUrl, setRespUrl] = useState("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,7 +56,7 @@ export default function CreateEvent() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true);
     try {
-      if (!currentUser) {
+      if (!currentUser || scanned) {
         console.log("No current user. Skipping fetch.");
         return;
       }
@@ -88,8 +90,8 @@ export default function CreateEvent() {
       respUrl = respUrl.replace(/^"(.*)"$/, "$1");
       console.log("Cleaned URL: ", respUrl);
 
-      window.open(respUrl);
-      navigate("/events");
+      setRespUrl(respUrl);
+      setScanned(true);
     } catch (error) {
       if (error instanceof Error) {
         const errorMessage = error.message;
@@ -114,52 +116,31 @@ export default function CreateEvent() {
           </div>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="scannerSecret"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Scanner Secret</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="itemSecret"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Item Secret</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="message"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Message</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Your existing fields here */}
 
-              <Button disabled={submitting} type="submit" className="w-full">
-                {submitting ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : null}
-                Create
-              </Button>
+              {!scanned ? (
+                <Button disabled={submitting} type="submit" className="w-full">
+                  {submitting ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    "Create"
+                  )}
+                </Button>
+              ) : (
+                <div className="text-center">
+                  {/* Placeholder for checkmark animation */}
+                  <div className="text-green-500">✓ Scan Successful</div>
+                  {/* Display the link */}
+                  <a
+                    href={respUrl} // Make sure respUrl is stored in the component state
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
+                    View Scan
+                  </a>
+                </div>
+              )}
             </form>
           </Form>
         </div>

@@ -73,7 +73,7 @@ export const columns = (toast: any): ColumnDef<ItemType>[] => [
         // Assuming `useScannerContext` is your custom hook to access the scanner context
 
         navigator.clipboard.writeText(
-          `https://www.pomerene.net/events/create/?itemSecret=${item.secretKey}`
+          `${import.meta.env.VITE_BROWSER_URL}/events/create?itemSecret=${item.secretKey}`
         );
 
         toast({
