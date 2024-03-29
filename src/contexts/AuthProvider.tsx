@@ -1,11 +1,11 @@
-import { createContext, ReactNode, useEffect, useState } from "react";
+import React, { createContext, ReactNode, useEffect, useState } from "react";
 import {
   User,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { auth } from "@/firebase-config"; // Make sure this is the correct path to your Firebase configuration
+import { auth } from "@/firebase-config"; // Ensure this is correctly pointing to your Firebase configuration
 
 export interface ScannerInfo {
   description: string;
@@ -17,13 +17,15 @@ interface AuthContextType {
   setCurrentUser: (user: User | null) => void;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  selectedScanner: ScannerInfo | null; // Add this line
-  setSelectedScanner: (scanner: ScannerInfo | null) => void; // And this line
+  selectedScanner: ScannerInfo | null;
+  setSelectedScanner: (scanner: ScannerInfo | null) => void;
 }
 
 interface AuthProviderProps {
   children: ReactNode;
 }
+
+const SCANNER_STORAGE_KEY = "selectedScanner";
 
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined
@@ -31,8 +33,12 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  // Initialize selectedScanner from localStorage
   const [selectedScanner, setSelectedScanner] = useState<ScannerInfo | null>(
-    null
+    () => {
+      const storedScanner = localStorage.getItem(SCANNER_STORAGE_KEY);
+      return storedScanner ? JSON.parse(storedScanner) : null;
+    }
   );
   const [loading, setLoading] = useState(true);
 
@@ -42,7 +48,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setLoading(false);
     });
 
-    return unsubscribe; // Ensure to clean up the subscription
+    return unsubscribe; // Cleanup subscription
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -53,13 +59,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     await signOut(auth);
   };
 
+  const handleSetSelectedScanner = (scanner: ScannerInfo | null) => {
+    setSelectedScanner(scanner);
+    localStorage.setItem(SCANNER_STORAGE_KEY, JSON.stringify(scanner));
+  };
+
   const value = {
     currentUser,
     setCurrentUser,
     login,
     logout,
     selectedScanner,
-    setSelectedScanner,
+    setSelectedScanner: handleSetSelectedScanner,
   };
 
   return (
