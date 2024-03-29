@@ -2,6 +2,7 @@ export type ItemType = {
   id: string;
   description: string;
   secretKey: string;
+  public: string;
 };
 
 export type ItemTypeRes = {
@@ -15,6 +16,10 @@ export type ItemTypeRes = {
     name: "string";
     symbol: "string";
     uri: "string";
-    additionalMetadata: [["secret", "potatoes"], ["description", "potatoes"]];
+    additionalMetadata: [
+      ["secret", "potatoes"],
+      ["description", "potatoes"],
+      ["public", "potatoes"]
+    ];
   };
 };

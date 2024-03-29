@@ -2,6 +2,7 @@ export type ScannerType = {
   id: string;
   secretKey: string;
   description: string;
+  public: string;
 };
 
 export type ScannerCreateType = {
@@ -24,7 +25,8 @@ export type GetScannerResponseType = {
         "secret",
         "jTW2SfoRecY4eaShFpq5M7qEFUVSEPaS5drhyj7Tnk54S2A6yAPu8r5qxWrormLd1Anbw5aBYhNDe3eebPuXVHC"
       ],
-      ["description", "test"]
+      ["description", "test"],
+      ["public", "true"]
 
     ];
   };
