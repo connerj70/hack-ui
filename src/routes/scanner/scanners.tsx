@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
-import { CalendarDateRangePicker } from "@/components/dateRangePicker";
+// import { CalendarDateRangePicker } from "@/components/dateRangePicker";
 import {
   ColumnFiltersState,
   SortingState,
@@ -34,7 +34,7 @@ export default function Scanners() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [loadingReport] = useState(false);
+  // const [loadingReport] = useState(false);
   const [scanners, setScanners] = useState<ScannerType[]>([]);
   const navigate = useNavigate();
   const { currentUser } = useAuth();

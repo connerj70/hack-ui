@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 // import { ItemType } from "@/types/scannerTypes";
 import { Button } from "@/components/ui/button";
-import { CalendarDateRangePicker } from "@/components/dateRangePicker";
+// import { CalendarDateRangePicker } from "@/components/dateRangePicker";
 import {
   ColumnFiltersState,
   SortingState,
@@ -46,7 +46,7 @@ export default function Items() {
   // const [loadingReport, setLoadingReport] = useState(false);
   // const items = useLoaderData() as ItemType[];
   // const items =  itemLoader();
-  const [loadingReport] = useState(false);
+  // const [loadingReport] = useState(false);
   const [items, setItems] = useState<ItemType[]>([]);
   const { currentUser } = useAuth();
   const [progress, setProgress] = useState(13);
