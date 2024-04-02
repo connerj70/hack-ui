@@ -1,6 +1,7 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
 import {
   User,
+  UserCredential,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
@@ -15,7 +16,7 @@ export interface ScannerInfo {
 interface AuthContextType {
   currentUser: User | null;
   setCurrentUser: (user: User | null) => void;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<UserCredential>;
   logout: () => Promise<void>;
   selectedScanner: ScannerInfo | null;
   setSelectedScanner: (scanner: ScannerInfo | null) => void;

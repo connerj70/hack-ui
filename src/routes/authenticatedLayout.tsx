@@ -7,6 +7,8 @@ import { useAuth } from '@/contexts/useAuth';
 const AuthenticatedLayout = () => {
   const { currentUser } = useAuth();
 
+  console.log("currentUser=", currentUser);
+
   return (
     <div>
       <div className="border-b">

@@ -30,7 +30,8 @@ export default function Login() {
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { login, setCurrentUser } = useAuth();
+
+  const { login } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -43,40 +44,20 @@ export default function Login() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true);
     try {
-      const resp = await fetch(`${import.meta.env.VITE_API_URL}/user/signin`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: values.email,
-          password: values.password,
-        }),
-      });
-
-      if (!resp.ok) {
-        toast({
-          title: "Error signing in",
-          description: "An error occurred while signing in",
-        });
-        return;
-      }
-
-      const body = await resp.json();
-
-      setCurrentUser(body.user);
-
-      login(values.email, values.password);
+      await login(values.email, values.password);
 
       navigate("/items");
     } catch (error) {
+      console.error(error);
+      let errorMessage = "An unexpected error occurred.";
       if (error instanceof Error) {
-        const errorMessage = error.message;
-        toast({
-          title: "Error logging in",
-          description: errorMessage,
-        });
+        errorMessage = error.message;
       }
+
+      toast({
+        title: "Error logging in",
+        description: errorMessage,
+      });
     } finally {
       setSubmitting(false);
     }
@@ -89,7 +70,11 @@ export default function Login() {
           to="/"
           className="lg:hidden absolute left-4 top-4 md:left-8 md:top-8 z-10"
         >
-          <img src="/white-small.png" alt="Pomerene" className="rounded-full h-10" />
+          <img
+            src="/white-small.png"
+            alt="Pomerene"
+            className="rounded-full h-10"
+          />
         </Link>
         <Link
           to="/signup"
@@ -104,7 +89,11 @@ export default function Login() {
           <div className="absolute inset-0 bg-zinc-900" />
           <div className="relative z-20 flex items-center text-lg font-medium">
             <Link to="/" className="flex items-center justify-center">
-              <img src="/yellow-black-small.png" alt="Pomerene" className="rounded-full h-10" />
+              <img
+                src="/yellow-black-small.png"
+                alt="Pomerene"
+                className="rounded-full h-10"
+              />
             </Link>
           </div>
           <div className="relative z-20 mt-auto">

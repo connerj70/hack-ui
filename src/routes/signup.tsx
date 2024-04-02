@@ -37,7 +37,7 @@ export default function Signup() {
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { login, setCurrentUser } = useAuth();
+  const { login } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -73,33 +73,7 @@ export default function Signup() {
         return;
       }
 
-      const userLoginResp = await fetch(
-        `${import.meta.env.VITE_API_URL}/user/signin`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: values.email,
-            password: values.password,
-          }),
-        }
-      );
-
-      if (!userLoginResp.ok) {
-        toast({
-          title: "Error signing in",
-          description: "An error occurred while signing in",
-        });
-        return;
-      }
-
-      const userLoginBody = await userLoginResp.json();
-
-      setCurrentUser(userLoginBody.user);
-
-      login(values.email, values.password);
+      await login(values.email, values.password);
 
       navigate("/items");
     } catch (error) {
@@ -118,8 +92,15 @@ export default function Signup() {
   return (
     <div className="w-100 h-screen">
       <div className="container relative h-full flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-        <Link to="/" className="lg:hidden absolute left-4 top-4 md:left-8 md:top-8 z-10">
-          <img src="/white-small.png" alt="Pomerene" className="rounded-full h-10" />
+        <Link
+          to="/"
+          className="lg:hidden absolute left-4 top-4 md:left-8 md:top-8 z-10"
+        >
+          <img
+            src="/white-small.png"
+            alt="Pomerene"
+            className="rounded-full h-10"
+          />
         </Link>
         <Link
           to="/login"
@@ -134,7 +115,11 @@ export default function Signup() {
           <div className="absolute inset-0 bg-zinc-900" />
           <div className="relative z-20 flex items-center text-lg font-medium">
             <Link to="/" className="flex items-center justify-center">
-              <img src="/yellow-black-small.png" alt="Pomerene" className="rounded-full h-10" />
+              <img
+                src="/yellow-black-small.png"
+                alt="Pomerene"
+                className="rounded-full h-10"
+              />
             </Link>
           </div>
           <div className="relative z-20 mt-auto">
