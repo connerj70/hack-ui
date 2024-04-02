@@ -172,13 +172,7 @@ export default function Items() {
               </Button>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row items-end justify-end md:space-x-2 space-y-2 md:space-y-0">
-            <CalendarDateRangePicker />
-            {/* <Button disabled={loadingReport} onClick={downloadReport} variant="secondary">Download</Button> */}
-            <Button disabled={loadingReport} variant="secondary">
-              Download
-            </Button>
-          </div>
+         
           {/* <div className="rounded-md border"> */}
             <Table>
               <TableHeader>
