@@ -217,7 +217,7 @@ export default function Items() {
                       className="h-24 text-center"
                     >
                       {!loadingData ? (
-                        <p>No Items Click add Item to Create Pallet Tag</p>
+                        <p>No Items. Click "Create Item" Button to Create Pallet Tag (check if user has sol)</p>
                       ) : (
                         <Progress value={progress} className="w-[60%]" />
                       )}

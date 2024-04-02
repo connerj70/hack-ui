@@ -12,17 +12,13 @@ export function MainNav({
       className={cn("flex items-center space-x-4 lg:space-x-6", className)}
       {...props}
     >
-      {/* <Link
-        to="/dashboard"
-        className={`text-sm font-medium transition-colors hover:text-primary ${
-          location.pathname === "/dashboard"
-            ? "text-primary"
-            : "text-muted-foreground"
-        }`}
-      >
-        Dashboard
-      </Link> */}
-
+      <Link to="/" className="flex items-center ">
+        <img
+          src="/white-small.png"
+          alt="Pomerene"
+          className="rounded-full h-10"
+        />
+      </Link>
       <Link
         to="/items"
         className={`text-sm font-medium transition-colors hover:text-primary ${
@@ -43,17 +39,6 @@ export function MainNav({
       >
         Scanners
       </Link>
-
-      {/* <Link
-        to="/events"
-        className={`text-sm font-medium transition-colors hover:text-primary ${
-          location.pathname === "/events"
-            ? "text-primary"
-            : "text-muted-foreground"
-        }`}
-      >
-        Events
-      </Link> */}
     </nav>
   );
 }

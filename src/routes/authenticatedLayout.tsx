@@ -12,8 +12,8 @@ const AuthenticatedLayout = () => {
   return (
     <div>
       <div className="border-b">
-        <div className="flex h-16 items-center px-4">
-          <MainNav className="mx-6" />
+        <div className="flex h-16 items-center px-3">
+          <MainNav  />
           {/* Wrap the Search component with a div and apply responsive display utilities */}
           <div className="ml-auto flex items-center space-x-4">
             <div className="hidden md:block">
