@@ -71,24 +71,33 @@ export function UserNav(props: any) {
     setSubmitting(true);
     try {
       const jwt = await props.user.getIdToken(); // Adjust according to how you get the JWT
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/user/airdrop`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
-      }).catch((error) => {
+      const res: Response = await fetch(
+        `${import.meta.env.VITE_API_URL}/user/airdrop`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+        }
+      ).catch((error) => {
         throw new Error(error);
       });
+
+      console.log("res=", res);
 
       if (!res.ok) {
         toast({
           title: "Airdrop Failed",
           description: "Try again later",
         });
+        return;
       }
 
-      setSolanaBalance(res.sol + solanaBalance);
+      if (res.ok) {
+        const sol = await res.json();
+        setSolanaBalance(sol.sol + solanaBalance);
+      }
     } catch (error) {
       console.error("Error during airdrop:", error);
       toast({
