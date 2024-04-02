@@ -48,14 +48,6 @@ export function UserNav(props: any) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <Link to="/profile">
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-          </Link>
-          <DropdownMenuItem>Billing</DropdownMenuItem>
-          <DropdownMenuItem>Settings</DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={logoutUser}>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

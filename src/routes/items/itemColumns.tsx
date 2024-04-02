@@ -11,73 +11,28 @@ import { ItemType } from "@/types/itemTypes";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 
-export const columns = (toast: any): ColumnDef<ItemType>[] => [
-  // {
-  //   id: "select",
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       checked={
-  //         table.getIsAllPageRowsSelected() ||
-  //         (table.getIsSomePageRowsSelected() && "indeterminate")
-  //       }
-  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //       aria-label="Select all"
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.getIsSelected()}
-  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //       aria-label="Select row"
-  //     />
-  //   ),
-  //   enableSorting: false,
-  //   enableHiding: false,
-  // },
+import { Badge } from "@/components/ui/badge";
+
+export const columns = (toast: any, navigate: any): ColumnDef<ItemType>[] => [
   {
     accessorKey: "description",
     header: "Description",
   },
   {
     accessorKey: "public",
-    header: "Public",
+    header: "Public Key",
     cell: ({ row }) => {
       const item = row.original;
 
       return (
         <div>
-          <Textarea value={item.public}></Textarea>
+          <Badge>{item.public}</Badge>
         </div>
       );
     },
-    
   },
-  // {
-  //   accessorKey: "secretKey",
-  //   header: "Secret Key",
-  //   cell: ({ row }) => {
-  //     const item = row.original;
-  //     const displayKey = `${item.secretKey.slice(0, 3)}...`; // Truncate the key for display
 
-  //     return (
-  //       <div
-  //         title={item.secretKey} // Show full key on hover
-  //         className="text-ellipsis overflow-hidden"
-  //         style={{
-  //           maxWidth: "150px", // Limit the width of the cell
-  //           whiteSpace: "nowrap",
-  //           overflow: "hidden",
-  //           textOverflow: "ellipsis",
-  //         }}
-  //       >
-  //         {displayKey}
-  //         {/* You can also add a button or icon here to click and copy or view the full key */}
-  //       </div>
-  //     );
-  //   },
-  // },
   {
     id: "actions",
     enableHiding: false,
@@ -85,8 +40,6 @@ export const columns = (toast: any): ColumnDef<ItemType>[] => [
       const item = row.original;
 
       const handleDemoCopy = () => {
-        // Assuming `useScannerContext` is your custom hook to access the scanner context
-
         navigator.clipboard.writeText(
           `${import.meta.env.VITE_BROWSER_URL}/events/create?itemSecret=${
             item.secretKey
@@ -110,21 +63,31 @@ export const columns = (toast: any): ColumnDef<ItemType>[] => [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(item.secretKey)}
-              >
-                Copy item ID
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleDemoCopy}>
-                Copy Demo Address
+                Copy NFC Demo Address
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              {/* <Link to={`/items/${item.id}`}>
-                  <DropdownMenuItem>View details</DropdownMenuItem>
-                </Link> */}
-              <DropdownMenuItem>View events</DropdownMenuItem>
-              <DropdownMenuItem>Deactivate</DropdownMenuItem>
+              <DropdownMenuItem>
+                <Button
+                  onClick={() =>
+                    navigate(`/events/create?itemSecret=${item.secretKey}`)
+                  }
+                >
+                  Scan Item
+                </Button>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <a
+                  href={`https://solana.fm/address/${item.public}/tokens?cluster=devnet-solana`} // Make sure respUrl is stored in the component state
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:underline"
+                >
+                  View Details
+                </a>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

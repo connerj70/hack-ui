@@ -68,7 +68,7 @@ export default function Login() {
 
       login(values.email, values.password);
 
-      navigate("/dashboard");
+      navigate("/items");
     } catch (error) {
       if (error instanceof Error) {
         const errorMessage = error.message;

@@ -12,7 +12,7 @@ export function MainNav({
       className={cn("flex items-center space-x-4 lg:space-x-6", className)}
       {...props}
     >
-      <Link
+      {/* <Link
         to="/dashboard"
         className={`text-sm font-medium transition-colors hover:text-primary ${
           location.pathname === "/dashboard"
@@ -21,17 +21,8 @@ export function MainNav({
         }`}
       >
         Dashboard
-      </Link>
-      <Link
-        to="/scanners"
-        className={`text-sm font-medium transition-colors hover:text-primary ${
-          location.pathname === "/scanners"
-            ? "text-primary"
-            : "text-muted-foreground"
-        }`}
-      >
-        Scanners
-      </Link>
+      </Link> */}
+
       <Link
         to="/items"
         className={`text-sm font-medium transition-colors hover:text-primary ${
@@ -43,6 +34,17 @@ export function MainNav({
         Items
       </Link>
       <Link
+        to="/scanners"
+        className={`text-sm font-medium transition-colors hover:text-primary ${
+          location.pathname === "/scanners"
+            ? "text-primary"
+            : "text-muted-foreground"
+        }`}
+      >
+        Scanners
+      </Link>
+
+      {/* <Link
         to="/events"
         className={`text-sm font-medium transition-colors hover:text-primary ${
           location.pathname === "/events"
@@ -51,7 +53,7 @@ export function MainNav({
         }`}
       >
         Events
-      </Link>
+      </Link> */}
     </nav>
   );
 }
