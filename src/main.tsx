@@ -7,14 +7,14 @@ import Scanners from "./routes/scanner/scanners";
 import Items from "./routes/items/items";
 import CreateItem from "./routes/items/createItem";
 import Profile from "./routes/profile";
-import Events from "./routes/events/events";
+// import Events from "./routes/events/events";
 import CreateEvent from "./routes/events/createEvent";
 import AuthenticatedLayout from "./routes/authenticatedLayout";
 import ErrorPage from "./error-page";
 import "./globals.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import CreateScanner from "./routes/scanner/createScanner";
-import { eventLoader } from "./routes/events/eventLoader";
+// import { eventLoader } from "./routes/events/eventLoader";
 // import Dashboard from "./routes/dashboard/dashboard";
 import { AuthProvider } from "./contexts/AuthProvider";
 import RequireAuth from "./routes/RequireAuth";
@@ -54,11 +54,11 @@ const router = createBrowserRouter([
         path: "items/create",
         element: <CreateItem />,
       },
-      {
-        path: "events",
-        element: <Events />,
-        loader: eventLoader,
-      },
+      // {
+      //   path: "events",
+      //   element: <Events />,
+      //   loader: eventLoader,
+      // },
       {
         path: "events/create",
         element: <CreateEvent />,
