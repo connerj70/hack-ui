@@ -77,6 +77,8 @@ export function UserNav(props: any) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${jwt}`,
         },
+      }).catch((error) => {
+        throw new Error(error);
       });
 
       if (!res.ok) {
@@ -85,6 +87,8 @@ export function UserNav(props: any) {
           description: "Try again later",
         });
       }
+
+      setSolanaBalance(res.sol + solanaBalance);
     } catch (error) {
       console.error("Error during airdrop:", error);
       toast({
