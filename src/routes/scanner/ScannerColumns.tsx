@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ScannerInfo } from "@/contexts/AuthProvider";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 
 type SetSelectedScannerFunc = (scanner: ScannerInfo | null) => void;
 
@@ -55,7 +56,7 @@ export const columns = (
 
       return (
         <div>
-          <Textarea value={scanner.public}></Textarea>
+          <Badge>{scanner.public}</Badge>
         </div>
       );
     },
@@ -122,15 +123,22 @@ export const columns = (
                 Copy Public key
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSelectScanner}>
-                Select This Scanner
+              <DropdownMenuItem>
+                <Button onClick={handleSelectScanner}>
+                  Select This Scanner
+                </Button>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link to={`/devices/${scanner.id}`}>
-                <DropdownMenuItem>View details</DropdownMenuItem>
-              </Link>
-              <DropdownMenuItem>View events</DropdownMenuItem>
-              <DropdownMenuItem>Deactivate</DropdownMenuItem>
+              <DropdownMenuItem>
+                <a
+                  href={`https://solana.fm/address/${scanner.public}/tokens?cluster=devnet-solana`} // Make sure respUrl is stored in the component state
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:underline"
+                >
+                  View Details
+                </a>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

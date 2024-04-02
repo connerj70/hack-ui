@@ -106,7 +106,7 @@ export default function Items() {
 
   const table = useReactTable({
     data: items,
-    columns: columns(toast),
+    columns: columns(toast, navigate),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),

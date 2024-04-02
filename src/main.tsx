@@ -15,7 +15,7 @@ import "./globals.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import CreateScanner from "./routes/scanner/createScanner";
 import { eventLoader } from "./routes/events/eventLoader";
-import Dashboard from "./routes/dashboard/dashboard";
+// import Dashboard from "./routes/dashboard/dashboard";
 import { AuthProvider } from "./contexts/AuthProvider";
 import RequireAuth from "./routes/RequireAuth";
 
@@ -34,10 +34,10 @@ const router = createBrowserRouter([
     ),
     errorElement: <ErrorPage />,
     children: [
-      {
-        path: "dashboard",
-        element: <Dashboard />,
-      },
+      // {
+      //   path: "dashboard",
+      //   element: <Dashboard />,
+      // },
       {
         path: "scanners",
         element: <Scanners />,
