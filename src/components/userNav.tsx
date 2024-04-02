@@ -14,11 +14,14 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/useAuth";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "./ui/use-toast";
+import { Loader2 } from "lucide-react";
 
 export function UserNav(props: any) {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [solanaBalance, setSolanaBalance] = useState<number>(0);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     console.log("props.user=", props.user);
@@ -64,6 +67,35 @@ export function UserNav(props: any) {
     }
   }
 
+  const handleAirdrop = async () => {
+    setSubmitting(true);
+    try {
+      const jwt = await props.user.getIdToken(); // Adjust according to how you get the JWT
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/user/airdrop`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+        },
+      });
+
+      if (!res.ok) {
+        toast({
+          title: "Airdrop Failed",
+          description: "Try again later",
+        });
+      }
+    } catch (error) {
+      console.error("Error during airdrop:", error);
+      toast({
+        title: "Airdrop Failed",
+        description: "Try again later",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -85,11 +117,18 @@ export function UserNav(props: any) {
             </p>
           </div>
           <div className="flex items-center justify-between pt-2">
-          <Badge>Sol: {solanaBalance?.toFixed(2).toString()}</Badge>
-          <Button variant="outline" className="ml-2 text-xs" onClick={() => {/* Function to handle airdrop */}}>
-            Airdrop SOL
-          </Button>
-        </div>
+            <Badge>Sol: {solanaBalance?.toFixed(2).toString()}</Badge>
+            <Button
+              variant="outline"
+              className="ml-2 text-xs"
+              onClick={handleAirdrop}
+            >
+              {submitting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
+              Airdrop SOL
+            </Button>
+          </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={logoutUser}>Log out</DropdownMenuItem>
