@@ -63,6 +63,13 @@ export const columns = (toast: any, navigate: any): ColumnDef<ItemType>[] => [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
+
+              <DropdownMenuItem
+                onClick={() => navigator.clipboard.writeText(item.public)}
+              >
+                Copy Public key
+              </DropdownMenuItem>
+
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleDemoCopy}>
                 Copy NFC Demo Address
