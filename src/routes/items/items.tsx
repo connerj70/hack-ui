@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 // import { ItemType } from "@/types/scannerTypes";
 import { Button } from "@/components/ui/button";
-import { CalendarDateRangePicker } from "@/components/dateRangePicker";
+// import { CalendarDateRangePicker } from "@/components/dateRangePicker";
 import {
   ColumnFiltersState,
   SortingState,
@@ -46,7 +46,7 @@ export default function Items() {
   // const [loadingReport, setLoadingReport] = useState(false);
   // const items = useLoaderData() as ItemType[];
   // const items =  itemLoader();
-  const [loadingReport] = useState(false);
+  // const [loadingReport] = useState(false);
   const [items, setItems] = useState<ItemType[]>([]);
   const { currentUser } = useAuth();
   const [progress, setProgress] = useState(13);
@@ -172,13 +172,7 @@ export default function Items() {
               </Button>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row items-end justify-end md:space-x-2 space-y-2 md:space-y-0">
-            <CalendarDateRangePicker />
-            {/* <Button disabled={loadingReport} onClick={downloadReport} variant="secondary">Download</Button> */}
-            <Button disabled={loadingReport} variant="secondary">
-              Download
-            </Button>
-          </div>
+         
           {/* <div className="rounded-md border"> */}
             <Table>
               <TableHeader>

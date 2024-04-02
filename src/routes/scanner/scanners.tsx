@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
-import { CalendarDateRangePicker } from "@/components/dateRangePicker";
+// import { CalendarDateRangePicker } from "@/components/dateRangePicker";
 import {
   ColumnFiltersState,
   SortingState,
@@ -34,7 +34,7 @@ export default function Scanners() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [loadingReport] = useState(false);
+  // const [loadingReport] = useState(false);
   const [scanners, setScanners] = useState<ScannerType[]>([]);
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -186,14 +186,8 @@ export default function Scanners() {
               </Button>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row items-end justify-end md:space-x-2 space-y-2 md:space-y-0">
-            <CalendarDateRangePicker />
-            {/* <Button disabled={loadingReport} onClick={downloadReport} variant="secondary">Download</Button> */}
-            <Button disabled={loadingReport} variant="secondary">
-              Download
-            </Button>
-          </div>
-          {/* <div className="rounded-md border"> */}
+          
+       
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -237,7 +231,7 @@ export default function Scanners() {
                       className="h-24 text-center"
                     >
                       {!loadingData ? (
-                        <p>No Items Click add Item to Create Pallet Tag</p>
+                        <p>No Scanners. Click "Create Scanner" Button (check if you have enough SOL)</p>
                       ) : (
                         <Progress value={progress} className="w-[60%]" />
                       )}
