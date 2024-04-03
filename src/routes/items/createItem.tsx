@@ -114,11 +114,7 @@ export default function CreateItem() {
               <AlertDialogDescription>
                 Save your item secret key
               </AlertDialogDescription>
-              <Textarea
-                className="pt-8 py-4"
-                value={itemSecret}
-                onClick={() => console.log("copied to clipboard")}
-              />
+              <Textarea className="pt-8 py-4" defaultValue={itemSecret} />
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogAction onClick={handleClose}>
