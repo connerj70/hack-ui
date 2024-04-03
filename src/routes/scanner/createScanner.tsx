@@ -115,16 +115,15 @@ export default function CreateScanner() {
             {" "}
             {/* Center text and possibly content */}
             <AlertDialogHeader>
-              <AlertDialogTitle style={{ textAlign: "center" }}>
-                Scanner secret
-              </AlertDialogTitle>
-              <AlertDialogDescription
-                className="text-wrap"
-                style={{ textAlign: "center" }}
-              >
+              <AlertDialogTitle>Scanner secret</AlertDialogTitle>
+              <AlertDialogDescription>
                 Save your scanner secret key
-                <Textarea value={scannerSecret} />
               </AlertDialogDescription>
+              <Textarea
+                className="pt-8 py-4"
+                value={scannerSecret}
+                onClick={() => console.log("copied to clipboard")}
+              />
             </AlertDialogHeader>
             <AlertDialogFooter style={{ justifyContent: "center" }}>
               <AlertDialogAction
