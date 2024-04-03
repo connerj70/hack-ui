@@ -9,13 +9,12 @@ import CreateItem from "./routes/items/createItem";
 import Profile from "./routes/profile";
 // import Events from "./routes/events/events";
 import CreateEvent from "./routes/events/createEvent";
-import AuthenticatedLayout from "./routes/authenticatedLayout";
+import AuthenticatedLayout from "./routes/PageLayout";
 import ErrorPage from "./error-page";
 import "./globals.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import CreateScanner from "./routes/scanner/createScanner";
-// import { eventLoader } from "./routes/events/eventLoader";
-// import Dashboard from "./routes/dashboard/dashboard";
+
 import { AuthProvider } from "./contexts/AuthProvider";
 import RequireAuth from "./routes/RequireAuth";
 
@@ -34,10 +33,6 @@ const router = createBrowserRouter([
     ),
     errorElement: <ErrorPage />,
     children: [
-      // {
-      //   path: "dashboard",
-      //   element: <Dashboard />,
-      // },
       {
         path: "scanners",
         element: <Scanners />,
@@ -48,7 +43,7 @@ const router = createBrowserRouter([
       },
       {
         path: "items",
-        element: <Items />
+        element: <Items />,
       },
       {
         path: "items/create",
@@ -82,9 +77,7 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <AuthProvider>
-      {/* <UserProvider> */}
       <RouterProvider router={router} />
-      {/* </UserProvider> */}
     </AuthProvider>
   </React.StrictMode>
 );

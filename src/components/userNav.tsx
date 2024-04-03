@@ -24,7 +24,7 @@ export function UserNav(props: any) {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    console.log("props.user=", props.user);
+   
     const fetchSolanaBalance = async () => {
       try {
         const jwt = await props.user.getIdToken();

@@ -50,7 +50,6 @@ export default function Scanners() {
 
   useEffect(() => {
     const fetchScanners = async () => {
-
       try {
         setLoadingData(true);
         const jwt = await currentUser?.getIdToken();
@@ -172,12 +171,10 @@ export default function Scanners() {
   //   }
   // }
 
-  
-
   return (
     <>
       <div className="flex-col md:flex">
-        <div className="flex-1 space-y-4 p-8 pt-6">
+      <div className="flex-1 space-y-4 p-4 pt-6">
           <div className="flex items-center justify-between space-y-2">
             <h2 className="text-3xl font-bold tracking-tight">Scanners</h2>
             <div className="flex items-center space-x-2">
@@ -186,66 +183,63 @@ export default function Scanners() {
               </Button>
             </div>
           </div>
-          
-       
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead key={header.id}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                        </TableHead>
-                      );
-                    })}
+
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
                   </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns?.length}
-                      className="h-24 text-center"
-                    >
-                      {!loadingData ? (
-                        <p>No Scanners. Click "Create Scanner" Button (check if you have enough SOL)</p>
-                      ) : (
-                        <Progress value={progress} className="w-[60%]" />
-                      )}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns?.length}
+                    className="h-24 text-center"
+                  >
+                    {!loadingData ? (
+                      <p>
+                        No Scanners. Click "Create Scanner" Button (check if you
+                        have enough SOL)
+                      </p>
+                    ) : (
+                      <Progress value={progress} className="w-[60%]" />
+                    )}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
           <div className="flex items-center justify-end space-x-2 py-4">
-            <div className="flex-1 text-sm text-muted-foreground">
-              {table.getFilteredSelectedRowModel().rows?.length} of{" "}
-              {table.getFilteredRowModel().rows?.length} row(s) selected.
-            </div>
             <div className="space-x-2">
               <Button
                 variant="outline"
@@ -266,7 +260,8 @@ export default function Scanners() {
             </div>
           </div>
         </div>
-        <Toaster />
+      </div>
+      <Toaster />
       {/* </div> */}
     </>
   );

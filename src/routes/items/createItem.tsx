@@ -51,7 +51,6 @@ export default function CreateItem() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true);
     try {
-      
       if (!currentUser) {
         console.log("No current user. Skipping fetch.");
         return;
@@ -114,8 +113,12 @@ export default function CreateItem() {
               <AlertDialogTitle>Item secret</AlertDialogTitle>
               <AlertDialogDescription>
                 Save your item secret key
-                <Textarea value={itemSecret}/>
               </AlertDialogDescription>
+              <Textarea
+                className="pt-8 py-4"
+                value={itemSecret}
+                onClick={() => console.log("copied to clipboard")}
+              />
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogAction onClick={handleClose}>
