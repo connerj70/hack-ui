@@ -24,9 +24,9 @@ export default function Root() {
           Sign Up
         </Link>
       </div>
-      <div className="bg-green-600 flex flex-col p-48 w-100 mt-20 justify-center items-center">
-        <h1 className="font-serif text-white text-8xl">Pomerene</h1>
-        <h2 className="text-yellow-400 text-xl uppercase">Triple Entry International Trade</h2>
+      <div className="bg-green-600 flex flex-col p-48 w-100 mt-20 justify-start items-start md:justify-center md:items-center">
+        <h1 className="font-serif text-white text-6xl md:text-8xl">Pomerene</h1>
+        <h2 className="text-yellow-400 text-xl uppercase" style={{wordSpacing: "0.43rem"}}>Triple Entry International Trade</h2>
       </div>
       <div className="p-48 rounded flex flex-col w-100 max-h-96 mt-4 md:mt-6 justify-center items-center">
         <h1 className="font-serif text-black text-5xl">Securing $13 Trillion in Global Trade</h1>
