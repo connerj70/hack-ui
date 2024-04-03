@@ -18,8 +18,8 @@ module.exports = {
       },
     },
     fontFamily: {
-      'sans': ['Raleway', ...defaultTheme.fontFamily.sans],
-      'serif': ['Merriweather', ...defaultTheme.fontFamily.serif],
+      'sans': ['Commuters', ...defaultTheme.fontFamily.sans],
+      'serif': ['Adelle', ...defaultTheme.fontFamily.serif],
     },
     extend: {
       colors: {
