@@ -1,13 +1,13 @@
 @font-face {
   font-family: 'adelle';
-  src: url('/public/ADELLE-HEAVY.otf') format('opentype');
+  src: url('https://www.pomerene.net/ADELLE-HEAVY.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'commuters';
-  src: url('/public/CommutersSans-Bold.otf') format('opentype');
+  src: url('https://www.pomerene.net/CommutersSans-Bold.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
 }
