@@ -116,10 +116,10 @@ export default function Scanners() {
   return (
     <>
       <div className="flex flex-col mx-auto max-w-4xl md:px-4 lg:px-8 pt-10">
-        <div className="flex-1 space-y-4 p-4 pt-6">
+        <div className="flex-1 space-y-4 pt-6">
           <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Scanners</h2>
-            <div className="flex items-center space-x-2">
+            <h2 className="text-3xl font-bold tracking-tight pl-4">Scanners</h2>
+            <div className="flex items-center space-x-2 pr-4">
               <Button onClick={() => navigate("/scanners/create")}>
                 Create Scanner
               </Button>
@@ -181,7 +181,7 @@ export default function Scanners() {
               )}
             </TableBody>
           </Table>
-          <div className="flex items-center justify-end space-x-2 py-4">
+          <div className="flex items-center justify-end space-x-2 py-4 pr-4">
             <div className="space-x-2">
               <Button
                 variant="outline"
