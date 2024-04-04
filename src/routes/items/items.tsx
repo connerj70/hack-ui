@@ -119,18 +119,17 @@ export default function Items() {
 
   return (
     <>
-      <div className="flex-col md:flex">
-      <div className="flex-1 space-y-4 p-4 pt-6">
+      <div className="flex flex-col mx-auto max-w-4xl md:px-4 lg:px-8 pt-10">
+        <div className="flex-1 space-y-4  pt-6">
           <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Items</h2>
-            <div className="flex items-center space-x-2">
+            <h2 className="text-3xl font-bold tracking-tight pl-4">Items</h2>
+            <div className="flex items-center space-x-2 pr-4">
               <Button onClick={() => navigate("/items/create")}>
                 Create Item
               </Button>
             </div>
           </div>
 
-          {/* <div className="rounded-md border"> */}
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -186,7 +185,7 @@ export default function Items() {
               )}
             </TableBody>
           </Table>
-          <div className="flex items-center justify-end space-x-2 py-4">
+          <div className="flex items-center justify-end space-x-2 py-4 pr-4">
             <Button
               variant="outline"
               size="sm"

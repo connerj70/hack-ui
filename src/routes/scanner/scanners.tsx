@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
-// import { CalendarDateRangePicker } from "@/components/dateRangePicker";
 import {
   ColumnFiltersState,
   SortingState,
@@ -13,7 +12,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-// import { Plus } from "lucide-react";
+
 import {
   Table,
   TableBody,
@@ -114,70 +113,13 @@ export default function Scanners() {
     },
   });
 
-  // async function newDeviceSetup() {
-  //   setLoading(true);
-  //   try {
-  //     const resp = await fetch(`${import.meta.env.VITE_API_URL}/solana/key`);
-
-  //     if (!resp.ok) {
-  //       console.error("Failed to create new device");
-  //       return;
-  //     }
-
-  //     const data = await resp.json();
-  //     const privateKey = data.privateKey;
-
-  //     navigate(`/devices/create/${privateKey}`);
-  //   } catch (error) {
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
-
-  // const downloadFile = ({ data, fileName, fileType }) => {
-  //   const blob = new Blob([data], { type: fileType })
-  //   const a = document.createElement('a')
-  //   a.download = fileName
-  //   a.href = window.URL.createObjectURL(blob)
-  //   const clickEvt = new MouseEvent('click', {
-  //     view: window,
-  //     bubbles: true,
-  //     cancelable: true,
-  //   })
-  //   a.dispatchEvent(clickEvt)
-  //   a.remove()
-  // }
-
-  // async function downloadReport(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-  //   setLoadingReport(true);
-  //   try {
-  //     e.preventDefault()
-  //     // Headers for each column
-  //     let headers = ['Id,Name,Coordinates,PublicKey, CreatedAt, Status']
-  //     let devicesCsv = devices.reduce((acc, device: any) => {
-  //       const { id, name, coordinates, publicKey, createdAt, status } = device
-  //       acc.push([id, name, coordinates, publicKey, createdAt, status].join(','))
-  //       return acc
-  //     }, [])
-  //     downloadFile({
-  //       data: [...headers, ...devicesCsv].join('\n'),
-  //       fileName: 'devices.csv',
-  //       fileType: 'text/csv',
-  //     })
-  //   } catch (error) {
-
-  //   } finally {
-  //     setLoadingReport(false)
-  //   }
-  // }
-
   return (
     <>
-      <div className="flex-col md:flex">
-      <div className="flex-1 space-y-4 p-4 pt-6">
+      <div className="flex flex-col mx-auto max-w-4xl md:px-4 lg:px-8 pt-10">
+        <div className="flex-1 space-y-4 pt-6">
           <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Scanners</h2>
-            <div className="flex items-center space-x-2">
+            <h2 className="text-3xl font-bold tracking-tight pl-4">Scanners</h2>
+            <div className="flex items-center space-x-2 pr-4">
               <Button onClick={() => navigate("/scanners/create")}>
                 Create Scanner
               </Button>
@@ -239,7 +181,7 @@ export default function Scanners() {
               )}
             </TableBody>
           </Table>
-          <div className="flex items-center justify-end space-x-2 py-4">
+          <div className="flex items-center justify-end space-x-2 py-4 pr-4">
             <div className="space-x-2">
               <Button
                 variant="outline"
@@ -262,7 +204,6 @@ export default function Scanners() {
         </div>
       </div>
       <Toaster />
-      {/* </div> */}
     </>
   );
 }
