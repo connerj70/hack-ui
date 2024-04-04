@@ -12,7 +12,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ScannerType } from "@/types/scannerTypes";
 import { Button } from "@/components/ui/button";
 import { ScannerInfo } from "@/contexts/AuthProvider";
-import { Badge } from "@/components/ui/badge";
 
 type SetSelectedScannerFunc = (scanner: ScannerInfo | null) => void;
 
@@ -20,69 +19,27 @@ export const columns = (
   setSelectedScanner: SetSelectedScannerFunc,
   toast: any
 ): ColumnDef<ScannerType>[] => [
-  // {
-  //   id: "select",
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       checked={
-  //         table.getIsAllPageRowsSelected() ||
-  //         (table.getIsSomePageRowsSelected() && "indeterminate")
-  //       }
-  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //       aria-label="Select all"
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.getIsSelected()}
-  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //       aria-label="Select row"
-  //     />
-  //   ),
-  //   enableSorting: false,
-  //   enableHiding: false,
-  // },
   {
     accessorKey: "description",
     header: "Description",
-  },
-  {
-    accessorKey: "public",
-    header: "Public",
     cell: ({ row }) => {
       const scanner = row.original;
 
       return (
-        <div>
-          <Badge>{scanner.public}</Badge>
+        <div className="mx-auto max-w-4xl">
+          <p className="text-sm font-medium leading-none break-words">
+            {scanner.description}
+          </p>
+          <p
+            className="text-xs leading-none text-muted-foreground break-words whitespace-normal"
+            style={{ overflowWrap: "anywhere" }}
+          >
+            {scanner.public}
+          </p>
         </div>
       );
     },
   },
-  // {
-  //   accessorKey: "secretKey",
-  //   header: "Secret Key",
-  //   cell: ({ row }) => {
-  //     const scanner = row.original;
-  //     const displayKey = `${scanner.secretKey.slice(0, 15)}...`; // Truncate the key for display
-
-  //     return (
-  //       <div
-  //         title={scanner.secretKey} // Show full key on hover
-  //         className="text-ellipsis overflow-hidden"
-  //         style={{
-  //           maxWidth: "150px", // Limit the width of the cell
-  //           whiteSpace: "nowrap",
-  //           overflow: "hidden",
-  //           textOverflow: "ellipsis",
-  //         }}
-  //       >
-  //         {displayKey}
-  //         {/* You can also add a button or icon here to click and copy or view the full key */}
-  //       </div>
-  //     );
-  //   },
-  // },
 
   {
     id: "actions",
@@ -114,28 +71,29 @@ export const columns = (
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(scanner.public)}
-              >
-                Copy Public key
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Button onClick={handleSelectScanner}>
-                  Select This Scanner
-                </Button>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuLabel>
+                <p className="text-lg">Actions</p>
+
                 <a
                   href={`https://solana.fm/address/${scanner.public}/tokens?cluster=devnet-solana`} // Make sure respUrl is stored in the component state
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-500 hover:underline"
+                  className="text-blue-500 text-xs hover:underline pr-8"
                 >
                   View Details
                 </a>
+                <Button
+                  className="text-xs"
+                  onClick={handleSelectScanner}
+                >
+                  Select
+                </Button>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => navigator.clipboard.writeText(scanner.public)}
+              >
+                Copy Public key
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
