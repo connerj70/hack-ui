@@ -1,8 +1,9 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
 import {
   ColumnFiltersState,
+  Row,
   SortingState,
   VisibilityState,
   flexRender,
@@ -12,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Input } from "@/components/ui/input"
+import { Input } from "@/components/ui/input";
 
 import {
   Table,
@@ -82,7 +83,9 @@ export default function Scanners() {
               secretKey: scanner.metadata?.additionalMetadata?.[0]?.[1] ?? "",
               description: scanner.metadata?.additionalMetadata?.[1]?.[1] ?? "",
               public: scanner.metadata?.additionalMetadata?.[2]?.[1] ?? "",
-              selected: selectedScanner?.secretKey === scanner.metadata?.additionalMetadata?.[0]?.[1],
+              selected:
+                selectedScanner?.secretKey ===
+                scanner.metadata?.additionalMetadata?.[0]?.[1],
             };
           }
         );
@@ -96,27 +99,35 @@ export default function Scanners() {
     fetchScanners();
   }, [currentUser, selectedScanner]);
 
-  function globalFilterFn(row: any, columnIds: any, filterValue: string) {
-    // filterValue is what the user types into the global filter input
-    if (!filterValue) {
-      return row;
-    }
+  function globalFilterFn(
+    row: Row<ScannerType>,
+    _columnIds: string,
+    filterValue: string
+  ): boolean {
+    // If filterValue is empty, return true for all rows
+    if (!filterValue) return true;
+
     const lowercasedFilterValue = filterValue.toLowerCase();
-    // Filtering logic: iterate over each row and each property of the row
-    if (row.original.public.toLowerCase().includes(lowercasedFilterValue) || row.original.description.toLowerCase().includes(lowercasedFilterValue)) {
-      return row
-    }
-    return null
+    // Determine if the row should be included based on your filter criteria
+    const matchesPublic = row.original.public
+      .toLowerCase()
+      .includes(lowercasedFilterValue);
+    const matchesDescription = row.original.description
+      .toLowerCase()
+      .includes(lowercasedFilterValue);
+
+    // Return true if either condition is met, false otherwise
+    return matchesPublic || matchesDescription;
   }
 
-  const [globalFilter, setGlobalFilter] = useState('');
+  const [globalFilter, setGlobalFilter] = useState("");
 
   const table = useReactTable({
     data: scanners,
     columns: columns(setSelectedScanner, toast),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    globalFilterFn: globalFilterFn,
+    globalFilterFn,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -128,7 +139,7 @@ export default function Scanners() {
       columnFilters,
       columnVisibility,
       rowSelection,
-      globalFilter: globalFilter
+      globalFilter: globalFilter,
     },
   });
 
@@ -143,7 +154,7 @@ export default function Scanners() {
                 Create Scanner
               </Button>
             </div>
-          </div> 
+          </div>
 
           <div className="flex items-center py-4">
             <Input
