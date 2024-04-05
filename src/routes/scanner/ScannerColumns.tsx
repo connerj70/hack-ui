@@ -25,8 +25,6 @@ export const columns = (
     cell: ({ row }) => {
       const scanner = row.original;
 
-      row.id = scanner.public
-
       return (
         <div className="mx-auto max-w-4xl">
           <p className="text-sm font-medium leading-none break-words">

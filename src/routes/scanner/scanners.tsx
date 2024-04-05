@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
 import {
@@ -95,11 +95,27 @@ export default function Scanners() {
     fetchScanners();
   }, [currentUser]);
 
+  function globalFilterFn(row: any, columnIds: any, filterValue: string) {
+    // filterValue is what the user types into the global filter input
+    if (!filterValue) {
+      return row;
+    }
+    const lowercasedFilterValue = filterValue.toLowerCase();
+    // Filtering logic: iterate over each row and each property of the row
+    if (row.original.public.toLowerCase().includes(lowercasedFilterValue) || row.original.description.toLowerCase().includes(lowercasedFilterValue)) {
+      return row
+    }
+    return null
+  }
+
+  const [globalFilter, setGlobalFilter] = useState('');
+
   const table = useReactTable({
     data: scanners,
     columns: columns(setSelectedScanner, toast),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    globalFilterFn: globalFilterFn,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -111,6 +127,7 @@ export default function Scanners() {
       columnFilters,
       columnVisibility,
       rowSelection,
+      globalFilter: globalFilter
     },
   });
 
@@ -129,11 +146,9 @@ export default function Scanners() {
 
           <div className="flex items-center py-4">
             <Input
-              placeholder="Search..."
-              value={(table.getColumn("description")?.getFilterValue() as string) ?? ""}
-              onChange={(event) =>
-                table.getColumn("description")?.setFilterValue(event.target.value)
-              }
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder="Type to search..."
               className="max-w-sm"
             />
           </div>
