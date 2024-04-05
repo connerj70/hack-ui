@@ -12,6 +12,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { Input } from "@/components/ui/input"
 
 import {
   Table,
@@ -124,6 +125,17 @@ export default function Scanners() {
                 Create Scanner
               </Button>
             </div>
+          </div> 
+
+          <div className="flex items-center py-4">
+            <Input
+              placeholder="Search..."
+              value={(table.getColumn("description")?.getFilterValue() as string) ?? ""}
+              onChange={(event) =>
+                table.getColumn("description")?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm"
+            />
           </div>
 
           <Table>

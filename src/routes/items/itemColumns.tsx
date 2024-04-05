@@ -19,6 +19,7 @@ export const columns = (toast: any, navigate: any): ColumnDef<ItemType>[] => [
     header: "Description",
     cell: ({ row }) => {
       const item = row.original;
+      row.id = item.public
 
       return (
         <div className="mx-auto max-w-4xl">
@@ -35,22 +36,6 @@ export const columns = (toast: any, navigate: any): ColumnDef<ItemType>[] => [
       );
     },
   },
-  // {
-  //   accessorKey: "public",
-  //   header: "Public Key",
-  //   enableHiding: true,
-  //   cell: ({ row }) => {
-  //     const item = row.original;
-
-  //     return (
-  //       <div>
-  //         <Badge>{item.public}</Badge>
-  //       </div>
-  //     );
-  //   },
-
-  // },
-
   {
     id: "actions",
     enableHiding: false,
