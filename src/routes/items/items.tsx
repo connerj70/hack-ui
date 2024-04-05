@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
-// import { ItemType } from "@/types/scannerTypes";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input"
-// import { CalendarDateRangePicker } from "@/components/dateRangePicker";
+import { Input } from "@/components/ui/input";
 import {
   ColumnFiltersState,
+  Row,
   SortingState,
   VisibilityState,
   flexRender,
@@ -15,15 +14,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-// import { Checkbox } from "@/components/ui/checkbox";
-// import {
-//   DropdownMenu,
-//   DropdownMenuContent,
-//   DropdownMenuItem,
-//   DropdownMenuLabel,
-//   DropdownMenuSeparator,
-//   DropdownMenuTrigger,
-// } from "@/components/ui/dropdown-menu";
+
 import {
   Table,
   TableBody,
@@ -99,20 +90,20 @@ export default function Items() {
     fetchItems(); // Correctly call fetchItems here
   }, [currentUser]); // Add currentUser to the dependency array if it's expected to change over time
 
-  function globalFilterFn(row: any, columnIds: any, filterValue: string) {
-    // filterValue is what the user types into the global filter input
-    if (!filterValue) {
-      return row;
-    }
+  function globalFilterFn(row: Row<ItemType>, _columnIds: string, filterValue: string): boolean {
+    // If filterValue is empty, return true for all rows
+    if (!filterValue) return true;
+    
     const lowercasedFilterValue = filterValue.toLowerCase();
-    // Filtering logic: iterate over each row and each property of the row
-    if (row.original.public.toLowerCase().includes(lowercasedFilterValue) || row.original.description.toLowerCase().includes(lowercasedFilterValue)) {
-      return row
-    }
-    return null
+    // Determine if the row should be included based on your filter criteria
+    const matchesPublic = row.original.public.toLowerCase().includes(lowercasedFilterValue);
+    const matchesDescription = row.original.description.toLowerCase().includes(lowercasedFilterValue);
+  
+    // Return true if either condition is met, false otherwise
+    return matchesPublic || matchesDescription;
   }
 
-  const [globalFilter, setGlobalFilter] = useState('');
+  const [globalFilter, setGlobalFilter] = useState("");
 
   const table = useReactTable({
     data: items,
@@ -131,7 +122,7 @@ export default function Items() {
       columnFilters,
       columnVisibility,
       rowSelection,
-      globalFilter
+      globalFilter,
     },
   });
 
