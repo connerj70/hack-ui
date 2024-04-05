@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 // import { ItemType } from "@/types/scannerTypes";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input"
 // import { CalendarDateRangePicker } from "@/components/dateRangePicker";
 import {
   ColumnFiltersState,
@@ -98,11 +99,27 @@ export default function Items() {
     fetchItems(); // Correctly call fetchItems here
   }, [currentUser]); // Add currentUser to the dependency array if it's expected to change over time
 
+  function globalFilterFn(row: any, columnIds: any, filterValue: string) {
+    // filterValue is what the user types into the global filter input
+    if (!filterValue) {
+      return row;
+    }
+    const lowercasedFilterValue = filterValue.toLowerCase();
+    // Filtering logic: iterate over each row and each property of the row
+    if (row.original.public.toLowerCase().includes(lowercasedFilterValue) || row.original.description.toLowerCase().includes(lowercasedFilterValue)) {
+      return row
+    }
+    return null
+  }
+
+  const [globalFilter, setGlobalFilter] = useState('');
+
   const table = useReactTable({
     data: items,
     columns: columns(toast, navigate),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    globalFilterFn,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -114,6 +131,7 @@ export default function Items() {
       columnFilters,
       columnVisibility,
       rowSelection,
+      globalFilter
     },
   });
 
@@ -128,6 +146,15 @@ export default function Items() {
                 Create Item
               </Button>
             </div>
+          </div>
+
+          <div className="flex items-center py-4">
+            <Input
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder="Type to search..."
+              className="max-w-sm"
+            />
           </div>
 
           <Table>

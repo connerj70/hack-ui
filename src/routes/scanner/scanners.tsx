@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +12,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { Input } from "@/components/ui/input"
 
 import {
   Table,
@@ -38,7 +39,7 @@ export default function Scanners() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [progress, setProgress] = useState(13);
-  const { setSelectedScanner } = useAuth();
+  const { setSelectedScanner, selectedScanner } = useAuth();
   const { toast } = useToast();
   const [loadingData, setLoadingData] = useState(true);
 
@@ -81,6 +82,7 @@ export default function Scanners() {
               secretKey: scanner.metadata?.additionalMetadata?.[0]?.[1] ?? "",
               description: scanner.metadata?.additionalMetadata?.[1]?.[1] ?? "",
               public: scanner.metadata?.additionalMetadata?.[2]?.[1] ?? "",
+              selected: selectedScanner?.secretKey === scanner.metadata?.additionalMetadata?.[0]?.[1],
             };
           }
         );
@@ -92,13 +94,29 @@ export default function Scanners() {
     };
 
     fetchScanners();
-  }, [currentUser]);
+  }, [currentUser, selectedScanner]);
+
+  function globalFilterFn(row: any, columnIds: any, filterValue: string) {
+    // filterValue is what the user types into the global filter input
+    if (!filterValue) {
+      return row;
+    }
+    const lowercasedFilterValue = filterValue.toLowerCase();
+    // Filtering logic: iterate over each row and each property of the row
+    if (row.original.public.toLowerCase().includes(lowercasedFilterValue) || row.original.description.toLowerCase().includes(lowercasedFilterValue)) {
+      return row
+    }
+    return null
+  }
+
+  const [globalFilter, setGlobalFilter] = useState('');
 
   const table = useReactTable({
     data: scanners,
     columns: columns(setSelectedScanner, toast),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    globalFilterFn: globalFilterFn,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -110,6 +128,7 @@ export default function Scanners() {
       columnFilters,
       columnVisibility,
       rowSelection,
+      globalFilter: globalFilter
     },
   });
 
@@ -124,6 +143,15 @@ export default function Scanners() {
                 Create Scanner
               </Button>
             </div>
+          </div> 
+
+          <div className="flex items-center py-4">
+            <Input
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder="Type to search..."
+              className="max-w-sm"
+            />
           </div>
 
           <Table>

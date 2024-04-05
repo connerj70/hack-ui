@@ -109,11 +109,10 @@ export default function CreateScanner() {
 
   return (
     <>
-      <div className="lg:p-8 p-4">
+      <div className="lg:p-8 p-4 pt-10">
         <AlertDialog open={open}>
           <AlertDialogContent style={{ textAlign: "center" }}>
-            {" "}
-            {/* Center text and possibly content */}
+         
             <AlertDialogHeader>
               <AlertDialogTitle>Scanner secret</AlertDialogTitle>
               <AlertDialogDescription>

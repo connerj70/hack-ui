@@ -3,6 +3,7 @@ export type ScannerType = {
   secretKey: string;
   description: string;
   public: string;
+  selected: boolean;
 };
 
 export type ScannerCreateType = {
