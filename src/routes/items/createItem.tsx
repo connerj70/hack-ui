@@ -106,7 +106,7 @@ export default function CreateItem() {
 
   return (
     <>
-      <div className="lg:p-8 p-4">
+      <div className="lg:p-8 p-4 pt-10">
         <AlertDialog open={open}>
           <AlertDialogContent>
             <AlertDialogHeader>
