@@ -34,23 +34,57 @@ export default function CreateEvent() {
   const [autoSubmitted, setAutoSubmitted] = useState(false);
   const [scanned, setScanned] = useState(false);
   const [respUrl, setRespUrl] = useState("");
+  const [location, setLocation] = useState<any>();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       scannerSecret: selectedScanner?.secretKey || "",
       itemSecret: itemSecret || "",
-      message: "HACKER HOUSE DEMO",
+      message: JSON.stringify(location) || "",
     },
   });
 
   useEffect(() => {
+    // Function to fetch the user's current location
+    const fetchLocation = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            setLocation({
+              lat: latitude.toString(),
+              lng: longitude.toString(),
+            });
+            // Update form message with the fetched coordinates
+            form.setValue("message", `Lat: ${latitude}, Lng: ${longitude}`);
+          },
+          () => {
+            toast({
+              title: "Location Error",
+              description: "Unable to fetch location",
+            });
+          }
+        );
+      } else {
+        toast({
+          title: "Geolocation Not Supported",
+          description: "Your browser does not support Geolocation",
+        });
+      }
+    };
+
+    // Call the function to fetch location
+    fetchLocation();
+  }, [form, toast]);
+
+  useEffect(() => {
     // Check if conditions for auto submission are met and it hasn't been submitted already
-    if (itemSecret && selectedScanner && !autoSubmitted) {
+    if (itemSecret && selectedScanner && location && !autoSubmitted) {
       form.handleSubmit(onSubmit)();
       setAutoSubmitted(true); // Prevent future submissions
     }
-  }, [itemSecret, selectedScanner, autoSubmitted, form]); // Added autoSubmitted to dependencies
+  }, [itemSecret, selectedScanner, autoSubmitted, form, location]); // Added autoSubmitted to dependencies
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true);
