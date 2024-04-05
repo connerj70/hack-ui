@@ -27,15 +27,16 @@ export const columns = (
 
       return (
         <div className="mx-auto max-w-4xl">
-          <p className="text-sm font-medium leading-none break-words">
-            {scanner.description}
-          </p>
-          <p
-            className="text-xs leading-none text-muted-foreground break-words whitespace-normal"
-            style={{ overflowWrap: "anywhere" }}
-          >
-            {scanner.public}
-          </p>
+            <p className="text-sm font-medium leading-none break-words flex">
+              {scanner.description}
+              {scanner.selected ? <div className="text-green-500 pl-2">✓</div> : ""}
+            </p>
+            <p
+              className="text-xs leading-none text-muted-foreground break-words whitespace-normal"
+              style={{ overflowWrap: "anywhere" }}
+            >
+              {scanner.public}
+            </p>
         </div>
       );
     },

@@ -39,7 +39,7 @@ export default function Scanners() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [progress, setProgress] = useState(13);
-  const { setSelectedScanner } = useAuth();
+  const { setSelectedScanner, selectedScanner } = useAuth();
   const { toast } = useToast();
   const [loadingData, setLoadingData] = useState(true);
 
@@ -82,6 +82,7 @@ export default function Scanners() {
               secretKey: scanner.metadata?.additionalMetadata?.[0]?.[1] ?? "",
               description: scanner.metadata?.additionalMetadata?.[1]?.[1] ?? "",
               public: scanner.metadata?.additionalMetadata?.[2]?.[1] ?? "",
+              selected: selectedScanner?.secretKey === scanner.metadata?.additionalMetadata?.[0]?.[1],
             };
           }
         );
@@ -93,7 +94,7 @@ export default function Scanners() {
     };
 
     fetchScanners();
-  }, [currentUser]);
+  }, [currentUser, selectedScanner]);
 
   function globalFilterFn(row: any, columnIds: any, filterValue: string) {
     // filterValue is what the user types into the global filter input
