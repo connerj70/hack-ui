@@ -74,7 +74,7 @@ export default function CreateItem() {
           navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
         } else {
           toast({
-            title: "Error creating item",
+            title: "Error creating item (check if you have enough SOL in your wallet)",
             description: "An error occurred while creating your item",
           });
         }
@@ -89,7 +89,7 @@ export default function CreateItem() {
       if (error instanceof Error) {
         const errorMessage = error.message;
         toast({
-          title: "Error creating item",
+          title: "Error creating item (check if you have enough SOL in your wallet)",
           description: errorMessage,
         });
       }

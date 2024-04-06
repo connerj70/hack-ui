@@ -110,7 +110,7 @@ export default function CreateEvent() {
 
       if (!resp.ok) {
         toast({
-          title: "Error creating item",
+          title: "Error creating event (check if you have enough SOL in your wallet)",
           description: "An error occurred while creating your item",
         });
 
@@ -127,7 +127,7 @@ export default function CreateEvent() {
       if (error instanceof Error) {
         const errorMessage = error.message;
         toast({
-          title: "Error creating item",
+          title: "Error creating event (check if you have enough SOL in your wallet)",
           description: errorMessage,
         });
       }
@@ -211,7 +211,7 @@ export default function CreateEvent() {
                 rel="noopener noreferrer"
                 className="text-blue-500 hover:underline"
               >
-                View Scan
+                View Scan (devnet-solana)
               </a>
             </div>
           )}
