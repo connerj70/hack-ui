@@ -1,4 +1,6 @@
-![Pomerene Logo](https://www.pomerene.net/white-logo.png)
+To explore more features and get started with Pomerene UI, visit our website:
+
+[![Pomerene Logo](https://www.pomerene.net/white-logo.png)](https://www.yourwebsite.com)
 
 
 # Pomerene UI
