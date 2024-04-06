@@ -52,7 +52,6 @@ export default function Items() {
       setLoadingData(true);
       try {
         if (!currentUser) {
-          console.log("No current user. Skipping fetch.");
           return;
         }
 
@@ -90,15 +89,23 @@ export default function Items() {
     fetchItems(); // Correctly call fetchItems here
   }, [currentUser]); // Add currentUser to the dependency array if it's expected to change over time
 
-  function globalFilterFn(row: Row<ItemType>, _columnIds: string, filterValue: string): boolean {
+  function globalFilterFn(
+    row: Row<ItemType>,
+    _columnIds: string,
+    filterValue: string
+  ): boolean {
     // If filterValue is empty, return true for all rows
     if (!filterValue) return true;
-    
+
     const lowercasedFilterValue = filterValue.toLowerCase();
     // Determine if the row should be included based on your filter criteria
-    const matchesPublic = row.original.public.toLowerCase().includes(lowercasedFilterValue);
-    const matchesDescription = row.original.description.toLowerCase().includes(lowercasedFilterValue);
-  
+    const matchesPublic = row.original.public
+      .toLowerCase()
+      .includes(lowercasedFilterValue);
+    const matchesDescription = row.original.description
+      .toLowerCase()
+      .includes(lowercasedFilterValue);
+
     // Return true if either condition is met, false otherwise
     return matchesPublic || matchesDescription;
   }

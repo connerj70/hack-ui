@@ -52,7 +52,6 @@ export default function CreateScanner() {
     setSubmitting(true);
     try {
       if (!currentUser) {
-        console.log("No current user. Skipping fetch.");
         return;
       }
 
@@ -112,17 +111,12 @@ export default function CreateScanner() {
       <div className="lg:p-8 p-4 pt-10">
         <AlertDialog open={open}>
           <AlertDialogContent style={{ textAlign: "center" }}>
-         
             <AlertDialogHeader>
               <AlertDialogTitle>Scanner secret</AlertDialogTitle>
               <AlertDialogDescription>
                 Save your scanner secret key
               </AlertDialogDescription>
-              <Textarea
-                className="pt-8 py-4"
-                value={scannerSecret}
-                onClick={() => console.log("copied to clipboard")}
-              />
+              <Textarea className="pt-8 py-4" value={scannerSecret} />
             </AlertDialogHeader>
             <AlertDialogFooter style={{ justifyContent: "center" }}>
               <AlertDialogAction

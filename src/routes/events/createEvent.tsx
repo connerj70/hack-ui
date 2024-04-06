@@ -90,7 +90,6 @@ export default function CreateEvent() {
     setSubmitting(true);
     try {
       if (!currentUser || scanned) {
-        console.log("No current user. Skipping fetch.");
         return;
       }
 
@@ -121,7 +120,6 @@ export default function CreateEvent() {
       let respUrl = await resp.text();
       // Remove any unwanted quotation marks that might be surrounding the URL
       respUrl = respUrl.replace(/^"(.*)"$/, "$1");
-      console.log("Cleaned URL: ", respUrl);
 
       setRespUrl(respUrl);
       setScanned(true);

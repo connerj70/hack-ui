@@ -52,7 +52,6 @@ export default function CreateItem() {
     setSubmitting(true);
     try {
       if (!currentUser) {
-        console.log("No current user. Skipping fetch.");
         return;
       }
 
