@@ -1,8 +1,9 @@
 {
-  "name": "hack-ui",
-  "private": true,
-  "version": "0.0.0",
+  "name": "pomerene-ui",
+  "version": "1.0.0",
   "type": "module",
+  "repository": "git@github.com:connerj70/hack-ui.git",
+  "author": "conner-jensen <conner@pomerene.xyz>",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -13,7 +14,6 @@
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
     "@hookform/resolvers": "^3.3.4",
-    "@mui/material": "^5.15.12",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-checkbox": "^1.0.4",
@@ -32,7 +32,6 @@
     "clsx": "^2.1.0",
     "date-fns": "^3.3.1",
     "firebase": "^10.8.1",
-    "js-cookie": "^3.0.5",
     "localforage": "^1.10.0",
     "lucide-react": "^0.344.0",
     "match-sorter": "^6.3.4",
