@@ -24,7 +24,6 @@ export function UserNav(props: any) {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-   
     const fetchSolanaBalance = async () => {
       try {
         const jwt = await props.user.getIdToken();
@@ -83,8 +82,6 @@ export function UserNav(props: any) {
       ).catch((error) => {
         throw new Error(error);
       });
-
-      console.log("res=", res);
 
       if (!res.ok) {
         toast({
