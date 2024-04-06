@@ -1,9 +1,7 @@
-[![Pomerene Logo](https://www.pomerene.net/white-logo.png)]
+![Pomerene Logo](https://www.pomerene.net/white-logo.png)
 
 
-# Website
-
-(https://www.pomerene.net/)
+# [Visit the Pomerene Website](https://www.pomerene.net/)
 
 # Pomerene UI
 
