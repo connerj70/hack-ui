@@ -77,7 +77,7 @@ export default function CreateScanner() {
           navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
         } else {
           toast({
-            title: "Error creating device",
+            title: "Error creating scnanner (check if you have enough SOL in your wallet)",
             description: "An error occurred while creating your scanner",
           });
         }
@@ -92,7 +92,7 @@ export default function CreateScanner() {
       if (error instanceof Error) {
         const errorMessage = error.message;
         toast({
-          title: "Error creating scanner",
+          title: "Error creating scanner (check if you have enough SOL in your wallet)",
           description: errorMessage,
         });
       }
