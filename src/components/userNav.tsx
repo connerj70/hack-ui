@@ -1,10 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-// import { Link } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  // DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -16,8 +14,13 @@ import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "./ui/use-toast";
 import { Loader2 } from "lucide-react";
+import { User } from "firebase/auth";
 
-export function UserNav(props: any) {
+interface UserNavProps {
+  user: User | null;
+}
+
+export const UserNav: React.FC<UserNavProps> = ({ user }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [solanaBalance, setSolanaBalance] = useState<number>(0);
@@ -26,7 +29,10 @@ export function UserNav(props: any) {
   useEffect(() => {
     const fetchSolanaBalance = async () => {
       try {
-        const jwt = await props.user.getIdToken();
+        if (!user) {
+          return;
+        }
+        const jwt = await user.getIdToken();
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/user/balance`,
           {
@@ -52,10 +58,10 @@ export function UserNav(props: any) {
       }
     };
 
-    if (props.user) {
+    if (user) {
       fetchSolanaBalance();
     }
-  }, [props.user]);
+  }, [user]);
 
   async function logoutUser() {
     try {
@@ -69,7 +75,10 @@ export function UserNav(props: any) {
   const handleAirdrop = async () => {
     setSubmitting(true);
     try {
-      const jwt = await props.user.getIdToken(); // Adjust according to how you get the JWT
+      if (!user) {
+        return;
+      }
+      const jwt = await user.getIdToken(); // Adjust according to how you get the JWT
       const res: Response = await fetch(
         `${import.meta.env.VITE_API_URL}/user/airdrop`,
         {
@@ -111,7 +120,7 @@ export function UserNav(props: any) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={props.user?.photoURL} alt="avatar" />
+            <AvatarImage src={user?.photoURL || ""} alt="avatar" />
             <AvatarFallback>US</AvatarFallback>
           </Avatar>
         </Button>
@@ -120,10 +129,10 @@ export function UserNav(props: any) {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none break-words">
-              {props.user?.email || "User"}
+              {user?.email || "User"}
             </p>
             <p className="text-xs leading-none text-muted-foreground break-words whitespace-normal">
-              {props.user?.displayName}
+              {user?.displayName}
             </p>
           </div>
           <div className="flex items-center justify-between pt-2">
@@ -145,4 +154,4 @@ export function UserNav(props: any) {
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
+};
