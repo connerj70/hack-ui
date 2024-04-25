@@ -69,7 +69,7 @@ export const columns = (toast: any, navigate: any): ColumnDef<ItemType>[] => [
                 <p className="text-lg">Actions</p>
 
                 <a
-                  href={`https://solana.fm/address/${item.public}/tokens?cluster=devnet-solana`} // Make sure respUrl is stored in the component state
+                  href={`https://explorer.solana.com/address/${item.public}/tokens?cluster=devnet`} // Make sure respUrl is stored in the component state
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-500 text-xs hover:underline pr-8"
