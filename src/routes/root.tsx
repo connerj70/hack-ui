@@ -56,8 +56,8 @@ export default function Root() {
 
       <div className={"md:hidden flex w-full justify-between px-4 py-6" + (mobileMenu ? " bg-black" : " bg-green-100")}>
         <div className="flex items-center gap-3">
-          <HamburgerMenuIcon onClick={() => setMobileMenu(true)} className={"bg-green-500 text-white p-2 rounded-full" + (mobileMenu ? " hidden" : "")} style={{width: '35px', height: '35px'}} />
-          <Cross1Icon onClick={() => setMobileMenu(false)} className={"bg-green-500 text-white p-2 rounded-full" + (mobileMenu ? "" : " hidden")} style={{width: '35px', height: '35px'}} />
+          <HamburgerMenuIcon onClick={() => setMobileMenu(true)} className={"bg-green-600 text-white p-2 rounded-full" + (mobileMenu ? " hidden" : "")} style={{width: '35px', height: '35px'}} />
+          <Cross1Icon onClick={() => setMobileMenu(false)} className={"bg-green-600 text-white p-2 rounded-full" + (mobileMenu ? "" : " hidden")} style={{width: '35px', height: '35px'}} />
           <Link
             to="/"
           >
@@ -99,7 +99,7 @@ export default function Root() {
 
       <div className="bg-green-600 flex flex-col w-full bg-green-100 justify-center items-center">
         <div className="px-4 py-10">
-          <h1 className="font-serif text-black w-full md:text-center text-6xl md:text-8xl">Pomerene</h1>
+          <h1 className="font-serif text-green-600 w-full md:text-center text-6xl md:text-8xl">Pomerene</h1>
           <h2 className="text-black text-xl w-full md:text-center uppercase" style={{wordSpacing: "0.43rem"}}>Triple Entry International Trade</h2>
           <div className="flex justify-center items-center pt-8">
             <Link
@@ -119,40 +119,53 @@ export default function Root() {
         </div>
         <img src="/landing.webp" alt="shipping containers" className="w-full" />
       </div>
-      <div className="p-48 rounded flex flex-col w-100 max-h-96 mt-4 md:mt-6 justify-center items-center">
+      <div className="p-48 rounded flex flex-col bg-white w-100 max-h-96 mt-4 md:mt-6 justify-center items-center">
         <h1 className="font-serif text-black text-5xl">Securing $13 Trillion in Global Trade</h1>
       </div>
       <div className="p-8 font-sans bg-green-100 text-black flex flex-col min-h-96 w-100 mt-20 md:mt-6 justify-center items-center">
         <img src="/containers.jpg" alt="shipping containers" className="rounded-br-3xl relative -top-24" />
-        <div className="w-full md:flex-row md:pb-10 flex-col flex justify-between xl:justify-around items-center">
-          <div className="w-1/2 xl:w-1/3 mt-6">
+        <div className="w-full md:flex-row md:pb-10 flex-col flex relative -top-20 justify-between xl:justify-around items-center">
+          <div className="w-full xl:w-1/3 mt-6 flex justify-center items-center">
+            <img src="/container.png" alt="container" width="50" height="50" className="mr-3 bg-yellow-100 rounded-full" />
             <h3 className="text-2xl">Shared Data Standard.</h3>
           </div>
-          <div className="w-1/2 xl:w-1/3 mt-6">
+          <div className="w-full flex justify-center items-center xl:w-1/3 mt-6">
+            <img src="/container.png" alt="container" width="50" height="50" className="mr-3 bg-yellow-100 rounded-full" />
             <h3 className="text-2xl">IoT Network of Connected Devices.</h3>
           </div>
         </div>
-        <div className="w-full flex md:flex-row flex-col justify-between xl:justify-around items-center">
-          <div className="w-1/2 xl:w-1/3 mt-6">
+        <div className="w-full flex md:flex-row flex-col justify-between relative -top-20 xl:justify-around items-center">
+          <div className="w-full flex justify-center items-center xl:w-1/3 mt-6">
+            <img src="/container.png" alt="container" width="50" height="50" className="mr-3 bg-yellow-100 rounded-full" />
             <h3 className="text-2xl">Base Layer for a Smart Economic Stack.</h3>
           </div>
-          <div className="w-1/2 xl:w-1/3 mt-6">
+          <div className="w-full flex items-center justify-center xl:w-1/3 mt-6">
+            <img src="/container.png" alt="container" width="50" height="50" className="mr-3 bg-yellow-100 rounded-full" />
             <h3 className="text-2xl">Authenticated Inventory Tracking System.</h3>
           </div>
         </div>
       </div>
       <div className="p-8 font-sans text-black flex flex-col min-h-96 w-100 mt-20 md:mt-6 justify-start items-start">
-        <img src="/containers.jpg" alt="shipping containers" className="rounded-br-3xl relative -top-32" />
-        <h4 className="uppercase">Use the network</h4>
-        <h2 className="text-2xl">Shipping & Warehouses:</h2>
-        <h3 className="text-lg">Track your shipments</h3>
-        <p>
-          Pomerene is an open source and user-owned network. Businesses use your data and you are rewarded.
-        </p>
-        <Link to="/explore" className="uppercase flex items-center md:justify-center w-full mt-8">
-          Get connected
-          <ArrowRightIcon style={{width: "20px", height: "20px"}} /> 
-        </Link>
+        <img src="/shipping.jpg" alt="container ships" className="rounded-br-3xl relative -top-44" />
+        <div className="relative -top-28">
+          <h4 className="uppercase mb-2">Use the network</h4>
+          <h2 className="text-2xl">Shipping & Warehouses:</h2>
+          <h3 className="text-lg">Track your shipments</h3>
+          <p>
+            Pomerene is an open source and user-owned network. Businesses use your data and you are rewarded.
+          </p>
+          <Link to="/explore" className="uppercase flex items-center md:justify-center w-full mt-8">
+            Get connected
+            <ArrowRightIcon style={{width: "20px", height: "20px"}} /> 
+          </Link>
+        </div>
+      </div>
+      <div className="p-8 font-sans bg-green-100 text-black flex flex-col min-h-96 w-100 mt-20 md:mt-6 justify-start items-start">
+        <h4 className="uppercase mb-2">Project overview</h4>
+        <h2 className="text-2xl">Explore Pomerene.</h2>
+          <p>
+            Pomerene is an open source and user-owned network. Businesses use your data and you are rewarded.
+          </p>
       </div>
     </>
   );
