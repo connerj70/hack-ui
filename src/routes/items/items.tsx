@@ -138,9 +138,7 @@ export default function Items() {
     <>
       <div className="flex flex-col mx-auto max-w-4xl md:px-4 lg:px-8 pt-10">
         <div className="flex-1 space-y-4  pt-6">
-          <div className="md:col-span-2">
-            <MapComponent />
-          </div>
+          
 
           <div className="flex items-center justify-between space-y-2">
             <h2 className="text-3xl font-bold tracking-tight pl-4">Items</h2>
@@ -149,6 +147,10 @@ export default function Items() {
                 Create Item
               </Button>
             </div>
+          </div>
+
+          <div className="md:col-span-1">
+            <MapComponent />
           </div>
 
           <div className="flex items-center py-4">
