@@ -97,18 +97,32 @@ export default function Root() {
         </div>
       </div>
 
-      <div className="bg-green-600 flex flex-col w-full py-48 px-8 bg-green-100 justify-center items-center">
-        <h1 className="font-serif text-black w-full md:text-center text-6xl md:text-8xl">Pomerene</h1>
-        <h2 className="text-black text-xl w-full md:text-center uppercase" style={{wordSpacing: "0.43rem"}}>Triple Entry International Trade</h2>
-        <Link to="/explore" className="uppercase flex items-center md:justify-center w-full mt-8">
-          Explore the network
-          <ArrowRightIcon style={{width: "20px", height: "20px"}} /> 
-        </Link>
+      <div className="bg-green-600 flex flex-col w-full bg-green-100 justify-center items-center">
+        <div className="px-4 py-10">
+          <h1 className="font-serif text-black w-full md:text-center text-6xl md:text-8xl">Pomerene</h1>
+          <h2 className="text-black text-xl w-full md:text-center uppercase" style={{wordSpacing: "0.43rem"}}>Triple Entry International Trade</h2>
+          <div className="flex justify-center items-center pt-8">
+            <Link
+              to="/signup"
+              className={cn(
+                buttonVariants({ variant: mobileMenu ? "outline" : "default" }),
+                "rounded-full p-8 text-lg"
+              )}
+            >
+              Get Started
+            </Link>
+          </div>
+          <Link to="/explore" className="uppercase flex items-center md:justify-center w-full mt-8">
+            Explore the network
+            <ArrowRightIcon style={{width: "20px", height: "20px"}} /> 
+          </Link>
+        </div>
+        <img src="/landing.webp" alt="shipping containers" className="w-full" />
       </div>
       <div className="p-48 rounded flex flex-col w-100 max-h-96 mt-4 md:mt-6 justify-center items-center">
         <h1 className="font-serif text-black text-5xl">Securing $13 Trillion in Global Trade</h1>
       </div>
-      <div className="p-8 font-sans bg-green-600 text-white flex flex-col min-h-96 w-100 mt-20 md:mt-6 justify-center items-center">
+      <div className="p-8 font-sans bg-green-100 text-black flex flex-col min-h-96 w-100 mt-20 md:mt-6 justify-center items-center">
         <img src="/containers.jpg" alt="shipping containers" className="rounded-br-3xl relative -top-24" />
         <div className="w-full md:flex-row md:pb-10 flex-col flex justify-between xl:justify-around items-center">
           <div className="w-1/2 xl:w-1/3 mt-6">
@@ -126,6 +140,19 @@ export default function Root() {
             <h3 className="text-2xl">Authenticated Inventory Tracking System.</h3>
           </div>
         </div>
+      </div>
+      <div className="p-8 font-sans text-black flex flex-col min-h-96 w-100 mt-20 md:mt-6 justify-start items-start">
+        <img src="/containers.jpg" alt="shipping containers" className="rounded-br-3xl relative -top-32" />
+        <h4 className="uppercase">Use the network</h4>
+        <h2 className="text-2xl">Shipping & Warehouses:</h2>
+        <h3 className="text-lg">Track your shipments</h3>
+        <p>
+          Pomerene is an open source and user-owned network. Businesses use your data and you are rewarded.
+        </p>
+        <Link to="/explore" className="uppercase flex items-center md:justify-center w-full mt-8">
+          Get connected
+          <ArrowRightIcon style={{width: "20px", height: "20px"}} /> 
+        </Link>
       </div>
     </>
   );
