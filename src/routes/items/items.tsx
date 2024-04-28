@@ -54,10 +54,16 @@ export default function Items() {
       if (!currentUser) return;
       try {
         const jwt = await currentUser.getIdToken();
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/event/map/items`, {
-          method: "GET",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${jwt}` },
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/event/map/items`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${jwt}`,
+            },
+          }
+        );
         const responseData = await response.json();
         setData(responseData);
       } catch (error) {
@@ -85,8 +91,6 @@ export default function Items() {
             Authorization: `Bearer ${jwt}`,
           },
         });
-
-        
 
         if (!resp.ok) {
           // Handle HTTP errors here, for example:
@@ -162,6 +166,9 @@ export default function Items() {
 
   return (
     <>
+      <div >
+        {data && <MapComponent data={data} />}
+      </div>
       <div className="flex flex-col mx-auto max-w-4xl md:px-4 lg:px-8 pt-10">
         <div className="flex-1 space-y-4  pt-6">
           <div className="flex items-center justify-between space-y-2">
@@ -171,10 +178,6 @@ export default function Items() {
                 Create Item
               </Button>
             </div>
-          </div>
-
-          <div className="md:col-span-2">
-            {data && <MapComponent data={data} />}
           </div>
 
           <div className="flex items-center py-4">

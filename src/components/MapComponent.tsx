@@ -58,7 +58,7 @@ const MapComponent: React.FC<{ data: MapComponentProps[] }> = ({ data }) => {
     return () => map.remove();
   }, []);
 
-  return <div id="map" style={{ width: "40vw", height: "40vh" }} />;
+  return <div id="map" style={{ width: "100vw" ,height: "40vh"}} className="w-full"/>;
 };
 
 export default MapComponent;
