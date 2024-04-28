@@ -86,6 +86,7 @@ export const columns = (
             title: "Delete Successful",
             description: "The item has been successfully deleted.",
           });
+          window.location.reload();
         } catch (error) {
           console.error("Error during deletion:", error);
           toast({
@@ -104,7 +105,7 @@ export const columns = (
               {isLoading ? (
                 <Button variant="ghost" className="h-8 w-8 p-0" disabled>
                   <span className="sr-only">Open menu</span>
-                  <MoreHorizontal className="h-4 w-4" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 </Button>
               ) : (
                 <Button variant="ghost" className="h-8 w-8 p-0">
