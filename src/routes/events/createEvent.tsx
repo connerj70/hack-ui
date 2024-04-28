@@ -34,7 +34,7 @@ export default function CreateEvent() {
   const [autoSubmitted, setAutoSubmitted] = useState(false);
   const [scanned, setScanned] = useState(false);
   const [respUrl, setRespUrl] = useState("");
-  const [location, setLocation] = useState<any>();
+  const [location, setLocation] = useState<string>();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,10 +52,12 @@ export default function CreateEvent() {
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const { latitude, longitude } = position.coords;
-            setLocation({
-              lat: latitude.toString(),
-              lng: longitude.toString(),
-            });
+            setLocation(
+              JSON.stringify({
+                lat: latitude.toString(),
+                lng: longitude.toString(),
+              })
+            );
             // Update form message with the fetched coordinates
             form.setValue("message", `Lat: ${latitude}, Lng: ${longitude}`);
           },
@@ -110,7 +112,8 @@ export default function CreateEvent() {
 
       if (!resp.ok) {
         toast({
-          title: "Error creating event (check if you have enough SOL in your wallet)",
+          title:
+            "Error creating event (check if you have enough SOL in your wallet)",
           description: "An error occurred while creating your item",
         });
 
@@ -127,7 +130,8 @@ export default function CreateEvent() {
       if (error instanceof Error) {
         const errorMessage = error.message;
         toast({
-          title: "Error creating event (check if you have enough SOL in your wallet)",
+          title:
+            "Error creating event (check if you have enough SOL in your wallet)",
           description: errorMessage,
         });
       }
@@ -191,7 +195,11 @@ export default function CreateEvent() {
                     </FormItem>
                   )}
                 />
-                <Button disabled={submitting} type="submit" className="w-full">
+                <Button
+                  disabled={!form.formState.isValid || submitting}
+                  type="submit"
+                  className="w-full"
+                >
                   {submitting ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
