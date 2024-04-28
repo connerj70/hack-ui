@@ -69,43 +69,6 @@ export default function Events() {
     },
   });
 
-  // const downloadFile = ({ data, fileName, fileType }) => {
-  //   const blob = new Blob([data], { type: fileType })
-  //   const a = document.createElement('a')
-  //   a.download = fileName
-  //   a.href = window.URL.createObjectURL(blob)
-  //   const clickEvt = new MouseEvent('click', {
-  //     view: window,
-  //     bubbles: true,
-  //     cancelable: true,
-  //   })
-  //   a.dispatchEvent(clickEvt)
-  //   a.remove()
-  // }
-
-  // async function downloadReport(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-  //   setLoadingReport(true);
-  //   try {
-  //     e.preventDefault()
-  //     // Headers for each column
-  //     let headers = ['Id,Name,Coordinates,PublicKey, CreatedAt, Status']
-  //     let itemsCsv = items.reduce((acc, item: any) => {
-  //       const { id, name, coordinates, publicKey, createdAt, status } = item
-  //       acc.push([id, name, coordinates, publicKey, createdAt, status].join(','))
-  //       return acc
-  //     }, [])
-  //     downloadFile({
-  //       data: [...headers, ...itemsCsv].join('\n'),
-  //       fileName: 'items.csv',
-  //       fileType: 'text/csv',
-  //     })
-  //   } catch (error) {
-
-  //   } finally {
-  //     setLoadingReport(false)
-  //   }
-  // }
-
   return (
     <>
       <div className="flex-col md:flex">
@@ -120,7 +83,7 @@ export default function Events() {
           </div>
           <div className="flex flex-col md:flex-row items-end justify-end md:space-x-2 space-y-2 md:space-y-0">
             <CalendarDateRangePicker />
-            {/* <Button disabled={loadingReport} onClick={downloadReport} variant="secondary">Download</Button> */}
+
             <Button disabled={loadingReport} variant="secondary">
               Download
             </Button>

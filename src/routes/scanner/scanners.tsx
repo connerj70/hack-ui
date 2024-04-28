@@ -29,13 +29,13 @@ import { useAuth } from "@/contexts/useAuth";
 import { GetScannerResponseType, ScannerType } from "@/types/scannerTypes";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
+import MapComponent from "@/components/MapComponent";
 
 export default function Scanners() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  // const [loadingReport] = useState(false);
   const [scanners, setScanners] = useState<ScannerType[]>([]);
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -43,10 +43,33 @@ export default function Scanners() {
   const { setSelectedScanner, selectedScanner } = useAuth();
   const { toast } = useToast();
   const [loadingData, setLoadingData] = useState(true);
+  const [data, setData] = useState();
 
   useEffect(() => {
     const timer = setTimeout(() => setProgress(66), 500);
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const fetchDataAndAddMarkers = async () => {
+      const jwt = await currentUser?.getIdToken();
+      const resp = await fetch(
+        `${import.meta.env.VITE_API_URL}/event/map/scanners`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            // Make sure you are sending the necessary authorization token
+            Authorization: `Bearer ${jwt}`,
+          },
+        }
+      );
+      const data = await resp.json();
+     
+      setData(data);
+    };
+
+    fetchDataAndAddMarkers();
   }, []);
 
   useEffect(() => {
@@ -154,6 +177,10 @@ export default function Scanners() {
                 Create Scanner
               </Button>
             </div>
+          </div>
+
+          <div className="md:col-span-2">
+            {data && <MapComponent data={data} />}
           </div>
 
           <div className="flex items-center py-4">

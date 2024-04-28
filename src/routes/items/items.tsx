@@ -42,11 +42,31 @@ export default function Items() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loadingData, setLoadingData] = useState(true);
+  const [data, setData] = useState();
 
   useEffect(() => {
     const timer = setTimeout(() => setProgress(66), 500);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    const fetchDataAndAddMarkers = async () => {
+      if (!currentUser) return;
+      try {
+        const jwt = await currentUser.getIdToken();
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/event/map/items`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${jwt}` },
+        });
+        const responseData = await response.json();
+        setData(responseData);
+      } catch (error) {
+        console.error("Failed to fetch event items:", error);
+      }
+    };
+
+    fetchDataAndAddMarkers();
+  }, [currentUser]);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -66,6 +86,8 @@ export default function Items() {
           },
         });
 
+        
+
         if (!resp.ok) {
           // Handle HTTP errors here, for example:
           throw new Error(`Failed to fetch items: ${resp.statusText}`);
@@ -73,11 +95,15 @@ export default function Items() {
 
         const body = await resp.json();
 
+        console.log("resp", body);
+
         const userItems = await body?.items.map((item: ItemTypeRes) => {
           return {
-            secretKey: item.metadata?.additionalMetadata?.[0]?.[1] ?? "",
+            secretKey: item.itemSecret ?? "",
             description: item.metadata?.additionalMetadata?.[1]?.[1] ?? "",
-            public: item.metadata?.additionalMetadata?.[2]?.[1] ?? "",
+            itemPublic: item.itemPublic ?? "",
+            tokenAccount: item.tokenAccount,
+            mint: item.mint,
           };
         });
         setItems(userItems);
@@ -100,7 +126,7 @@ export default function Items() {
 
     const lowercasedFilterValue = filterValue.toLowerCase();
     // Determine if the row should be included based on your filter criteria
-    const matchesPublic = row.original.public
+    const matchesPublic = row.original.itemPublic
       .toLowerCase()
       .includes(lowercasedFilterValue);
     const matchesDescription = row.original.description
@@ -115,7 +141,7 @@ export default function Items() {
 
   const table = useReactTable({
     data: items,
-    columns: columns(toast, navigate),
+    columns: columns(toast, navigate, currentUser),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     globalFilterFn,
@@ -138,8 +164,6 @@ export default function Items() {
     <>
       <div className="flex flex-col mx-auto max-w-4xl md:px-4 lg:px-8 pt-10">
         <div className="flex-1 space-y-4  pt-6">
-          
-
           <div className="flex items-center justify-between space-y-2">
             <h2 className="text-3xl font-bold tracking-tight pl-4">Items</h2>
             <div className="flex items-center space-x-2 pr-4">
@@ -149,8 +173,8 @@ export default function Items() {
             </div>
           </div>
 
-          <div className="md:col-span-1">
-            <MapComponent />
+          <div className="md:col-span-2">
+            {data && <MapComponent data={data} />}
           </div>
 
           <div className="flex items-center py-4">

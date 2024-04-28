@@ -9,17 +9,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ItemType } from "@/types/itemTypes";
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
+import { Loader2, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { User } from "@firebase/auth";
+import { useState } from "react";
 // import { Badge } from "@/components/ui/badge";
 
-export const columns = (toast: any, navigate: any): ColumnDef<ItemType>[] => [
+export const columns = (
+  toast: any,
+  navigate: any,
+  currentUser: User | null
+): ColumnDef<ItemType>[] => [
   {
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => {
       const item = row.original;
-      row.id = item.public
+      row.id = item.itemPublic;
 
       return (
         <div className="mx-auto max-w-4xl">
@@ -30,7 +36,7 @@ export const columns = (toast: any, navigate: any): ColumnDef<ItemType>[] => [
             className="text-xs leading-none text-muted-foreground break-words whitespace-normal"
             style={{ overflowWrap: "anywhere" }}
           >
-            {item.public}
+            {item.itemPublic}
           </p>
         </div>
       );
@@ -40,6 +46,7 @@ export const columns = (toast: any, navigate: any): ColumnDef<ItemType>[] => [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
+      const [isLoading, setIsLoading] = useState(false);
       const item = row.original;
 
       const handleDemoCopy = () => {
@@ -55,21 +62,63 @@ export const columns = (toast: any, navigate: any): ColumnDef<ItemType>[] => [
         });
       };
 
+      async function handleDelete(mint: string, tokenAccount: string) {
+        if (!currentUser) return;
+        setIsLoading(true); // Start loading
+        try {
+          const jwt = await currentUser.getIdToken();
+          const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/item/${mint}/${tokenAccount}`,
+            {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${jwt}`,
+              },
+            }
+          );
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const result = await response.json();
+          console.log("Delete successful:", result);
+          toast({
+            title: "Delete Successful",
+            description: "The item has been successfully deleted.",
+          });
+        } catch (error) {
+          console.error("Error during deletion:", error);
+          toast({
+            title: "Delete Failed",
+            description: "Failed to delete the item.",
+          });
+        } finally {
+          setIsLoading(false); // End loading
+        }
+      }
+
       return (
         <div className="flex justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
+              {isLoading ? (
+                <Button variant="ghost" className="h-8 w-8 p-0" disabled>
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              ) : (
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              )}
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>
                 <p className="text-lg">Actions</p>
 
                 <a
-                  href={`https://explorer.solana.com/address/${item.public}/tokens?cluster=devnet`} // Make sure respUrl is stored in the component state
+                  href={`https://explorer.solana.com/address/${item.itemPublic}/tokens?cluster=devnet`} // Make sure respUrl is stored in the component state
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-500 text-xs hover:underline pr-8"
@@ -88,9 +137,9 @@ export const columns = (toast: any, navigate: any): ColumnDef<ItemType>[] => [
 
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(item.public)}
+                onClick={() => handleDelete(item.mint, item.tokenAccount)}
               >
-                Copy Public key
+                <div className="text-red-500">Delete Item</div>
               </DropdownMenuItem>
 
               <DropdownMenuItem onClick={handleDemoCopy}>
