@@ -65,7 +65,7 @@ export default function Scanners() {
         }
       );
       const data = await resp.json();
-     
+
       setData(data);
     };
 
@@ -168,6 +168,17 @@ export default function Scanners() {
 
   return (
     <>
+      <div>
+        {data ? (
+          <MapComponent data={data} />
+        ) : (
+          <div
+            id="map"
+            style={{ width: "100vw", height: "40vh" }}
+            className="w-full bg-gray-200"
+          />
+        )}
+      </div>
       <div className="flex flex-col mx-auto max-w-4xl md:px-4 lg:px-8 pt-10">
         <div className="flex-1 space-y-4 pt-6">
           <div className="flex items-center justify-between space-y-2">
@@ -177,10 +188,6 @@ export default function Scanners() {
                 Create Scanner
               </Button>
             </div>
-          </div>
-
-          <div className="md:col-span-2">
-            {data && <MapComponent data={data} />}
           </div>
 
           <div className="flex items-center py-4">

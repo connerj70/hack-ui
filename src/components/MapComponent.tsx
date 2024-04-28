@@ -18,8 +18,12 @@ const MapComponent: React.FC<{ data: MapComponentProps[] }> = ({ data }) => {
     const map = new mapboxgl.Map({
       container: "map", // container ID
       style: "mapbox://styles/mapbox/streets-v11", // style URL
-      center: [-111.237, 40.626], // initial center position [lng, lat]
-      zoom: 8, // initial zoom
+      center:
+        data.length > 0
+          ? [data[0].longitude, data[0].latitude]
+          : [-111.237, 40.626], // initial center position [lng, lat]
+      zoom: data.length > 0 ? 8 : 2, // initial zoom
+      attributionControl: false,
     });
 
     try {
@@ -58,7 +62,13 @@ const MapComponent: React.FC<{ data: MapComponentProps[] }> = ({ data }) => {
     return () => map.remove();
   }, []);
 
-  return <div id="map" style={{ width: "100vw" ,height: "40vh"}} className="w-full"/>;
+  return (
+    <div
+      id="map"
+      style={{ width: "100vw", height: "40vh" }}
+      className="w-full"
+    />
+  );
 };
 
 export default MapComponent;
