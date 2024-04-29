@@ -93,3 +93,8 @@ html, body {
   height: 100%;
 }
 
+@keyframes float-0 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(10px, -15px); } }
+@keyframes float-1 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-10px, 10px); } }
+@keyframes float-2 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-15px, -20px); } }
+@keyframes float-3 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(20px, 15px); } }
+@keyframes float-4 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-20px, -10px); } }
