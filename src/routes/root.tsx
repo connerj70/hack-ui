@@ -23,6 +23,12 @@ export default function Root() {
     "/avatar5.jpg",
   ];
 
+  const cards = [
+    { title: "About Us", description: "Learn more about our mission and team.", link: "/about" },
+    { title: "Our Services", description: "Discover our wide range of services.", link: "/services" },
+    { title: "Contact", description: "Get in touch with us today.", link: "/contact" }
+  ];
+
   return (
     <>
       <div className="hidden md:flex bg-green-100 w-full justify-between px-4 py-6 lg:px-20">
@@ -200,6 +206,25 @@ export default function Root() {
           </Link>
         </div>
       </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-36">
+        {cards.map((card, index) => (
+          <div key={index} className="relative w-full h-64 perspective">
+            <div className="relative w-full h-full transform-style-3d hover:rotate-y-180 transition duration-700">
+              <div className="absolute inset-0 bg-blue-500 text-white flex items-center justify-center font-bold text-xl p-4 backface-hidden">
+                {card.title}
+              </div>
+              <div className="absolute inset-0 bg-green-100 text-gray-800 flex flex-col items-center justify-center p-4 rotate-y-180 backface-hidden">
+                <p>{card.description}</p>
+                <a href={card.link} className="mt-4 bg-black text-white py-2 px-4 rounded">
+                  Learn More
+                </a>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <section className="bg-green-100 text-black py-32 relative">
       <div className="container mx-auto px-4 text-center relative z-10">
         <h2 className="text-3xl font-bold mb-8">Get Involved</h2>
