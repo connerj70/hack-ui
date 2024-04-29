@@ -23,12 +23,6 @@ export default function Root() {
     "/avatar5.jpg",
   ];
 
-  const cards = [
-    { title: "About Us", description: "Learn more about our mission and team.", link: "/about" },
-    { title: "Our Services", description: "Discover our wide range of services.", link: "/services" },
-    { title: "Contact", description: "Get in touch with us today.", link: "/contact" }
-  ];
-
   return (
     <>
       <div className="hidden md:flex bg-green-100 w-full justify-between px-4 py-6 lg:px-20">
@@ -46,7 +40,7 @@ export default function Root() {
         </div>
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
-            <a href="https://twitter.com/PomereneNetwork">
+            <a href="https://x.com/PomereneNetwork">
               <TwitterLogoIcon style={{width: '20px', height: '20px'}} />
             </a>
             <a href="">
@@ -216,7 +210,7 @@ export default function Root() {
             <DiscordLogoIcon style={{width: '20px', height: '20px'}} className="mr-2" />
             Join Discord
           </a>
-          <a href="" className="bg-black text-white flex justify-center items-center py-3 px-6 text-lg rounded-lg hover:bg-gray-700 transition-colors">
+          <a href="https://x.com/PomereneNetwork" className="bg-black text-white flex justify-center items-center py-3 px-6 text-lg rounded-lg hover:bg-gray-700 transition-colors">
             <TwitterLogoIcon style={{width: '20px', height: '20px'}} className="mr-2" />
             Follow on Twitter
           </a>
