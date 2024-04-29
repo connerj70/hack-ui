@@ -6,6 +6,7 @@ export function MainNav({
   ...props
 }: React.HTMLAttributes<HTMLElement>) {
   const location = useLocation();
+  
 
   return (
     <nav

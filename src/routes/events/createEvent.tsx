@@ -19,74 +19,67 @@ import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/useAuth";
 
 const formSchema = z.object({
-  scannerSecret: z.string(),
-  itemSecret: z.string(),
-  message: z.string(),
+  scannerSecret: z.string().min(1, {
+    message: "scanner secret cannot be empty.",
+  }),
+  itemSecret: z.string().min(1, {
+    message: "item secret cannot be empty.",
+  }),
+  message: z.string().min(1, {
+    message: "message cannot be empty.",
+  }),
 });
 
 export default function CreateEvent() {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
-  // const navigate = useNavigate();
   const itemSecret = searchParams.get("itemSecret");
-  const { currentUser, selectedScanner } = useAuth();
-  const [autoSubmitted, setAutoSubmitted] = useState(false);
+  const { currentUser, selectedScanner, location, setLocation } = useAuth();
   const [scanned, setScanned] = useState(false);
   const [respUrl, setRespUrl] = useState("");
-  const [location, setLocation] = useState<string>();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       scannerSecret: selectedScanner?.secretKey || "",
       itemSecret: itemSecret || "",
-      message: JSON.stringify(location) || "",
+      message: location || "",
     },
   });
 
-  useEffect(() => {
-    // Function to fetch the user's current location
-    const fetchLocation = () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            setLocation(
-              JSON.stringify({
-                lat: latitude.toString(),
-                lng: longitude.toString(),
-              })
-            );
-            // Update form message with the fetched coordinates
-            form.setValue("message", `Lat: ${latitude}, Lng: ${longitude}`);
-          },
-          () => {
-            toast({
-              title: "Location Error",
-              description: "Unable to fetch location",
-            });
-          }
-        );
-      } else {
+  function useLocation() {
+    useEffect(() => {
+      if (!navigator.geolocation) {
         toast({
           title: "Geolocation Not Supported",
           description: "Your browser does not support Geolocation",
         });
+        return;
       }
-    };
 
-    // Call the function to fetch location
-    fetchLocation();
-  }, [form, toast]);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const locText = `${latitude}, ${longitude}`;
+          setLocation(locText);
 
-  useEffect(() => {
-    // Check if conditions for auto submission are met and it hasn't been submitted already
-    if (itemSecret && selectedScanner && location && !autoSubmitted) {
-      form.handleSubmit(onSubmit)();
-      setAutoSubmitted(true); // Prevent future submissions
-    }
-  }, [itemSecret, selectedScanner, autoSubmitted, form, location]); // Added autoSubmitted to dependencies
+          if (form.getValues("message") !== "") {
+            return;
+          }
+          form.setValue("message", locText);
+        },
+        () => {
+          toast({
+            title: "Location Error",
+            description: "Unable to fetch location",
+          });
+        }
+      );
+    }, [form, toast]);
+  }
+
+  useLocation();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true);
@@ -94,6 +87,8 @@ export default function CreateEvent() {
       if (!currentUser || scanned) {
         return;
       }
+
+      setLocation(values.message);
 
       const jwt = await currentUser.getIdToken();
 
@@ -163,7 +158,7 @@ export default function CreateEvent() {
                     <FormItem>
                       <FormLabel>Scanner Secret</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} type="password" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -176,7 +171,7 @@ export default function CreateEvent() {
                     <FormItem>
                       <FormLabel>Item Secret</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} type="password" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -195,11 +190,9 @@ export default function CreateEvent() {
                     </FormItem>
                   )}
                 />
-                <Button
-                  disabled={!form.formState.isValid || submitting}
-                  type="submit"
-                  className="w-full"
-                >
+
+                {form.formState.isValid}
+                <Button type="submit" className="w-full" disabled={submitting}>
                   {submitting ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
@@ -217,9 +210,9 @@ export default function CreateEvent() {
                 href={respUrl} // Make sure respUrl is stored in the component state
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-500 hover:underline"
+                className="text-blue-700 hover:underline center"
               >
-                View Scan (devnet-solana)
+                View Scan (devnet)
               </a>
             </div>
           )}

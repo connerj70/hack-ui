@@ -15,6 +15,8 @@ const MapComponent: React.FC<{ data: MapComponentProps[] }> = ({ data }) => {
   useEffect(() => {
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || "";
 
+    console.log("data", data)
+
     const map = new mapboxgl.Map({
       container: "map", // container ID
       style: "mapbox://styles/mapbox/streets-v11", // style URL
@@ -30,20 +32,20 @@ const MapComponent: React.FC<{ data: MapComponentProps[] }> = ({ data }) => {
       // Parse data and add markers
       data.forEach((item: MapComponentProps) => {
         const content = `
-<div class=" bg-white  rounded-lg max-w-xs"> 
-  <h4 class="text-lg font-semibold">Transaction</h4>
-  <p class="text-sm text-gray-600 mt-1">Time: ${new Date(
-    item.timestamp * 1000
-  ).toLocaleString()}</p>
-  <p class="text-sm text-gray-600 mt-1 font-bold break-words">From: ${
+<div > 
+<p class="text-sm text-gray-600 font-bold mt-1">${new Date(
+          item.timestamp * 1000
+        ).toLocaleString()}</p>
+ 
+  <p class="text-xsm text-gray-600 mt-1">${item.latitude}, ${item.longitude}</p>
+  
+  <p class="text-xsm text-gray-600 mt-1  break-words">item: ${
     item.itemPublicKey
   }</p> 
-  <p class="text-sm text-gray-600 mt-1 font-bold break-words">To: ${
+  <p class="text-xsm text-gray-600 mt-1  break-words">scanner: ${
     item.scannerPublicKey
   }</p> 
-  <p class="text-sm text-gray-600 mt-1">Lat: ${item.latitude.toFixed(
-    6
-  )}, Lng: ${item.longitude.toFixed(6)}</p>
+ 
 </div>`;
 
         // Create a marker and add it to the map
