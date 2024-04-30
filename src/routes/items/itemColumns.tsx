@@ -49,19 +49,6 @@ export const columns = (
       const [isLoading, setIsLoading] = useState(false);
       const item = row.original;
 
-      const handleDemoCopy = () => {
-        navigator.clipboard.writeText(
-          `${import.meta.env.VITE_BROWSER_URL}/events/create?itemSecret=${
-            item.secretKey
-          }`
-        );
-
-        toast({
-          title: "NFC Address copied",
-          description: item.description,
-        });
-      };
-
       async function handleDelete(mint: string, tokenAccount: string) {
         if (!currentUser) return;
         setIsLoading(true); // Start loading
@@ -143,8 +130,10 @@ export const columns = (
                 <div className="text-red-500">Delete Item</div>
               </DropdownMenuItem>
 
-              <DropdownMenuItem onClick={handleDemoCopy}>
-                Copy NFC Demo Address
+              <DropdownMenuItem
+                onClick={() => navigate(`/items/${item.itemPublic}`)}
+              >
+                Shipping Info
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

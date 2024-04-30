@@ -28,3 +28,12 @@ export type ItemTypeRes = {
     ];
   };
 };
+
+export interface TransactionData {
+  blockTime: number;
+  confirmationStatus: string;
+  err: null;
+  memo: string;
+  signature: string;
+  slot: number;
+}
