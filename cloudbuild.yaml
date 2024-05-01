@@ -10,7 +10,6 @@ steps:
   - name: 'gcr.io/cloud-builders/npm'
     args: ['run', 'build']
     env:
-      - 'NODE_ENV=production'
       - 'VITE_API_URL=https://www.pomerene.net/api/v1'
       - 'VITE_BROWSER_URL=https://www.pomerene.net'
 
