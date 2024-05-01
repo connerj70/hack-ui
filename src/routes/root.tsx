@@ -9,8 +9,6 @@ import {
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { useEffect } from "react";
-import { toast } from "@/components/ui/use-toast";
-import { useAuth } from "@/contexts/useAuth";
 
 const containerVariants1 = {
   hidden: { opacity: 0, y: 20 },
@@ -32,7 +30,7 @@ const headingVariants = {
 };
 
 const sideVariant = {
-  hidden: (direction) => ({
+  hidden: (direction:any) => ({
     x: direction === "left" ? -200 : 200,
     opacity: 0,
   }),

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   ColumnFiltersState,
-  Row,
   SortingState,
   VisibilityState,
   flexRender,
@@ -23,12 +22,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { columns } from "./itemColumnsTx";
 import { TransactionData } from "@/types/itemTypes";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/useAuth";
-import { useToast } from "@/components/ui/use-toast";
 import MapComponentItem from "@/components/MapComponentItem";
 
 export default function ItemInfo() {
@@ -40,8 +38,6 @@ export default function ItemInfo() {
   const [items, setItems] = useState<TransactionData[]>([]);
   const { currentUser } = useAuth();
   const [progress, setProgress] = useState(13);
-  const navigate = useNavigate();
-  const { toast } = useToast();
   const [loadingData, setLoadingData] = useState(true);
   const [data, setData] = useState();
 
@@ -50,7 +46,7 @@ export default function ItemInfo() {
     const timer = setTimeout(() => setProgress(66), 500);
     return () => clearTimeout(timer);
   }, []);
-  
+
 
   useEffect(() => {
     const fetchDataAndAddMarkers = async () => {
@@ -106,7 +102,7 @@ export default function ItemInfo() {
 
   const table = useReactTable({
     data: items,
-    columns: columns(navigate),
+    columns: columns(),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     // globalFilterFn,

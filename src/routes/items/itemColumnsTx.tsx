@@ -1,7 +1,7 @@
 import { TransactionData } from "@/types/itemTypes";
 import { ColumnDef } from "@tanstack/react-table";
 
-export const columns = (navigate: any): ColumnDef<TransactionData>[] => [
+export const columns = (): ColumnDef<TransactionData>[] => [
   {
     accessorKey: "blockTime", // Assuming blockTime should be used for sorting/filtering if needed
     header: "Description",
@@ -24,11 +24,24 @@ export const columns = (navigate: any): ColumnDef<TransactionData>[] => [
           <p className="text-sm font-medium leading-none break-words">
             {new Date(item.blockTime * 1000).toLocaleString()}
           </p>
+          <a
+            href={`https://explorer.solana.com/tx/${item.signature}?cluster=devnet`} // Make sure respUrl is stored in the component state
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-700 hover:underline center"
+          ></a>
           <p
             className="text-xs leading-none text-muted-foreground break-words whitespace-normal"
             style={{ overflowWrap: "anywhere" }}
           >
-            {`Item Key: ${itemKey}, Scanner Key: ${scannerKey}, Lat: ${lat}, Lng: ${lng}`}
+            {`Item Key: ${itemKey}, Scanner Key: ${scannerKey}`}
+          </p>
+
+          <p
+            className="text-xs leading-none text-muted-foreground break-words whitespace-normal"
+            style={{ overflowWrap: "anywhere" }}
+          >
+            {`Lat: ${lat}, Lng: ${lng}`}
           </p>
         </div>
       );

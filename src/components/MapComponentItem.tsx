@@ -1,6 +1,13 @@
 import React, { useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { Feature, LineString } from 'geojson';
+
+interface GeoJSONFeature {
+  type: 'Feature';
+  properties: any;
+  geometry: LineString;
+}
 
 interface MapData {
   blockTime: number;
@@ -39,7 +46,7 @@ const MapComponentItem: React.FC<MapComponentProps> = ({ data }) => {
       }).filter(coord => coord[0] !== 0 && coord[1] !== 0); // Filter out default coordinates
 
       // Define a GeoJSON object for the line
-      const lineData = {
+      const lineData:GeoJSONFeature = {
         type: "Feature",
         properties: {},
         geometry: {
@@ -51,7 +58,7 @@ const MapComponentItem: React.FC<MapComponentProps> = ({ data }) => {
       // Add lineData as a source to the map
       map.addSource("lineSource", {
         type: "geojson",
-        data: lineData,
+        data: lineData as Feature<LineString>,
       });
 
       // Add a layer to display the line
