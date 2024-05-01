@@ -24,8 +24,4 @@ steps:
       - '$PROJECT_ID'
       - '--quiet'
 
-substitutions:
-  _VITE_API_URL: 'https://www.pomerene.net/api/v1'
-  _VITE_BROWSER_URL: 'https://www.pomerene.net'
-
 timeout: '1200s'
