@@ -19,6 +19,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
   selectedScanner: ScannerInfo | null;
   setSelectedScanner: (scanner: ScannerInfo | null) => void;
+  location: string;
+  setLocation: (location: string) => void;
 }
 
 interface AuthProviderProps {
@@ -41,6 +43,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   );
   const [loading, setLoading] = useState(true);
+  const [location, setLocation] = useState("");
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -71,6 +75,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     logout,
     selectedScanner,
     setSelectedScanner: handleSetSelectedScanner,
+    location,
+    setLocation,
   };
 
   return (

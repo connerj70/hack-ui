@@ -14,9 +14,9 @@ import ErrorPage from "./error-page";
 import "./globals.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import CreateScanner from "./routes/scanner/createScanner";
-
 import { AuthProvider } from "./contexts/AuthProvider";
 import RequireAuth from "./routes/RequireAuth";
+import ItemInfo from "./routes/items/ItemInfo";
 
 const router = createBrowserRouter([
   {
@@ -49,6 +49,7 @@ const router = createBrowserRouter([
         path: "items/create",
         element: <CreateItem />,
       },
+      { path: "items/:pubKey", element: <ItemInfo /> },
       // {
       //   path: "events",
       //   element: <Events />,
