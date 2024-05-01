@@ -12,6 +12,7 @@ steps:
     env:
       - 'VITE_API_URL=${_VITE_API_URL}'  
       - 'VITE_BROWSER_URL=${_VITE_BROWSER_URL}'
+      - 'VITE_MAPBOX_ACCESS_TOKEN=${_VITE_MAPBOX_ACCESS_TOKEN}'
 
   # Deploy the application to App Engine
   - name: 'gcr.io/cloud-builders/gcloud'
