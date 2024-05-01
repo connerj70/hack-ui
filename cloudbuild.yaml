@@ -10,8 +10,8 @@ steps:
   - name: 'gcr.io/cloud-builders/npm'
     args: ['run', 'build']
     env:
-      - 'VITE_API_URL=${_VITE_API_URL}'  # Use substitution here
-      - 'VITE_BROWSER_URL=${_VITE_BROWSER_URL}'  # Use substitution here
+      - 'VITE_API_URL=${_VITE_API_URL}'  
+      - 'VITE_BROWSER_URL=${_VITE_BROWSER_URL}'
 
   # Deploy the application to App Engine
   - name: 'gcr.io/cloud-builders/gcloud'
