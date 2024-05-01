@@ -50,6 +50,7 @@ export default function ItemInfo() {
     const timer = setTimeout(() => setProgress(66), 500);
     return () => clearTimeout(timer);
   }, []);
+  
 
   useEffect(() => {
     const fetchDataAndAddMarkers = async () => {
