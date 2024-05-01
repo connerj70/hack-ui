@@ -10,8 +10,8 @@ steps:
   - name: 'gcr.io/cloud-builders/npm'
     args: ['run', 'build']
     env:
-      - 'VITE_API_URL=https://www.pomerene.net/api/v1'
-      - 'VITE_BROWSER_URL=https://www.pomerene.net'
+      - 'VITE_API_URL=${_VITE_API_URL}'  # Use substitution here
+      - 'VITE_BROWSER_URL=${_VITE_BROWSER_URL}'  # Use substitution here
 
   # Deploy the application to App Engine
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -23,5 +23,9 @@ steps:
       - '--project'
       - '$PROJECT_ID'
       - '--quiet'
+
+substitutions:
+  _VITE_API_URL: 'https://www.pomerene.net/api/v1'
+  _VITE_BROWSER_URL: 'https://www.pomerene.net'
 
 timeout: '1200s'
