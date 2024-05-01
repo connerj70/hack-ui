@@ -109,5 +109,10 @@ export default {
       },
     },
   },
-  plugins: [import("tailwindcss-animate")],
-};
+  plugins: [
+    "postcss-import",
+    require("tailwindcss-animate"),
+    require("@tailwindcss/forms")
+  ],
+}
+

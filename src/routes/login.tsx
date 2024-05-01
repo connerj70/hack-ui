@@ -80,17 +80,17 @@ export default function Login() {
           to="/signup"
           className={cn(
             buttonVariants({ variant: "ghost" }),
-            "absolute right-4 top-4 md:right-8 md:top-8"
+            "absolute right-4 top-4 md:right-8 md:top-8 hover:bg-green-50"
           )}
         >
           Sign Up
         </Link>
         <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
-          <div className="absolute inset-0 bg-zinc-900" />
+          <div className="absolute inset-0 bg-green-100" />
           <div className="relative z-20 flex items-center text-lg font-medium">
             <Link to="/" className="flex items-center justify-center">
               <img
-                src="/yellow-black-small.png"
+                src="/white-small.png"
                 alt="Pomerene"
                 className="rounded-full h-10"
               />
@@ -98,7 +98,7 @@ export default function Login() {
           </div>
           <div className="relative z-20 mt-auto">
             <blockquote className="space-y-2">
-              <p className="text-lg">A smart network for international trade</p>
+              <p className="text-lg text-black">A smart network for international trade</p>
             </blockquote>
           </div>
         </div>
@@ -138,7 +138,7 @@ export default function Login() {
                     </FormItem>
                   )}
                 />
-                <Button disabled={submitting} type="submit" className="w-full">
+                <Button disabled={submitting} type="submit" className="w-full bg-green-600 hover:bg-green-700">
                   {submitting ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : null}
