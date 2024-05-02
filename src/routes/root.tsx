@@ -70,7 +70,7 @@ export default function Root() {
           <Link
             to="/"
           >
-            <img src="/white-small.png" alt="Pomerene" className="rounded-full h-10" />
+            <img src="/white-small.png" alt="Pomerene" className="rounded-full h-10" />root
           </Link>
         </div> 
           <Link
@@ -106,7 +106,7 @@ export default function Root() {
         </div>
       </div>
 
-      <div className="bg-green-100 flex flex-col w-full bg-green-100 justify-center items-center">
+      <div className="bg-green-100 flex flex-col w-full h-screen bg-green-100 justify-center items-center">
         <div className="px-4 pt-10 pb-10 md:pb-44">
           <h1 className="font-serif text-green-600 w-full md:text-center text-6xl md:text-8xl">Pomerene</h1>
           <h2 className="text-black text-xl w-full md:text-center uppercase" style={{wordSpacing: "0.43rem"}}>Triple Entry International Trade</h2>
@@ -130,37 +130,25 @@ export default function Root() {
       <div className="p-48 rounded flex flex-col bg-white w-100 max-h-96 mt-4 md:mt-6 justify-center items-center">
         <h1 className="font-serif text-black text-5xl">Securing $13 Trillion in Global Trade</h1>
       </div>
-      <div className="lg:px-20 p-8 font-sans bg-green-100 text-black flex flex-col md:flex-row-reverse min-h-96 w-100 mt-20 md:mt-6 justify-center items-center">
-        <img src="/containers.jpg" alt="shipping containers" className="w-full md:w-1/2 rounded-br-3xl relative -top-24" />
-        <div className="w-full md:w-1/2 flex-col flex relative -top-20 justify-between md:justify-start items-center md:items-start">
-          <div className="w-full mt-6 md:mt-0 flex justify-center items-center md:justify-start">
-            <img src="/container.png" alt="container" width="50" height="50" className="mr-3 bg-yellow-100 rounded-full" />
-            <h3 className="text-2xl">Shared Data Standard.</h3>
-          </div>
-          <div className="w-full flex justify-center items-center mt-6 md:justify-start">
-            <img src="/container.png" alt="container" width="50" height="50" className="mr-3 bg-yellow-100 rounded-full" />
-            <h3 className="text-2xl">Network of Connected Devices.</h3>
-          </div>
-        </div>
-        <div className="w-full md:w-1/2 flex flex-col justify-between relative -top-20 md:justify-start items-center md:items-start">
-          <div className="w-full flex justify-center items-center mt-6 md:mt-0 md:justify-start">
-            <img src="/container.png" alt="container" width="50" height="50" className="mr-3 bg-yellow-100 rounded-full" />
-            <h3 className="text-2xl">Smart Economic Stack.</h3>
-          </div>
-          <div className="w-full flex items-center justify-center mt-6 md:justify-start">
-            <img src="/container.png" alt="container" width="50" height="50" className="mr-3 bg-yellow-100 rounded-full" />
-            <h3 className="text-2xl">Authenticated Inventory Tracking.</h3>
-          </div>
+      <div className="p-8 md:px-20 font-sans text-black gap-6 bg-green-100 flex flex-col md:flex-row-reverse min-h-96 w-100 mt-20 md:mt-6 justify-around items-start">
+        <img src="/containers.jpg" alt="container ships" className="w-full md:w-1/2 rounded-bl-3xl relative -top-44 md:-top-28" />
+        <div className="w-full md:w1/2 max-w-md relative -top-36 md:top-32">
+          <h2 className="text-2xl">Shared Data Standard</h2>
+          <p className="mt-3">
+            The network is a neatural data standard for use by all trade counterparties.
+          </p>
+          <Link to="/explore" className="uppercase flex items-center md:justify-center w-full mt-8">
+            Learn more
+            <ArrowRightIcon style={{width: "20px", height: "20px"}} /> 
+          </Link>
         </div>
       </div>
-      <div className="p-8 md:px-20 font-sans text-black gap-6 flex flex-col md:flex-row min-h-96 w-100 mt-20 md:mt-6 justify-start items-start">
-        <img src="/shipping.jpg" alt="container ships" className="w-full md:w-1/2 rounded-bl-3xl relative -top-44 md:-top-28" />
-        <div className="w-full md:w1/2 relative -top-36 md:top-32">
-          <h4 className="uppercase mb-2">Use the network</h4>
-          <h2 className="text-2xl">Shipping & Warehouses:</h2>
-          <h3 className="text-lg">Track your shipments</h3>
-          <p>
-            Pomerene is an open source and user-owned network. Businesses use your data and you are rewarded.
+      <div className="p-8 md:px-20 font-sans text-black gap-6 flex flex-col md:flex-row min-h-96 w-100 mt-20 md:mt-6 justify-around items-start">
+        <img src="/warehouse.jpg" alt="container ships" className="w-full md:w-1/2 rounded-tr-3xl relative -top-44 md:-top-28" />
+        <div className="w-full md:w1/2 max-w-md relative -top-36 md:top-32">
+          <h2 className="text-2xl">IoT Network of Connected Devices</h2>
+          <p className="mt-3">
+            Pomerene is a decentralized infrastructure network. Powered by hardware.
           </p>
           <Link to="/explore" className="uppercase flex items-center md:justify-center w-full mt-8">
             Get connected
@@ -168,32 +156,28 @@ export default function Root() {
           </Link>
         </div>
       </div>
-      <div className="p-8 md:px-20 bg-green-100 font-sans text-black gap-6 flex flex-col md:flex-row-reverse min-h-96 w-100 mt-20 md:mt-6 justify-start items-start">
-        <img src="/shipping2.jpg" alt="container ships" className="w-full md:w-1/2 rounded-br-3xl relative -top-44 md:-top-28" />
-        <div className="w-full md:w1/2 relative -top-36 md:top-32">
-          <h4 className="uppercase mb-2">Project overview</h4>
-          <h2 className="text-2xl">Explore Pomerene.</h2>
-          <h3 className="text-lg">Track your shipments</h3>
-          <p>
-            Pomerene is an open source and user-owned network. Businesses use your data and you are rewarded.
+      <div className="p-8 md:px-20 bg-green-100 font-sans text-black gap-6 flex flex-col md:flex-row-reverse min-h-96 w-100 mt-20 md:mt-6 justify-around items-start">
+        <img src="/warehouse2.jpg" alt="container ships" className="w-full md:w-1/2 rounded-bl-3xl relative -top-44 md:-top-28" />
+        <div className="w-full max-w-md md:w1/2 relative -top-36 md:top-32">
+          <h2 className="text-2xl">Authenticated Inventory Tracking System</h2>
+          <p className="mt-3">
+            The network is an open, global inventory tracking system, secured by cryptographic authentication.
           </p>
           <Link to="/explore" className="uppercase flex items-center md:justify-center w-full mt-8">
-            Get connected
+            Start tracking
             <ArrowRightIcon style={{width: "20px", height: "20px"}} /> 
           </Link>
         </div>
       </div>
-      <div className="p-8 md:px-20 font-sans text-black gap-6 flex flex-col md:flex-row min-h-96 w-100 mt-20 md:mt-6 justify-start items-start">
-        <img src="/shipping2.jpg" alt="container ships" className="w-full md:w-1/2 rounded-br-3xl relative -top-44 md:-top-28" />
-        <div className="w-full md:w1/2 relative -top-36 md:top-32">
-          <h4 className="uppercase mb-2">Project overview</h4>
-          <h2 className="text-2xl">Explore Pomerene.</h2>
-          <h3 className="text-lg">Track your shipments</h3>
-          <p>
-            Pomerene is an open source and user-owned network. Businesses use your data and you are rewarded.
+      <div className="p-8 md:px-20 font-sans text-black gap-6 flex flex-col md:flex-row min-h-96 w-100 mt-20 md:mt-6 justify-around items-start">
+        <img src="/shipping2.jpg" alt="container ships" className="w-full md:w-1/2 rounded-tr-3xl relative -top-44 md:-top-28" />
+        <div className="w-full md:w1/2 max-w-md relative -top-36 md:top-32">
+          <h2 className="text-2xl">Base Layer for a Smart Economic Stack</h2>
+          <p className="mt-3">
+            Pomerene’s authenticated data layer is the foundation for a value stack that includes: smart invoices, counterparty escrow countracts, trade finance and insurance products.
           </p>
           <Link to="/explore" className="uppercase flex items-center md:justify-center w-full mt-8">
-            Get connected
+            Learn more
             <ArrowRightIcon style={{width: "20px", height: "20px"}} /> 
           </Link>
         </div>
