@@ -174,7 +174,7 @@ export default function Root() {
         <div className="w-full md:w1/2 max-w-md relative -top-36 md:top-32">
           <h2 className="text-2xl">Shared Data Standard</h2>
           <p className="mt-3">
-            The network is a neatural data standard for use by all trade counterparties.
+            The network is a neutral data standard for use by all trade counterparties.
           </p>
           <Link to="/explore" className="uppercase flex items-center md:justify-center w-full mt-8">
             Learn more
@@ -216,7 +216,7 @@ export default function Root() {
         <div className="w-full md:w1/2 max-w-md relative -top-36 md:top-32">
           <h2 className="text-2xl">Base Layer for a Smart Economic Stack</h2>
           <p className="mt-3">
-            Pomerene’s authenticated data layer is the foundation for a value stack that includes: smart invoices, counterparty escrow countracts, trade finance and insurance products.
+            Pomerene’s authenticated data layer is the foundation for a value stack that includes: smart invoices, counterparty escrow contracts, trade finance and insurance products.
           </p>
           <Link to="/explore" className="uppercase flex items-center md:justify-center w-full mt-8">
             Learn more
