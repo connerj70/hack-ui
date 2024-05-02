@@ -17,14 +17,6 @@ export default function Root() {
     }
   })
 
-  const avatars = [
-    "/avatar1.jpg",
-    "/avatar2.jpg",
-    "/avatar3.jpg",
-    "/avatar4.jpg",
-    "/avatar5.jpg",
-  ];
-
   return (
     <>
       <div className="hidden md:flex bg-green-100 w-full justify-between px-4 py-6 lg:px-20">
@@ -37,7 +29,6 @@ export default function Root() {
           <div className="flex items-center gap-8">
             <Link to="/about" className="text-sm hover:underline">About</Link>
             <Link to="/contact" className="ml-4 text-sm hover:underline">Contact</Link>
-            <Link to="/build" className="ml-4 text-sm hover:underline">Build</Link>
           </div>
         </div>
         <div className="flex items-center gap-6">
@@ -71,7 +62,7 @@ export default function Root() {
           <Link
             to="/"
           >
-            <img src="/white-small.png" alt="Pomerene" className="rounded-full h-10" />root
+            <img src="/white-small.png" alt="Pomerene" className="rounded-full h-10" />
           </Link>
         </div> 
           <Link
@@ -92,9 +83,6 @@ export default function Root() {
           </li>
           <li className="py-4 border-b">
             <Link to="/contact" className="text-sm hover:underline">Contact</Link>
-          </li>
-          <li className="py-4 border-b">
-            <Link to="/build" className="text-sm hover:underline">Build</Link>
           </li>
         </ul>
         <div className="bg-green-200 bg-gradient-to-r from-green-200 to-green-800 border-br-rounded flex justify-between flex-col min-h-72 text-black p-6 rounded-br-3xl">
