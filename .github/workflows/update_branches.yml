@@ -1,0 +1,22 @@
+name: Auto Update Branches
+
+on:
+  push:
+    branches:
+      - '**'
+      - '!main'
+
+jobs:
+  update_branches:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+      - name: Merge dev into current branch
+        run: |
+          git fetch origin dev
+          git merge origin/dev --no-edit
+          git push
