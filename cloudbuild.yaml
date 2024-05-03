@@ -1,3 +1,6 @@
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 steps:
   # Install Node.js dependencies
   - name: 'gcr.io/cloud-builders/npm'
@@ -7,9 +10,9 @@ steps:
   - name: 'gcr.io/cloud-builders/npm'
     args: ['run', 'build']
     env:
-      - 'NODE_ENV=production'
-      - 'VITE_API_URL=https://www.pomerene.net/api/v1'
-      - 'VITE_BROWSER_URL=https://www.pomerene.net'
+      - 'VITE_API_URL=${_VITE_API_URL}'  
+      - 'VITE_BROWSER_URL=${_VITE_BROWSER_URL}'
+      - 'VITE_MAPBOX_ACCESS_TOKEN=${_VITE_MAPBOX_ACCESS_TOKEN}'
 
   # Deploy the application to App Engine
   - name: 'gcr.io/cloud-builders/gcloud'

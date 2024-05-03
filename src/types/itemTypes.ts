@@ -2,14 +2,19 @@ export type ItemType = {
   id: string;
   description: string;
   secretKey: string;
-  public: string;
+  itemPublic: string;
+  itemSecret: string;
+  mint: string;
+  tokenAccount: string;
 };
 
 export type ItemTypeRes = {
   mint: "string";
   owner: "string";
-  tokenAccount: "string";
   tokenAmount: 0;
+  itemPublic: string;
+  itemSecret: string;
+  tokenAccount: string;
   metadata: {
     updateAuthority: "string";
     mint: "string";
@@ -23,3 +28,12 @@ export type ItemTypeRes = {
     ];
   };
 };
+
+export interface TransactionData {
+  blockTime: number;
+  confirmationStatus: string;
+  err: null;
+  memo: string;
+  signature: string;
+  slot: number;
+}
