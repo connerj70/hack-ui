@@ -24,7 +24,7 @@ const MapComponent: React.FC<{ data: MapComponentProps[] }> = ({ data }) => {
         data.length > 0
           ? [data[0].longitude, data[0].latitude]
           : [-111.237, 40.626], // initial center position [lng, lat]
-      zoom: 12, // initial zoom
+      zoom: 1, // initial zoom
       attributionControl: false,
     });
 
