@@ -47,7 +47,6 @@ export default function ItemInfo() {
     return () => clearTimeout(timer);
   }, []);
 
-
   useEffect(() => {
     const fetchDataAndAddMarkers = async () => {
       if (!currentUser) return;
@@ -65,7 +64,6 @@ export default function ItemInfo() {
         );
         const responseData = await response.json();
 
-        console.log("responseData", responseData);
         setData(responseData);
         setItems(responseData);
         setLoadingData(false);
@@ -75,7 +73,7 @@ export default function ItemInfo() {
     };
 
     fetchDataAndAddMarkers();
-  }, [currentUser]);
+  }, [currentUser, params.pubKey]);
 
   // function globalFilterFn(
   //   row: Row<TransactionData>,

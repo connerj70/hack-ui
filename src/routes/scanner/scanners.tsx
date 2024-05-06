@@ -117,9 +117,23 @@ export default function Scanners() {
 
   const [globalFilter, setGlobalFilter] = useState("");
 
+  const handleSelectScanner = (scanner:ItemType) => {
+    // Assuming `useScannerContext` is your custom hook to access the scanner context
+
+    setSelectedScanner({
+      description: scanner.description,
+      secretKey: scanner.secret,
+    });
+
+    toast({
+      title: "Scanner selected",
+      description: scanner.description,
+    });
+  };
+
   const table = useReactTable({
     data: scanners,
-    columns: columns(setSelectedScanner, toast),
+    columns: columns(handleSelectScanner),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     globalFilterFn,

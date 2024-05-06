@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +26,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { columns } from "./itemColumns";
 import { ItemType } from "@/types/itemTypes";
-import { Progress } from "@/components/ui/progress";
+
 import { useAuth } from "@/contexts/useAuth";
 import { useToast } from "@/components/ui/use-toast";
 import MapComponent from "@/components/MapComponent";
@@ -38,20 +38,11 @@ export default function Items() {
   const [rowSelection, setRowSelection] = useState({});
   const [items, setItems] = useState<ItemType[]>([]);
   const { currentUser } = useAuth();
-  const [progress, setProgress] = useState(13);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [loadingData, setLoadingData] = useState(true);
-  // const [data, setData] = useState();
-
-  useEffect(() => {
-    const timer = setTimeout(() => setProgress(66), 500);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     const fetchItems = async () => {
-      setLoadingData(true);
       try {
         if (!currentUser) {
           return;
@@ -74,10 +65,7 @@ export default function Items() {
 
         const body = await resp.json();
 
-        console.log("resp", body);
-
         setItems(body.items);
-        setLoadingData(false);
       } catch (error) {
         console.error("An unexpected error occurred:", error);
       }
@@ -130,19 +118,22 @@ export default function Items() {
     },
   });
 
+  const memoizedMap = useMemo(() => {
+    return items && items.length > 0 ? (
+      <MapComponent data={items} />
+    ) : (
+      <div
+        id="map"
+        style={{ width: "100vw", height: "40vh" }}
+        className="w-full bg-gray-200"
+      />
+    );
+  }, [items]);
+
   return (
     <>
-      <div>
-        {items ? (
-          <MapComponent data={items} />
-        ) : (
-          <div
-            id="map"
-            style={{ width: "100vw", height: "40vh" }}
-            className="w-full bg-gray-200"
-          />
-        )}
-      </div>
+      <div>{memoizedMap}</div>
+
       <div className="flex flex-col mx-auto max-w-4xl md:px-4 lg:px-8 pt-10">
         <div className="flex-1 space-y-4  pt-6">
           <div className="flex items-center justify-between space-y-2">
@@ -205,14 +196,10 @@ export default function Items() {
                     colSpan={columns?.length}
                     className="h-24 text-center"
                   >
-                    {!loadingData ? (
-                      <p>
-                        No Items. Click "Create Item" Button to Create Pallet
-                        Tag (check if user has sol)
-                      </p>
-                    ) : (
-                      <Progress value={progress} className="w-[60%]" />
-                    )}
+                    <p>
+                      No Items. Click "Create Item" Button to Create Pallet Tag
+                      (check if user has sol)
+                    </p>
                   </TableCell>
                 </TableRow>
               )}
@@ -239,7 +226,6 @@ export default function Items() {
         </div>
       </div>
       <Toaster />
-      {/* </div> */}
     </>
   );
 }
