@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/table";
 import { useNavigate } from "react-router-dom";
 import { columns } from "./itemColumns";
-import { ItemType, ItemTypeRes } from "@/types/itemTypes";
+import { ItemType } from "@/types/itemTypes";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/useAuth";
 import { useToast } from "@/components/ui/use-toast";
@@ -42,37 +42,12 @@ export default function Items() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loadingData, setLoadingData] = useState(true);
-  const [data, setData] = useState();
+  // const [data, setData] = useState();
 
   useEffect(() => {
     const timer = setTimeout(() => setProgress(66), 500);
     return () => clearTimeout(timer);
   }, []);
-
-  useEffect(() => {
-    const fetchDataAndAddMarkers = async () => {
-      if (!currentUser) return;
-      try {
-        const jwt = await currentUser.getIdToken();
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/event/map/items`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${jwt}`,
-            },
-          }
-        );
-        const responseData = await response.json();
-        setData(responseData);
-      } catch (error) {
-        console.error("Failed to fetch event items:", error);
-      }
-    };
-
-    fetchDataAndAddMarkers();
-  }, [currentUser]);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -101,16 +76,7 @@ export default function Items() {
 
         console.log("resp", body);
 
-        const userItems = await body?.items.map((item: ItemTypeRes) => {
-          return {
-            secretKey: item.itemSecret ?? "",
-            description: item.metadata?.additionalMetadata?.[1]?.[1] ?? "",
-            itemPublic: item.itemPublic ?? "",
-            tokenAccount: item.tokenAccount,
-            mint: item.mint,
-          };
-        });
-        setItems(userItems);
+        setItems(body.items);
         setLoadingData(false);
       } catch (error) {
         console.error("An unexpected error occurred:", error);
@@ -130,7 +96,7 @@ export default function Items() {
 
     const lowercasedFilterValue = filterValue.toLowerCase();
     // Determine if the row should be included based on your filter criteria
-    const matchesPublic = row.original.itemPublic
+    const matchesPublic = row.original.public
       .toLowerCase()
       .includes(lowercasedFilterValue);
     const matchesDescription = row.original.description
@@ -167,8 +133,8 @@ export default function Items() {
   return (
     <>
       <div>
-        {data ? (
-          <MapComponent data={data} />
+        {items ? (
+          <MapComponent data={items} />
         ) : (
           <div
             id="map"

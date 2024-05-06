@@ -30,7 +30,7 @@ const MapComponentItem: React.FC<MapComponentProps> = ({ data }) => {
       container: "map",
       style: "mapbox://styles/mapbox/streets-v11",
       center: [-111.7943618, 40.6959141],
-      zoom: 12,
+      zoom: 3,
       attributionControl: false,
     });
 

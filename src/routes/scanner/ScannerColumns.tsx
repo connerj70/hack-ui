@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ColumnDef } from "@tanstack/react-table";
-import { ScannerType } from "@/types/scannerTypes";
+import { ItemType } from "@/types/itemTypes";
 import { Button } from "@/components/ui/button";
 import { ScannerInfo } from "@/contexts/AuthProvider";
 
@@ -18,7 +18,7 @@ type SetSelectedScannerFunc = (scanner: ScannerInfo | null) => void;
 export const columns = (
   setSelectedScanner: SetSelectedScannerFunc,
   toast: any
-): ColumnDef<ScannerType>[] => [
+): ColumnDef<ItemType>[] => [
   {
     accessorKey: "description",
     header: "Description",
@@ -53,7 +53,7 @@ export const columns = (
 
         setSelectedScanner({
           description: scanner.description,
-          secretKey: scanner.secretKey,
+          secretKey: scanner.secret,
         });
 
         toast({

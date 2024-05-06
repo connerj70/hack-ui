@@ -26,50 +26,28 @@ import {
 import { useNavigate } from "react-router-dom";
 import { columns } from "./ScannerColumns";
 import { useAuth } from "@/contexts/useAuth";
-import { GetScannerResponseType, ScannerType } from "@/types/scannerTypes";
+// import { ScannerType } from "@/types/scannerTypes";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
 import MapComponent from "@/components/MapComponent";
+import { ItemType } from "@/types/itemTypes";
 
 export default function Scanners() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [scanners, setScanners] = useState<ScannerType[]>([]);
+  const [scanners, setScanners] = useState<ItemType[]>([]);
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [progress, setProgress] = useState(13);
   const { setSelectedScanner, selectedScanner } = useAuth();
   const { toast } = useToast();
   const [loadingData, setLoadingData] = useState(true);
-  const [data, setData] = useState();
 
   useEffect(() => {
     const timer = setTimeout(() => setProgress(66), 500);
     return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    const fetchDataAndAddMarkers = async () => {
-      const jwt = await currentUser?.getIdToken();
-      const resp = await fetch(
-        `${import.meta.env.VITE_API_URL}/event/map/scanners`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            // Make sure you are sending the necessary authorization token
-            Authorization: `Bearer ${jwt}`,
-          },
-        }
-      );
-      const data = await resp.json();
-
-      setData(data);
-    };
-
-    fetchDataAndAddMarkers();
   }, []);
 
   useEffect(() => {
@@ -100,18 +78,12 @@ export default function Scanners() {
 
         const body = await resp.json();
 
-        const scannerItems = body.scanners.map(
-          (scanner: GetScannerResponseType) => {
-            return {
-              secretKey: scanner.metadata?.additionalMetadata?.[0]?.[1] ?? "",
-              description: scanner.metadata?.additionalMetadata?.[1]?.[1] ?? "",
-              public: scanner.metadata?.additionalMetadata?.[2]?.[1] ?? "",
-              selected:
-                selectedScanner?.secretKey ===
-                scanner.metadata?.additionalMetadata?.[0]?.[1],
-            };
-          }
-        );
+        const scannerItems = body.scanners.map((scanner: ItemType) => {
+          return {
+            ...scanner,
+            selected: selectedScanner?.secretKey === scanner.secret,
+          };
+        });
         setScanners(scannerItems);
         setLoadingData(false);
       } catch (error) {
@@ -123,7 +95,7 @@ export default function Scanners() {
   }, [currentUser, selectedScanner]);
 
   function globalFilterFn(
-    row: Row<ScannerType>,
+    row: Row<ItemType>,
     _columnIds: string,
     filterValue: string
   ): boolean {
@@ -169,8 +141,8 @@ export default function Scanners() {
   return (
     <>
       <div>
-        {data ? (
-          <MapComponent data={data} />
+        {scanners ? (
+          <MapComponent data={scanners} />
         ) : (
           <div
             id="map"

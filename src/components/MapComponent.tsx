@@ -1,60 +1,46 @@
 import React, { useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-// import { useAuth } from "@/contexts/useAuth";
+import { ItemType } from "@/types/itemTypes";
 
-interface MapComponentProps {
-  latitude: number;
-  longitude: number;
-  itemPublicKey: string;
-  scannerPublicKey: string;
-  timestamp: number;
-  sig: string;
-}
-const MapComponent: React.FC<{ data: MapComponentProps[] }> = ({ data }) => {
+const MapComponent: React.FC<{ data: ItemType[] }> = ({ data }) => {
   useEffect(() => {
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || "";
 
-    console.log("data", data)
+    console.log("data", data);
 
     const map = new mapboxgl.Map({
       container: "map", // container ID
       style: "mapbox://styles/mapbox/streets-v11", // style URL
-      center:
-        data.length > 0
-          ? [data[0].longitude, data[0].latitude]
-          : [-111.237, 40.626], // initial center position [lng, lat]
-      zoom: data.length > 0 ? 8 : 2, // initial zoom
+      center: [-111.237, 40.626], // initial center position [lng, lat]
+      zoom: 2, // initial zoom
       attributionControl: false,
     });
 
     try {
       // Parse data and add markers
-      data.forEach((item: MapComponentProps) => {
-        const content = `
-<div > 
-<p class="text-sm text-gray-600 font-bold mt-1">${new Date(
-          item.timestamp * 1000
-        ).toLocaleString()}</p>
- 
-  <p class="text-xsm text-gray-600 mt-1">${item.latitude}, ${item.longitude}</p>
-  
-  <p class="text-xsm text-gray-600 mt-1  break-words">item: ${
-    item.itemPublicKey
-  }</p> 
-  <p class="text-xsm text-gray-600 mt-1  break-words">scanner: ${
-    item.scannerPublicKey
-  }</p> 
- 
-</div>`;
+      data.forEach((item) => {
+        const coords = item.lastTransaction.memo.match(
+          /(\d+\.\d+),\s*(-?\d+\.\d+)/
+        );
+        if (!coords) return;
 
-        // Create a marker and add it to the map
+        const latitude = parseFloat(coords[1]);
+        const longitude = parseFloat(coords[2]);
+        const link = `https://explorer.solana.com/tx/${item.lastTransaction.signature}?cluster=devnet`;
+        const content = `
+          <div>
+         
+          <p class="text-sm  font-bold mt-1">${item.description}</p>
+          <a href="${link}" target="_blank" rel="noopener noreferrer" class="text-blue-700 hover:underline center">Last Transaction</a>
+          <p class="text-sm text-gray-600 font-bold mt-1">${new Date(
+            item.lastTransaction.blockTime * 1000
+          ).toLocaleString()}</p>
+          </div>`;
+
         new mapboxgl.Marker()
-          .setLngLat([item.longitude, item.latitude])
-          .setPopup(
-            new mapboxgl.Popup({ offset: 25 }) // add popups
-              .setHTML(content)
-          )
+          .setLngLat([longitude, latitude])
+          .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(content))
           .addTo(map);
       });
     } catch (error) {
@@ -62,7 +48,7 @@ const MapComponent: React.FC<{ data: MapComponentProps[] }> = ({ data }) => {
     }
 
     return () => map.remove();
-  }, []);
+  }, [data]);
 
   return (
     <div
