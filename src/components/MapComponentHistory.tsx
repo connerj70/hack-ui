@@ -22,7 +22,7 @@ interface MapComponentProps {
   data: MapData[];
 }
 
-const MapComponentItem: React.FC<MapComponentProps> = ({ data }) => {
+const MapComponentHistory: React.FC<MapComponentProps> = ({ data }) => {
   useEffect(() => {
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || "";
 
@@ -114,4 +114,4 @@ const MapComponentItem: React.FC<MapComponentProps> = ({ data }) => {
   );
 };
 
-export default MapComponentItem;
+export default MapComponentHistory;
