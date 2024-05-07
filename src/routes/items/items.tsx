@@ -71,8 +71,8 @@ export default function Items() {
       }
     };
 
-    fetchItems(); // Correctly call fetchItems here
-  }, [currentUser]); // Add currentUser to the dependency array if it's expected to change over time
+    fetchItems();
+  }, [currentUser]);
 
   function globalFilterFn(
     row: Row<ItemType>,
@@ -120,46 +120,48 @@ export default function Items() {
 
   const memoizedMap = useMemo(() => {
     return items && items.length > 0 ? (
-      <MapComponent data={items} />
+      <MapComponent data={items} width="50vw" height="100vh" />
     ) : (
       <div
         id="map"
-        style={{ width: "100vw", height: "40vh" }}
+        style={{ width: "50vw", height: "100vh" }}
         className="w-full bg-gray-200"
       />
     );
   }, [items]);
 
+  const [isMobile] = useState(window.innerWidth < 768);
+
   return (
     <>
-      <div>{memoizedMap}</div>
+      <div className="flex flex-col md:flex-row w-full">
+        <div className="w-full md:w-1/2 h-screen">{memoizedMap}</div>
 
-      <div className="flex flex-col mx-auto max-w-4xl md:px-4 lg:px-8 pt-10">
-        <div className="flex-1 space-y-4  pt-6">
-          <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight pl-4">Items</h2>
-            <div className="flex items-center space-x-2 pr-4">
-              <Button onClick={() => navigate("/items/create")}>
-                Create Item
-              </Button>
+        <div className="flex flex-col w-full md:w-1/2 max-w-4xl mx-auto md:px-4 lg:px-8 pt-10 overflow-auto">
+          <div className="flex-1 space-y-4 pt-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-3xl font-bold tracking-tight">Items</h2>
+              <div className="flex items-center space-x-2">
+                <Button onClick={() => navigate("/items/create")}>
+                  Create Item
+                </Button>
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-center py-4">
-            <Input
-              value={globalFilter}
-              onChange={(e) => setGlobalFilter(e.target.value)}
-              placeholder="Type to search..."
-              className="max-w-sm"
-            />
-          </div>
+            <div className="flex items-center py-4">
+              <Input
+                value={globalFilter}
+                onChange={(e) => setGlobalFilter(e.target.value)}
+                placeholder="Type to search..."
+                className="max-w-sm"
+              />
+            </div>
 
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
                       <TableHead key={header.id}>
                         {header.isPlaceholder
                           ? null
@@ -168,60 +170,60 @@ export default function Items() {
                               header.getContext()
                             )}
                       </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
                     ))}
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns?.length}
-                    className="h-24 text-center"
-                  >
-                    <p>
-                      No Items. Click "Create Item" Button to Create Pallet Tag
-                      (check if user has sol)
-                    </p>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-          <div className="flex items-center justify-end space-x-2 py-4 pr-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns?.length}
+                      className="h-24 text-center"
+                    >
+                      <p>
+                        No Items. Click "Create Item" Button to Create Pallet
+                        Tag (check if user has sol)
+                      </p>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+            <div className="flex items-center justify-end space-x-2 py-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Next
+              </Button>
+            </div>
           </div>
         </div>
       </div>
