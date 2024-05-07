@@ -27,7 +27,7 @@ import { columns } from "./itemColumnsTx";
 import { TransactionData } from "@/types/itemTypes";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/useAuth";
-import MapComponentItem from "@/components/MapComponentItem";
+import MapComponentItem from "@/components/MapComponentHistory";
 
 export default function ItemInfo() {
   const params = useParams();
@@ -47,7 +47,6 @@ export default function ItemInfo() {
     return () => clearTimeout(timer);
   }, []);
 
-
   useEffect(() => {
     const fetchDataAndAddMarkers = async () => {
       if (!currentUser) return;
@@ -65,7 +64,6 @@ export default function ItemInfo() {
         );
         const responseData = await response.json();
 
-        console.log("responseData", responseData);
         setData(responseData);
         setItems(responseData);
         setLoadingData(false);
@@ -75,28 +73,7 @@ export default function ItemInfo() {
     };
 
     fetchDataAndAddMarkers();
-  }, [currentUser]);
-
-  // function globalFilterFn(
-  //   row: Row<TransactionData>,
-  //   _columnIds: string,
-  //   filterValue: string
-  // ): boolean {
-  //   // If filterValue is empty, return true for all rows
-  //   if (!filterValue) return true;
-
-  //   const lowercasedFilterValue = filterValue.toLowerCase();
-  //   // Determine if the row should be included based on your filter criteria
-  //   const matchesPublic = row.original.itemPublic
-  //     .toLowerCase()
-  //     .includes(lowercasedFilterValue);
-  //   const matchesDescription = row.original.description
-  //     .toLowerCase()
-  //     .includes(lowercasedFilterValue);
-
-  //   // Return true if either condition is met, false otherwise
-  //   return matchesPublic || matchesDescription;
-  // }
+  }, [currentUser, params.pubKey]);
 
   const [globalFilter, setGlobalFilter] = useState("");
 

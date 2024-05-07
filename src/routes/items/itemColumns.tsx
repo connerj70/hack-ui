@@ -13,7 +13,6 @@ import { Loader2, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { User } from "@firebase/auth";
 import { useState } from "react";
-// import { Badge } from "@/components/ui/badge";
 
 export const columns = (
   toast: any,
@@ -25,7 +24,7 @@ export const columns = (
     header: "Description",
     cell: ({ row }) => {
       const item = row.original;
-      row.id = item.itemPublic;
+      row.id = item.public;
 
       return (
         <div className="mx-auto max-w-4xl">
@@ -36,7 +35,7 @@ export const columns = (
             className="text-xs leading-none text-muted-foreground break-words whitespace-normal"
             style={{ overflowWrap: "anywhere" }}
           >
-            {item.itemPublic}
+            {item.public}
           </p>
         </div>
       );
@@ -106,7 +105,7 @@ export const columns = (
                 <p className="text-lg">Actions</p>
 
                 <a
-                  href={`https://explorer.solana.com/address/${item.itemPublic}/tokens?cluster=devnet`} // Make sure respUrl is stored in the component state
+                  href={`https://explorer.solana.com/address/${item.public}/tokens?cluster=devnet`} // Make sure respUrl is stored in the component state
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-500 text-xs hover:underline pr-8"
@@ -115,7 +114,7 @@ export const columns = (
                 </a>
                 <Button
                   onClick={() =>
-                    navigate(`/events/create?itemSecret=${item.secretKey}`)
+                    navigate(`/events/create?itemSecret=${item.secret}`)
                   }
                   className="text-xs px-2 py-0" // Adjust font size and padding
                 >
@@ -131,7 +130,7 @@ export const columns = (
               </DropdownMenuItem>
 
               <DropdownMenuItem
-                onClick={() => navigate(`/items/${item.itemPublic}`)}
+                onClick={() => navigate(`/items/${item.public}`)}
               >
                 Shipping Info
               </DropdownMenuItem>

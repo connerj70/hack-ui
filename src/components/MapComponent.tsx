@@ -1,76 +1,71 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-// import { useAuth } from "@/contexts/useAuth";
+import { ItemType } from "@/types/itemTypes";
 
 interface MapComponentProps {
-  latitude: number;
-  longitude: number;
-  itemPublicKey: string;
-  scannerPublicKey: string;
-  timestamp: number;
-  sig: string;
+  data: ItemType[];
+  width?: string;  // default to "100vw" if not provided
+  height?: string; // default to "40vh" if not provided
 }
-const MapComponent: React.FC<{ data: MapComponentProps[] }> = ({ data }) => {
+
+const MapComponent: React.FC<MapComponentProps> = ({ data, width = "100vw", height = "40vh" }) => {
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const markersRef = useRef<mapboxgl.Marker[]>([]);
+
   useEffect(() => {
-    mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || "";
-
-    console.log("data", data)
-
-    const map = new mapboxgl.Map({
-      container: "map", // container ID
-      style: "mapbox://styles/mapbox/streets-v11", // style URL
-      center:
-        data.length > 0
-          ? [data[0].longitude, data[0].latitude]
-          : [-111.237, 40.626], // initial center position [lng, lat]
-      zoom: 1, // initial zoom
-      attributionControl: false,
-    });
-
-    try {
-      // Parse data and add markers
-      data.forEach((item: MapComponentProps) => {
-        const content = `
-<div > 
-<p class="text-sm text-gray-600 font-bold mt-1">${new Date(
-          item.timestamp * 1000
-        ).toLocaleString()}</p>
- 
-  <p class="text-xsm text-gray-600 mt-1">${item.latitude}, ${item.longitude}</p>
-  
-  <p class="text-xsm text-gray-600 mt-1  break-words">item: ${
-    item.itemPublicKey
-  }</p> 
-  <p class="text-xsm text-gray-600 mt-1  break-words">scanner: ${
-    item.scannerPublicKey
-  }</p> 
- 
-</div>`;
-
-        // Create a marker and add it to the map
-        new mapboxgl.Marker()
-          .setLngLat([item.longitude, item.latitude])
-          .setPopup(
-            new mapboxgl.Popup({ offset: 25 }) // add popups
-              .setHTML(content)
-          )
-          .addTo(map);
+    if (!mapRef.current) {
+      mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || "";
+      mapRef.current = new mapboxgl.Map({
+        container: "map",
+        style: "mapbox://styles/mapbox/streets-v11",
+        center: [-111.237, 40.626],
+        zoom: 2,
+        attributionControl: false,
       });
-    } catch (error) {
-      console.error("Failed to fetch event items:", error);
     }
 
-    return () => map.remove();
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
   }, []);
 
-  return (
-    <div
-      id="map"
-      style={{ width: "100vw", height: "40vh" }}
-      className="w-full"
-    />
-  );
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current = [];
+
+    data.forEach(item => {
+      if (!item.lastTransaction || !item.lastTransaction.memo) return;
+
+      const coords = item.lastTransaction.memo.match(/(\d+\.\d+),\s*(-?\d+\.\d+)/);
+      if (!coords) return;
+
+      const latitude = parseFloat(coords[1]);
+      const longitude = parseFloat(coords[2]);
+      const link = `https://explorer.solana.com/tx/${item.lastTransaction.signature}?cluster=devnet`;
+      const content = `
+        <div>
+          <p class="text-sm font-bold mt-1">${item.description}</p>
+          <a href="${link}" target="_blank" rel="noopener noreferrer" class="text-blue-700 hover:underline center">Last Transaction</a>
+          <p class="text-sm text-gray-600 font-bold mt-1">${new Date(item.lastTransaction.blockTime * 1000).toLocaleString()}</p>
+        </div>`;
+
+      const marker = new mapboxgl.Marker()
+        .setLngLat([longitude, latitude])
+        .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(content))
+        .addTo(map);
+
+      markersRef.current.push(marker);
+    });
+  }, [data]);
+
+  return <div id="map" style={{ width: width, height: height }} className="w-full" />;
 };
 
 export default MapComponent;

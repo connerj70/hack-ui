@@ -22,26 +22,29 @@ export const columns = (): ColumnDef<TransactionData>[] => [
       return (
         <div className="mx-auto max-w-4xl">
           <p className="text-sm font-medium leading-none break-words">
-            {new Date(item.blockTime * 1000).toLocaleString()}
+            {item && item.blockTime
+              ? `${new Date(
+                  item.blockTime * 1000
+                ).toLocaleString()} (${lat}, ${lng})`
+              : "Loading..."}
           </p>
           <a
             href={`https://explorer.solana.com/tx/${item.signature}?cluster=devnet`} // Make sure respUrl is stored in the component state
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-700 hover:underline center"
-          ></a>
+          >{`view`}</a>
           <p
             className="text-xs leading-none text-muted-foreground break-words whitespace-normal"
             style={{ overflowWrap: "anywhere" }}
           >
-            {`Item Key: ${itemKey}, Scanner Key: ${scannerKey}`}
+            {`Item Key: ${itemKey}`}
           </p>
-
           <p
             className="text-xs leading-none text-muted-foreground break-words whitespace-normal"
             style={{ overflowWrap: "anywhere" }}
           >
-            {`Lat: ${lat}, Lng: ${lng}`}
+            {`Scanner Key: ${scannerKey}`}
           </p>
         </div>
       );
