@@ -44,7 +44,7 @@ export default function Root() {
             <a href="https://x.com/PomereneNetwork">
               <TwitterLogoIcon style={{ width: "20px", height: "20px" }} />
             </a>
-            <a href="">
+            <a href="https://discord.gg/3ZgRgrCA">
               <DiscordLogoIcon style={{ width: "20px", height: "20px" }} />
             </a>
             <a href="https://github.com/russell-brouillard/hack-api">
