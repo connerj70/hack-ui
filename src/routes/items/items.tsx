@@ -118,30 +118,34 @@ export default function Items() {
     },
   });
 
-  const memoizedMap = useMemo(() => {
-    return items && items.length > 0 ? (
-      <MapComponent data={items} width="50vw" height="100vh" />
-    ) : (
-      <div
-        id="map"
-        style={{ width: "50vw", height: "100vh" }}
-        className="w-full bg-gray-200"
-      />
-    );
-  }, [items]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  const [isMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Define the layout for the map based on isMobile
+  const memoizedMap = useMemo(() => {
+    const width = isMobile ? "100vw" : "50vw";
+    const height = isMobile ? "40vh" : "100vh";
+    return <MapComponent data={items} width={width} height={height} />;
+  }, [items, isMobile]);
 
   return (
     <>
-      <div className="flex flex-col md:flex-row w-full">
-        <div className="w-full md:w-1/2 h-screen">{memoizedMap}</div>
-
+      <div
+        className={isMobile ? "flex flex-col w-full" : "flex flex-row w-full"}
+      >
+        {memoizedMap}
         <div className="flex flex-col w-full md:w-1/2 max-w-4xl mx-auto md:px-4 lg:px-8 pt-10 overflow-auto">
           <div className="flex-1 space-y-4 pt-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-3xl font-bold tracking-tight">Items</h2>
-              <div className="flex items-center space-x-2">
+              <h2 className="text-3xl font-bold tracking-tight pl-4">Items</h2>
+              <div className="flex items-center space-x-2 pr-4">
                 <Button onClick={() => navigate("/items/create")}>
                   Create Item
                 </Button>
