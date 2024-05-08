@@ -6,9 +6,9 @@ import {
   TwitterLogoIcon,
   GitHubLogoIcon,
   DiscordLogoIcon,
-  HamburgerMenuIcon,
+  // HamburgerMenuIcon,
   Cross1Icon,
-  ArrowTopRightIcon,
+  // ArrowTopRightIcon,
 } from "@radix-ui/react-icons";
 import { useState, useEffect } from "react";
 
