@@ -20,7 +20,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ data, width = "100vw", heig
         container: "map",
         style: "mapbox://styles/mapbox/streets-v11",
         center: [-111.237, 40.626],
-        zoom: 2,
+        zoom: 0,
         attributionControl: false,
       });
     }
@@ -49,11 +49,15 @@ const MapComponent: React.FC<MapComponentProps> = ({ data, width = "100vw", heig
       const latitude = parseFloat(coords[1]);
       const longitude = parseFloat(coords[2]);
       const link = `https://explorer.solana.com/tx/${item.lastTransaction.signature}?cluster=devnet`;
+      const info = `/items/${item.public}`
       const content = `
         <div>
+        <p class="text-sm text-gray-600 font-bold mt-1">${new Date(item.lastTransaction.blockTime * 1000).toLocaleString()}</p>
+          
+          <a href="${link}" target="_blank" rel="noopener noreferrer" class="text-blue-700 hover:underline center">Last solana Transaction</a>
           <p class="text-sm font-bold mt-1">${item.description}</p>
-          <a href="${link}" target="_blank" rel="noopener noreferrer" class="text-blue-700 hover:underline center">Last Transaction</a>
-          <p class="text-sm text-gray-600 font-bold mt-1">${new Date(item.lastTransaction.blockTime * 1000).toLocaleString()}</p>
+          <a href="${info}" target="_blank" rel="noopener noreferrer" class="text-green-700 hover:underline center">info</a>
+         
         </div>`;
 
       const marker = new mapboxgl.Marker()

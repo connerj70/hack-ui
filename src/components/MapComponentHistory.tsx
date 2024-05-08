@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { Feature, LineString } from 'geojson';
+import { Feature, LineString } from "geojson";
 
 interface GeoJSONFeature {
-  type: 'Feature';
+  type: "Feature";
   properties: any;
   geometry: LineString;
 }
@@ -30,23 +30,25 @@ const MapComponentHistory: React.FC<MapComponentProps> = ({ data }) => {
       container: "map",
       style: "mapbox://styles/mapbox/streets-v11",
       center: [-111.7943618, 40.6959141],
-      zoom: 3,
+      zoom: 2,
       attributionControl: false,
     });
 
     map.on("load", () => {
       // Collect coordinates from data for the line
-      const coordinates = data.map(item => {
-        const matchResults = item.memo.match(/[\w.:-]+/g);
-        if (matchResults) {
-          const [, , , lat, lng] = matchResults; // Skip the first two matches
-          return [parseFloat(lng), parseFloat(lat)];
-        }
-        return [0, 0]; // Default fall back to [0, 0] if no match
-      }).filter(coord => coord[0] !== 0 && coord[1] !== 0); // Filter out default coordinates
+      const coordinates = data
+        .map((item) => {
+          const matchResults = item.memo.match(/[\w.:-]+/g);
+          if (matchResults) {
+            const [, , , lat, lng] = matchResults; // Skip the first two matches
+            return [parseFloat(lng), parseFloat(lat)];
+          }
+          return [0, 0]; // Default fall back to [0, 0] if no match
+        })
+        .filter((coord) => coord[0] !== 0 && coord[1] !== 0); // Filter out default coordinates
 
       // Define a GeoJSON object for the line
-      const lineData:GeoJSONFeature = {
+      const lineData: GeoJSONFeature = {
         type: "Feature",
         properties: {},
         geometry: {
@@ -80,18 +82,20 @@ const MapComponentHistory: React.FC<MapComponentProps> = ({ data }) => {
       data.forEach((item) => {
         const matchResults = item.memo.match(/[\w.:-]+/g);
         if (matchResults) {
-          const [, itemKey, scannerKey, lat, lng] = matchResults;
+          const [, , , lat, lng] = matchResults;
           const latitude = parseFloat(lat);
           const longitude = parseFloat(lng);
+          const link = `https://explorer.solana.com/tx/${item.signature}?cluster=devnet`;
 
           const content = `
             <div>
-              <p><strong>Timestamp:</strong> ${new Date(item.blockTime * 1000).toLocaleString()}</p>
+              <p><strong>Timestamp:</strong> ${new Date(
+                item.blockTime * 1000
+              ).toLocaleString()}</p>
               <p><strong>Latitude:</strong> ${latitude}</p>
               <p><strong>Longitude:</strong> ${longitude}</p>
-              <p class="text-xsm text-gray-600 mt-1  break-words">item: ${itemKey}</p> 
-              <p class="text-xsm text-gray-600 mt-1  break-words">scanner: ${scannerKey}</p>
-              <p class="text-xsm text-gray-600 mt-1  break-words"> ${item.signature}</p>
+              <a href="${link}" target="_blank" rel="noopener noreferrer" class="text-blue-700 hover:underline center">Solana Transaction</a>
+          
             </div>`;
 
           new mapboxgl.Marker()
