@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,7 +27,7 @@ import { columns } from "./itemColumnsTx";
 import { TransactionData } from "@/types/itemTypes";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/useAuth";
-import MapComponentItem from "@/components/MapComponentHistory";
+import MapComponentHistory from "@/components/MapComponentHistory";
 
 export default function ItemInfo() {
   const params = useParams();
@@ -39,7 +39,7 @@ export default function ItemInfo() {
   const { currentUser } = useAuth();
   const [progress, setProgress] = useState(13);
   const [loadingData, setLoadingData] = useState(true);
-  const [data, setData] = useState();
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     console.log(params);
@@ -98,23 +98,35 @@ export default function ItemInfo() {
     },
   });
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Define the layout for the map based on isMobile
+  const memoizedMap = useMemo(() => {
+    const width = isMobile ? "100vw" : "50vw";
+    const height = isMobile ? "40vh" : "100vh";
+    return <MapComponentHistory data={data} width={width} height={height} />;
+  }, [data, isMobile]);
+
   return (
     <>
-      <div>
-        {data ? (
-          <MapComponentItem data={data} />
-        ) : (
-          <div
-            id="map"
-            style={{ width: "100vw", height: "40vh" }}
-            className="w-full bg-gray-200"
-          />
-        )}
-      </div>
-      <div className="flex flex-col mx-auto max-w-4xl md:px-4 lg:px-8 pt-10">
-        <div className="flex-1 space-y-4  pt-6">
-          <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight pl-4">History</h2>
+      <div
+        className={isMobile ? "flex flex-col w-full" : "flex flex-row w-full"}
+      >
+        {memoizedMap}
+        <div className="flex flex-col w-full md:w-1/2 max-w-4xl mx-auto md:px-4 lg:px-8 pt-10 overflow-auto">
+          <div className="flex-1 space-y-4 pt-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-3xl font-bold tracking-tight pl-4">History</h2>
+            </div>
+
             <div className="flex items-center py-4">
               <Input
                 value={globalFilter}
@@ -123,80 +135,80 @@ export default function ItemInfo() {
                 className="max-w-sm"
               />
             </div>
-          </div>
 
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
+                      );
+                    })}
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns?.length}
-                    className="h-24 text-center"
-                  >
-                    {!loadingData ? (
-                      <p>
-                        No Items. Click "Create Item" Button to Create Pallet
-                        Tag (check if user has sol)
-                      </p>
-                    ) : (
-                      <Progress value={progress} className="w-[60%]" />
-                    )}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-          <div className="flex items-center justify-end space-x-2 py-4 pr-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns?.length}
+                      className="h-24 text-center"
+                    >
+                      {!loadingData ? (
+                        <p>
+                          No Items. Click "Create Item" Button to Create Pallet
+                          Tag (check if user has sol)
+                        </p>
+                      ) : (
+                        <Progress value={progress} className="w-[60%]" />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+            <div className="flex items-center justify-end space-x-2 py-4 pr-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Next
+              </Button>
+            </div>
           </div>
         </div>
       </div>
