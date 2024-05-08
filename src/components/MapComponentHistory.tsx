@@ -20,9 +20,11 @@ interface MapData {
 
 interface MapComponentProps {
   data: MapData[];
+  width?: string;  // default to "100vw" if not provided
+  height?: string; // default to "40vh" if not provided
 }
 
-const MapComponentHistory: React.FC<MapComponentProps> = ({ data }) => {
+const MapComponentHistory: React.FC<MapComponentProps> = ({data, width = "100vw", height = "40vh" }) => {
   useEffect(() => {
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || "";
 
@@ -109,13 +111,7 @@ const MapComponentHistory: React.FC<MapComponentProps> = ({ data }) => {
     return () => map.remove(); // Clean up the map instance on unmount
   }, [data]);
 
-  return (
-    <div
-      id="map"
-      style={{ width: "100vw", height: "50vh" }}
-      className="w-full"
-    ></div>
-  );
+  return <div id="map" style={{ width: width, height: height }} className="w-full" />;
 };
 
 export default MapComponentHistory;
