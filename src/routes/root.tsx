@@ -21,7 +21,7 @@ export default function Root() {
     } else {
       document.body.classList.remove("overflow-y-hidden");
     }
-  })
+  });
 
   return (
     <>
@@ -34,10 +34,10 @@ export default function Root() {
               className="rounded-full h-10"
             />
           </Link>
-          <div className="flex items-center gap-8">
+          {/* <div className="flex items-center gap-8">
             <Link to="/about" className="text-sm hover:underline">About</Link>
             <Link to="/contact" className="ml-4 text-sm hover:underline">Contact</Link>
-          </div>
+          </div> */}
         </div>
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
@@ -70,14 +70,14 @@ export default function Root() {
         }
       >
         <div className="flex items-center gap-3">
-          <HamburgerMenuIcon
+          {/* <HamburgerMenuIcon
             onClick={() => setMobileMenu(true)}
             className={
               "bg-green-600 text-white p-2 rounded-full" +
               (mobileMenu ? " hidden" : "")
             }
             style={{ width: "35px", height: "35px" }}
-          />
+          /> */}
           <Cross1Icon
             onClick={() => setMobileMenu(false)}
             className={
@@ -105,7 +105,7 @@ export default function Root() {
         </Link>
       </div>
 
-      <div
+      {/* <div
         className={
           "px-4 bg-black text-white flex flex-col gap-4 relative top-0 left-0 w-screen h-screen overscroll-none" +
           (mobileMenu ? "" : " hidden")
@@ -131,7 +131,7 @@ export default function Root() {
             </button>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="bg-green-100 flex flex-col w-full h-screen bg-green-100 justify-center items-center">
         <div className="px-4 pt-10 pb-10 md:pb-44">
@@ -170,24 +170,37 @@ export default function Root() {
         </h1>
       </div>
       <div className="p-8 md:px-20 font-sans text-black gap-6 bg-green-100 flex flex-col md:flex-row-reverse min-h-96 w-100 mt-20 md:mt-6 justify-around items-start">
-        <img src="/containers.jpg" alt="container ships" className="w-full md:w-1/2 rounded-bl-3xl relative -top-44 md:-top-28" />
+        <img
+          src="/containers.jpg"
+          alt="container ships"
+          className="w-full md:w-1/2 rounded-bl-3xl relative -top-44 md:-top-28"
+        />
         <div className="w-full md:w1/2 max-w-md relative -top-36 md:top-32">
           <h2 className="text-2xl">Shared Data Standard</h2>
           <p className="mt-3">
-            The network is a neutral data standard for use by all trade counterparties.
+            The network is a neutral data standard for use by all trade
+            counterparties.
           </p>
-          <Link to="/explore" className="uppercase flex items-center md:justify-center w-full mt-8">
+          <Link
+            to="/explore"
+            className="uppercase flex items-center md:justify-center w-full mt-8"
+          >
             Learn more
-            <ArrowRightIcon style={{width: "20px", height: "20px"}} /> 
+            <ArrowRightIcon style={{ width: "20px", height: "20px" }} />
           </Link>
         </div>
       </div>
       <div className="p-8 md:px-20 font-sans text-black gap-6 flex flex-col md:flex-row min-h-96 w-100 mt-20 md:mt-6 justify-around items-start">
-        <img src="/warehouse.jpg" alt="container ships" className="w-full md:w-1/2 rounded-tr-3xl relative -top-44 md:-top-28" />
+        <img
+          src="/warehouse.jpg"
+          alt="container ships"
+          className="w-full md:w-1/2 rounded-tr-3xl relative -top-44 md:-top-28"
+        />
         <div className="w-full md:w1/2 max-w-md relative -top-36 md:top-32">
           <h2 className="text-2xl">IoT Network of Connected Devices</h2>
           <p className="mt-3">
-            Pomerene is a decentralized infrastructure network. Powered by hardware.
+            Pomerene is a decentralized infrastructure network. Powered by
+            hardware.
           </p>
           <Link
             to="/explore"
@@ -199,33 +212,50 @@ export default function Root() {
         </div>
       </div>
       <div className="p-8 md:px-20 bg-green-100 font-sans text-black gap-6 flex flex-col md:flex-row-reverse min-h-96 w-100 mt-20 md:mt-6 justify-around items-start">
-        <img src="/warehouse2.jpg" alt="container ships" className="w-full md:w-1/2 rounded-bl-3xl relative -top-44 md:-top-28" />
+        <img
+          src="/warehouse2.jpg"
+          alt="container ships"
+          className="w-full md:w-1/2 rounded-bl-3xl relative -top-44 md:-top-28"
+        />
         <div className="w-full max-w-md md:w1/2 relative -top-36 md:top-32">
           <h2 className="text-2xl">Authenticated Inventory Tracking System</h2>
           <p className="mt-3">
-            The network is an open, global inventory tracking system, secured by cryptographic authentication.
+            The network is an open, global inventory tracking system, secured by
+            cryptographic authentication.
           </p>
-          <Link to="/explore" className="uppercase flex items-center md:justify-center w-full mt-8">
+          <Link
+            to="/explore"
+            className="uppercase flex items-center md:justify-center w-full mt-8"
+          >
             Start tracking
-            <ArrowRightIcon style={{width: "20px", height: "20px"}} /> 
+            <ArrowRightIcon style={{ width: "20px", height: "20px" }} />
           </Link>
         </div>
       </div>
       <div className="p-8 md:px-20 font-sans text-black gap-6 flex flex-col md:flex-row min-h-96 w-100 mt-20 md:mt-6 justify-around items-start">
-        <img src="/shipping2.jpg" alt="container ships" className="w-full md:w-1/2 rounded-tr-3xl relative -top-44 md:-top-28" />
+        <img
+          src="/shipping2.jpg"
+          alt="container ships"
+          className="w-full md:w-1/2 rounded-tr-3xl relative -top-44 md:-top-28"
+        />
         <div className="w-full md:w1/2 max-w-md relative -top-36 md:top-32">
           <h2 className="text-2xl">Base Layer for a Smart Economic Stack</h2>
           <p className="mt-3">
-            Pomerene’s authenticated data layer is the foundation for a value stack that includes: smart invoices, counterparty escrow contracts, trade finance and insurance products.
+            Pomerene’s authenticated data layer is the foundation for a value
+            stack that includes: smart invoices, counterparty escrow contracts,
+            trade finance and insurance products.
           </p>
-          <Link to="/explore" className="uppercase flex items-center md:justify-center w-full mt-8">
+          <Link
+            to="/explore"
+            className="uppercase flex items-center md:justify-center w-full mt-8"
+          >
             Learn more
-            <ArrowRightIcon style={{width: "20px", height: "20px"}} /> 
+            <ArrowRightIcon style={{ width: "20px", height: "20px" }} />
           </Link>
         </div>
       </div>
 
-      <div className="relative isolate overflow-hidden bg-gray-900 py-16 sm:py-24 lg:py-32">
+      {/* <div className="relative isolate overflow-hidden bg-gray-900 py-16 sm:py-24 lg:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2">
             <div className="max-w-xl lg:max-w-lg">
@@ -270,7 +300,7 @@ export default function Root() {
             }}
           />
         </div>
-      </div>
+      </div> */}
 
       <footer className="bg-black text-white p-12">
         <div className="container mx-auto px-4">
@@ -281,14 +311,17 @@ export default function Root() {
               </p>
             </div>
             <div className="flex justify-center md:justify-start space-x-4">
-              <a href="" className="text-sm hover:text-green-500">
+              {/* <a href="" className="text-sm hover:text-green-500">
                 Terms of use
               </a>
               <a href="" className="text-sm hover:text-green-500">
                 Privacy Policy
-              </a>
-              <a href="" className="text-sm hover:text-green-500">
-                Cookies
+              </a> */}
+              <a
+                href="mailto:info@pomerene.xyz"
+                className="text-sm hover:text-green-500"
+              >
+                info@pomerene.xyz
               </a>
             </div>
           </div>
