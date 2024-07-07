@@ -10,11 +10,22 @@ jobs:
   update_branches:
     runs-on: ubuntu-latest
     steps:
+      # Checkout the repository
       - uses: actions/checkout@v3
+
+      # Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      # Setup Git
       - name: Setup Git
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
+
+      # Merge dev into current branch
       - name: Merge dev into current branch
         run: |
           git fetch origin dev
