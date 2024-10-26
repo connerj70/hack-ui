@@ -2992,6 +2992,11 @@ json5@^2.2.3:
   resolved "https://registry.npmjs.org/json5/-/json5-2.2.3.tgz"
   integrity sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==
 
+jsqr@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/jsqr/-/jsqr-1.4.0.tgz#8efb8d0a7cc6863cb6d95116b9069123ce9eb2d1"
+  integrity sha512-dxLob7q65Xg2DvstYkRpkYtmKm2sPJ9oFhrhmudT1dZvNFFTlroai3AWSpLey/w5vMcLBXRgOJsbXpdN9HzU/A==
+
 kdbush@^4.0.1, kdbush@^4.0.2:
   version "4.0.2"
   resolved "https://registry.npmjs.org/kdbush/-/kdbush-4.0.2.tgz"
