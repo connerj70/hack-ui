@@ -23,7 +23,7 @@ interface UserNavProps {
 export const UserNav: React.FC<UserNavProps> = ({ user }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const [solanaBalance, setSolanaBalance] = useState<number>(0);
+  const [suiBalance, setSuiBalance] = useState<number>(0);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -51,7 +51,9 @@ export const UserNav: React.FC<UserNavProps> = ({ user }) => {
         }
 
         const data = await response.json();
-        setSolanaBalance(data.balance);
+
+        console.log("DATA ", data);
+        setSuiBalance(data.balance);
       } catch (error) {
         console.error("Error fetching Solana balance:", error);
         // Optionally, handle the error, e.g., by showing an error message or setting the balance to null
@@ -102,7 +104,7 @@ export const UserNav: React.FC<UserNavProps> = ({ user }) => {
 
       if (res.ok) {
         const sol = await res.json();
-        setSolanaBalance(sol.sol + solanaBalance);
+        setSuiBalance(sol.sol + suiBalance);
       }
     } catch (error) {
       console.error("Error during airdrop:", error);
@@ -136,7 +138,7 @@ export const UserNav: React.FC<UserNavProps> = ({ user }) => {
             </p>
           </div>
           <div className="flex items-center justify-between pt-2">
-            <Badge>Sol: {solanaBalance?.toFixed(2).toString()}</Badge>
+            <Badge>Sui: {suiBalance?.toFixed(2).toString()}</Badge>
             <Button
               variant="outline"
               className="ml-2 text-xs"
@@ -145,7 +147,7 @@ export const UserNav: React.FC<UserNavProps> = ({ user }) => {
               {submitting ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : null}
-              Airdrop SOL
+              Airdrop Sui
             </Button>
           </div>
         </DropdownMenuLabel>
