@@ -51,27 +51,16 @@ export default function Signup() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true);
     try {
-      const userCreateResp = await fetch(
-        `${import.meta.env.VITE_API_URL}/user/create`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: values.email,
-            password: values.password,
-          }),
-        }
-      );
-
-      if (!userCreateResp.ok) {
-        toast({
-          title: "Error creating account",
-          description: "An error occurred while creating your account",
-        });
-        return;
-      }
+      await fetch(`${import.meta.env.VITE_API_URL}/user/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+        }),
+      });
 
       await login(values.email, values.password);
 
@@ -124,7 +113,9 @@ export default function Signup() {
           </div>
           <div className="relative z-20 mt-auto">
             <blockquote className="space-y-2">
-              <p className="text-lg text-black">A smart network for international trade</p>
+              <p className="text-lg text-black">
+                A smart network for international trade
+              </p>
             </blockquote>
           </div>
         </div>
@@ -182,7 +173,11 @@ export default function Signup() {
                     </FormItem>
                   )}
                 />
-                <Button disabled={submitting} type="submit" className="w-full bg-green-600 hover:bg-green-700">
+                <Button
+                  disabled={submitting}
+                  type="submit"
+                  className="w-full bg-green-600 hover:bg-green-700"
+                >
                   {submitting ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : null}
