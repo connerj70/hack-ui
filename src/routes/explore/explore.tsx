@@ -1,9 +1,9 @@
 import MapComponent from "@/components/MapComponent";
-import { ItemType } from "@/types/itemTypes";
-import { useEffect, useState } from "react";
+// import { ItemType } from "@/types/itemTypes";
+import { useEffect } from "react";
 
 export default function Explore() {
-  const [items, setItems] = useState<ItemType[]>([]);
+  // const [items, setItems] = useState<ItemType[]>([]);
   useEffect(() => {
     async function fetchData() {
       const response = await fetch(
@@ -17,10 +17,10 @@ export default function Explore() {
       );
       const data = await response.json();
       console.log(data.items);
-      setItems(data.items);
+      // setItems(data.items);
     }
 
     fetchData();
   }, []);
-  return <MapComponent data={items} width={"100vw"} height={"100vh"} />;
+  return <MapComponent width={"100vw"} height={"100vh"} />;
 }

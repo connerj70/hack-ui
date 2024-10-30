@@ -1,26 +1,17 @@
 import React, { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+// import { ScannerType } from "@/types/scannerTypes";
+// import { ItemType } from "@/types/itemTypes";
 
 interface MapComponentProps {
-  data: ItemType[];
+  // data: ItemType[] | ScannerType[];
   width?: string; // default to "100vw" if not provided
   height?: string; // default to "40vh" if not provided
 }
 
-type ItemType = {
-  description: string;
-  id: {
-    id: string;
-  };
-  itemAddress: string;
-  name: string;
-  url: string;
-  selected?: boolean; // Added 'selected' property
-};
-
 const MapComponent: React.FC<MapComponentProps> = ({
-  data,
+  // data,
   width = "100vw",
   height = "40vh",
 }) => {
@@ -54,38 +45,38 @@ const MapComponent: React.FC<MapComponentProps> = ({
     markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
 
-    data.forEach((item) => {
-      if (!item.lastTransaction || !item.lastTransaction.memo) return;
+    // data.forEach((item) => {
+    // if (!item.lastTransaction || !item.lastTransaction.memo) return;
 
-      const coords = item.lastTransaction.memo.match(
-        /(\d+\.\d+),\s*(-?\d+\.\d+)/
-      );
-      if (!coords) return;
+    // const coords = item.lastTransaction.memo.match(
+    //   /(\d+\.\d+),\s*(-?\d+\.\d+)/
+    // );
+    // if (!coords) return;
 
-      const latitude = parseFloat(coords[1]);
-      const longitude = parseFloat(coords[2]);
-      const link = `https://explorer.solana.com/tx/${item.lastTransaction.signature}?cluster=devnet`;
-      const info = `/items/${item.public}`;
-      const content = `
-        <div>
-        <p class="text-sm text-gray-600 font-bold mt-1">${new Date(
-          item.lastTransaction.blockTime * 1000
-        ).toLocaleString()}</p>
-          
-          <a href="${link}" target="_blank" rel="noopener noreferrer" class="text-blue-700 hover:underline center">Last solana Transaction</a>
-          <p class="text-sm font-bold mt-1">${item.description}</p>
-          <a href="${info}" target="_blank" rel="noopener noreferrer" class="text-green-700 hover:underline center">info</a>
-         
-        </div>`;
+    // const latitude = parseFloat(coords[1]);
+    // const longitude = parseFloat(coords[2]);
+    // const link = `https://explorer.solana.com/tx/${item.lastTransaction.signature}?cluster=devnet`;
+    // const info = `/items/${item.public}`;
+    // const content = `
+    //   <div>
+    //   <p class="text-sm text-gray-600 font-bold mt-1">${new Date(
+    //     item.lastTransaction.blockTime * 1000
+    //   ).toLocaleString()}</p>
 
-      const marker = new mapboxgl.Marker()
-        .setLngLat([longitude, latitude])
-        .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(content))
-        .addTo(map);
+    //     <a href="${link}" target="_blank" rel="noopener noreferrer" class="text-blue-700 hover:underline center">Last solana Transaction</a>
+    //     <p class="text-sm font-bold mt-1">${item.description}</p>
+    //     <a href="${info}" target="_blank" rel="noopener noreferrer" class="text-green-700 hover:underline center">info</a>
 
-      markersRef.current.push(marker);
-    });
-  }, [data]);
+    //   </div>`;
+
+    // const marker = new mapboxgl.Marker()
+    //   .setLngLat([longitude, latitude])
+    //   .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(content))
+    //   .addTo(map);
+
+    // markersRef.current.push(marker);
+  });
+  // }, [data]);
 
   return (
     <div id="map" style={{ width: width, height: height }} className="w-full" />

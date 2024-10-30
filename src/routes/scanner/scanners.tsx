@@ -1,11 +1,10 @@
 // src/components/Scanners.tsx
 
-import React, { useEffect, useMemo, useState, FC } from "react";
+import React, { useEffect, useMemo, useState, FC, useCallback } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
 import {
   ColumnFiltersState,
-  Row,
   SortingState,
   VisibilityState,
   flexRender,
@@ -31,7 +30,7 @@ import { useAuth } from "@/contexts/useAuth";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
 import MapComponent from "@/components/MapComponent";
-import { User } from "firebase/auth";
+import { User as FirebaseUser } from "firebase/auth";
 import { MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
@@ -58,8 +57,9 @@ interface ScannerType {
 interface ActionsCellProps {
   scanner: ScannerType;
   handleSelectScanner: (scanner: ScannerType) => void;
-  currentUser: User | null;
+  currentUser: FirebaseUser | null;
   toast: ReturnType<typeof useToast>["toast"];
+  setScanners: React.Dispatch<React.SetStateAction<ScannerType[]>>;
 }
 
 const Scanners: FC = () => {
@@ -86,6 +86,16 @@ const Scanners: FC = () => {
       try {
         setLoadingData(true);
         const jwt = await currentUser?.getIdToken();
+
+        if (!jwt) {
+          toast({
+            title: "Authentication Error",
+            description: "You must be logged in to view scanners.",
+            variant: "destructive",
+          });
+          setLoadingData(false);
+          return;
+        }
 
         const resp = await fetch(
           `${import.meta.env.VITE_API_URL}/scanner/user`,
@@ -122,7 +132,16 @@ const Scanners: FC = () => {
         if (!body.success) {
           toast({
             title: "Error",
-            description: "Failed to fetch scanners.",
+            description: body.message || "Failed to fetch scanners.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (!Array.isArray(body.scanners)) {
+          toast({
+            title: "Error",
+            description: "Invalid data format received.",
             variant: "destructive",
           });
           return;
@@ -150,44 +169,54 @@ const Scanners: FC = () => {
 
     if (currentUser) {
       fetchScanners();
+    } else {
+      setScanners([]);
+      setLoadingData(false);
     }
   }, [currentUser, selectedScanner, toast]);
 
   // Define the global filter function
-  function globalFilterFn(
-    row: Row<ScannerType>,
-    _columnIds: string[],
-    filterValue: string
-  ): boolean {
-    if (!filterValue) return true;
+  // const globalFilterFn = useCallback(
+  //   (
+  //     row: Row<ScannerType>,
+  //     _columnIds: string[],
+  //     filterValue: string
+  //   ): boolean => {
+  //     if (!filterValue) return true;
 
-    const lowercasedFilterValue = filterValue.toLowerCase();
-    const matchesName = row.original.name
-      .toLowerCase()
-      .includes(lowercasedFilterValue);
-    const matchesDescription = row.original.description
-      .toLowerCase()
-      .includes(lowercasedFilterValue);
-    const matchesScannerAddress = row.original.scannerAddress
-      .toLowerCase()
-      .includes(lowercasedFilterValue);
+  //     const lowercasedFilterValue = filterValue.toLowerCase();
+  //     const matchesName = row.original.name
+  //       .toLowerCase()
+  //       .includes(lowercasedFilterValue);
+  //     const matchesDescription = row.original.description
+  //       .toLowerCase()
+  //       .includes(lowercasedFilterValue);
+  //     const matchesScannerAddress = row.original.scannerAddress
+  //       .toLowerCase()
+  //       .includes(lowercasedFilterValue);
 
-    return matchesName || matchesDescription || matchesScannerAddress;
-  }
+  //     return matchesName || matchesDescription || matchesScannerAddress;
+  //   },
+  //   []
+  // );
 
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const handleSelectScanner = (scanner: ScannerType) => {
-    setSelectedScanner({
-      description: scanner.description,
-      secretKey: scanner.scannerAddress,
-    });
+  const handleSelectScanner = useCallback(
+    (scanner: ScannerType) => {
+      setSelectedScanner({
+        description: scanner.description,
+        secretKey: scanner.scannerAddress,
+      });
 
-    toast({
-      title: "Scanner Selected:",
-      description: scanner.name,
-    });
-  };
+      toast({
+        title: "Scanner Selected:",
+        description: scanner.name,
+        variant: "default",
+      });
+    },
+    [setSelectedScanner, toast]
+  );
 
   // Define the ActionsCell component within Scanners.tsx
   const ActionsCell: FC<ActionsCellProps> = ({
@@ -195,6 +224,7 @@ const Scanners: FC = () => {
     handleSelectScanner,
     currentUser,
     toast,
+    setScanners,
   }) => {
     const [isLoading, setIsLoading] = useState(false);
 
@@ -208,6 +238,12 @@ const Scanners: FC = () => {
         });
         return;
       }
+
+      const confirmDelete = window.confirm(
+        `Are you sure you want to delete scanner "${scanner.name}"? This action cannot be undone.`
+      );
+
+      if (!confirmDelete) return;
 
       setIsLoading(true);
       try {
@@ -224,24 +260,28 @@ const Scanners: FC = () => {
         );
 
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          const errorBody = await response.json();
+          throw new Error(
+            errorBody.message || `HTTP error! Status: ${response.status}`
+          );
         }
 
         const result = await response.json();
         console.log("Delete successful:", result);
         toast({
           title: "Delete Successful",
-          description: "The scanner has been successfully deleted.",
+          description: `Scanner "${scanner.name}" has been successfully deleted.`,
+          variant: "default",
         });
         // Remove the deleted scanner from the state without reloading
         setScanners((prevScanners) =>
           prevScanners.filter((s) => s.id.id !== scanner.id.id)
         );
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error during deletion:", error);
         toast({
           title: "Delete Failed",
-          description: "Failed to delete the scanner.",
+          description: error.message || "Failed to delete the scanner.",
           variant: "destructive",
         });
       } finally {
@@ -250,7 +290,7 @@ const Scanners: FC = () => {
     };
 
     return (
-      <div className="flex justify-end">
+      <div className="flex justify-end items-center">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -263,8 +303,8 @@ const Scanners: FC = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>
-              <div className="text-lg">Actions</div>
+            <DropdownMenuLabel className="flex flex-col">
+              <div className="text-lg font-semibold">Actions</div>
               <a
                 href={`https://explorer.sui.io/address/${scanner.id.id}`}
                 target="_blank"
@@ -275,7 +315,8 @@ const Scanners: FC = () => {
               </a>
 
               <Button
-                className="text-xs mt-2"
+                variant="ghost"
+                className="text-xs mt-2 p-0"
                 onClick={() => handleSelectScanner(scanner)}
               >
                 Select
@@ -284,13 +325,35 @@ const Scanners: FC = () => {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() =>
-                navigator.clipboard.writeText(scanner.scannerAddress)
+                navigator.clipboard.writeText(scanner.scannerAddress).then(
+                  () => {
+                    toast({
+                      title: "Copied",
+                      description: "Scanner address copied to clipboard.",
+                      variant: "default",
+                    });
+                  },
+                  (err) => {
+                    console.error("Clipboard copy failed:", err);
+                    toast({
+                      title: "Error",
+                      description: "Failed to copy scanner address.",
+                      variant: "destructive",
+                    });
+                  }
+                )
               }
             >
               Copy Scanner Address
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleDelete}>
-              <div className="text-red-500">Delete Scanner</div>
+            <DropdownMenuItem onClick={handleDelete} disabled={isLoading}>
+              <div
+                className={`text-red-500 ${
+                  isLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                Delete Scanner
+              </div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -315,7 +378,9 @@ const Scanners: FC = () => {
               <div className="text-sm font-medium leading-none break-words">
                 {scanner.name}
                 {scanner.selected && (
-                  <span className="text-green-500 pl-2">✓</span>
+                  <span className="text-green-500 pl-2" aria-label="Selected">
+                    ✓
+                  </span>
                 )}
               </div>
             </div>
@@ -347,6 +412,7 @@ const Scanners: FC = () => {
               handleSelectScanner={handleSelectScanner}
               currentUser={currentUser}
               toast={toast}
+              setScanners={setScanners}
             />
           );
         },
@@ -360,7 +426,7 @@ const Scanners: FC = () => {
     columns: columnsDefinition,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    globalFilterFn,
+
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -391,9 +457,10 @@ const Scanners: FC = () => {
 
   // Define the layout for the map based on isMobile
   const memoizedMap = useMemo(() => {
+    // Assuming MapComponent accepts width and height as strings with units
     const width = isMobile ? "100vw" : "50vw";
     const height = isMobile ? "40vh" : "100vh";
-    return <MapComponent data={scanners} width={width} height={height} />;
+    return <MapComponent width={width} height={height} />;
   }, [scanners, isMobile]);
 
   return (
@@ -421,6 +488,7 @@ const Scanners: FC = () => {
                 onChange={(e) => setGlobalFilter(e.target.value)}
                 placeholder="Type to search..."
                 className="max-w-sm"
+                aria-label="Search Scanners"
               />
             </div>
 
@@ -448,7 +516,7 @@ const Scanners: FC = () => {
                   table.getRowModel().rows.map((row) => (
                     <TableRow
                       key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
+                      data-state={row.getIsSelected() ? "selected" : undefined}
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
@@ -463,16 +531,19 @@ const Scanners: FC = () => {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={columnsDefinition?.length || 1}
+                      colSpan={columnsDefinition.length || 1}
                       className="h-24 text-center"
                     >
                       {!loadingData ? (
                         <p>
-                          No Scanners. Click "Create Scanner" Button (check if
-                          you have enough Sui)
+                          No Scanners. Click the "Create Scanner" button (ensure
+                          you have enough SUI).
                         </p>
                       ) : (
-                        <Progress value={progress} className="w-[60%]" />
+                        <Progress
+                          value={progress}
+                          className="w-[60%] mx-auto"
+                        />
                       )}
                     </TableCell>
                   </TableRow>
