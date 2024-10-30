@@ -40,6 +40,17 @@ export function MainNav({
       >
         Scanners
       </Link>
+
+      <Link
+        to="/qr-scanner"
+        className={`text-sm font-medium transition-colors hover:text-primary ${
+          location.pathname === "/qr-scanner"
+            ? "text-primary"
+            : "text-muted-foreground"
+        }`}
+      >
+        QR-Scan
+      </Link>
     </nav>
   );
 }

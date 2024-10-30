@@ -184,8 +184,8 @@ const Scanners: FC = () => {
     });
 
     toast({
-      title: "Scanner Selected",
-      description: scanner.description,
+      title: "Scanner Selected:",
+      description: scanner.name,
     });
   };
 
