@@ -1,3 +1,5 @@
+// src/components/Scanners.tsx
+
 import { useEffect, useMemo, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
@@ -26,18 +28,17 @@ import {
 import { useNavigate } from "react-router-dom";
 import { columns } from "./ScannerColumns";
 import { useAuth } from "@/contexts/useAuth";
-// import { ScannerType } from "@/types/scannerTypes";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
 import MapComponent from "@/components/MapComponent";
-import { ItemType } from "@/types/itemTypes";
+import { ScannerType } from "@/types/itemTypes";
 
 export default function Scanners() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [scanners, setScanners] = useState<ItemType[]>([]);
+  const [scanners, setScanners] = useState<ScannerType[]>([]);
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [progress, setProgress] = useState(13);
@@ -69,60 +70,86 @@ export default function Scanners() {
 
         if (!resp.ok) {
           if (resp.status === 403) {
-            // Redirect the user to the login page with a redirect back to the current page after login
+            // Handle 403 Forbidden
+            toast({
+              title: "Access Denied",
+              description: "You do not have permission to view scanners.",
+              variant: "destructive",
+            });
             throw new Error("403 Forbidden");
           }
-          console.error("Failed to fetch user accounts");
-          return [];
+          console.error("Failed to fetch user scanners");
+          toast({
+            title: "Error",
+            description: "Failed to fetch scanners.",
+            variant: "destructive",
+          });
+          return;
         }
 
         const body = await resp.json();
 
-        const scannerItems = body.scanners.map((scanner: ItemType) => {
-          return {
+        if (!body.success) {
+          toast({
+            title: "Error",
+            description: "Failed to fetch scanners.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const scannerItems: ScannerType[] = body.scanners.map(
+          (scanner: ScannerType) => ({
             ...scanner,
-            selected: selectedScanner?.secretKey === scanner.secret,
-          };
-        });
+            selected: selectedScanner?.secretKey === scanner.scannerAddress,
+          })
+        );
+
         setScanners(scannerItems);
         setLoadingData(false);
       } catch (error) {
         console.error("An unexpected error occurred:", error);
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred.",
+          variant: "destructive",
+        });
+        setLoadingData(false);
       }
     };
 
-    fetchScanners();
-  }, [currentUser, selectedScanner]);
+    if (currentUser) {
+      fetchScanners();
+    }
+  }, [currentUser, selectedScanner, toast]);
 
   function globalFilterFn(
-    row: Row<ItemType>,
-    _columnIds: string,
+    row: Row<ScannerType>,
+    _columnIds: string[],
     filterValue: string
   ): boolean {
-    // If filterValue is empty, return true for all rows
     if (!filterValue) return true;
 
     const lowercasedFilterValue = filterValue.toLowerCase();
-    // Determine if the row should be included based on your filter criteria
-    const matchesPublic = row.original.public
+    const matchesName = row.original.name
       .toLowerCase()
       .includes(lowercasedFilterValue);
     const matchesDescription = row.original.description
       .toLowerCase()
       .includes(lowercasedFilterValue);
+    const matchesScannerAddress = row.original.scannerAddress
+      .toLowerCase()
+      .includes(lowercasedFilterValue);
 
-    // Return true if either condition is met, false otherwise
-    return matchesPublic || matchesDescription;
+    return matchesName || matchesDescription || matchesScannerAddress;
   }
 
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const handleSelectScanner = (scanner: ItemType) => {
-    // Assuming `useScannerContext` is your custom hook to access the scanner context
-
+  const handleSelectScanner = (scanner: ScannerType) => {
     setSelectedScanner({
       description: scanner.description,
-      secretKey: scanner.secret,
+      secretKey: scanner.scannerAddress,
     });
 
     toast({
@@ -133,7 +160,7 @@ export default function Scanners() {
 
   const table = useReactTable({
     data: scanners,
-    columns: columns(handleSelectScanner),
+    columns: useMemo(() => columns(handleSelectScanner), [handleSelectScanner]),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     globalFilterFn,
@@ -178,7 +205,9 @@ export default function Scanners() {
         <div className="flex flex-col w-full md:w-1/2 max-w-4xl mx-auto md:px-4 lg:px-8 pt-10 overflow-auto">
           <div className="flex-1 space-y-4 pt-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-3xl font-bold tracking-tight pl-4">Scanners</h2>
+              <h2 className="text-3xl font-bold tracking-tight pl-4">
+                Scanners
+              </h2>
               <div className="flex items-center space-x-2 pr-4">
                 <Button onClick={() => navigate("/scanners/create")}>
                   Create Scanner
@@ -234,7 +263,7 @@ export default function Scanners() {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={columns?.length}
+                      colSpan={columns(handleSelectScanner)?.length || 1}
                       className="h-24 text-center"
                     >
                       {!loadingData ? (

@@ -1,3 +1,5 @@
+// src/components/ScannerColumns.tsx
+
 import { MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
@@ -8,37 +10,51 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ColumnDef } from "@tanstack/react-table";
-import { ItemType } from "@/types/itemTypes";
+
 import { Button } from "@/components/ui/button";
 
-export const columns = (handleSelectScanner: any): ColumnDef<ItemType>[] => [
+interface ScannerType {
+  description: string;
+  id: {
+    id: string;
+  };
+  scannerAddress: string;
+  name: string;
+  url: string;
+}
+
+export const columns = (
+  handleSelectScanner: (scanner: ScannerType) => void
+): ColumnDef<ScannerType>[] => [
   {
-    accessorKey: "description",
-    header: "Description",
+    accessorKey: "name",
+    header: "Name",
     cell: ({ row }) => {
       const scanner = row.original;
 
       return (
-        <div className="mx-auto max-w-4xl">
-          <div className="text-sm font-medium leading-none break-words flex">
-            {scanner.description}
-            {scanner.selected ? (
-              <span className="text-green-500 pl-2">✓</span>
-            ) : (
-              ""
-            )}
-          </div>
-          <div
-            className="text-xs leading-none text-muted-foreground break-words whitespace-normal"
-            style={{ overflowWrap: "anywhere" }}
-          >
-            {scanner.public}
+        <div className="flex items-center">
+          <div className="text-sm font-medium leading-none break-words">
+            {scanner.name}
+            {scanner.selected && <span className="text-green-500 pl-2">✓</span>}
           </div>
         </div>
       );
     },
   },
 
+  {
+    accessorKey: "scannerAddress",
+    header: "Scanner Address",
+    cell: ({ row }) => {
+      const scanner = row.original;
+      return (
+        <div className="text-sm text-gray-700 whitespace-normal break-all">
+          {scanner.scannerAddress}
+        </div>
+      );
+    },
+  },
   {
     id: "actions",
     enableHiding: false,
@@ -49,7 +65,11 @@ export const columns = (handleSelectScanner: any): ColumnDef<ItemType>[] => [
         <div className="flex justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                className="h-8 w-8 p-0"
+                aria-label="Open actions menu"
+              >
                 <span className="sr-only">Open menu</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
@@ -58,7 +78,7 @@ export const columns = (handleSelectScanner: any): ColumnDef<ItemType>[] => [
               <DropdownMenuLabel>
                 <div className="text-lg">Actions</div>
                 <a
-                  href={`https://explorer.solana.com/address/${scanner.public}/tokens?cluster=devnet`}
+                  href={`https://explorer.sui.io/address/${scanner.id.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-500 text-xs hover:underline pr-8"
@@ -66,7 +86,7 @@ export const columns = (handleSelectScanner: any): ColumnDef<ItemType>[] => [
                   View Details
                 </a>
                 <Button
-                  className="text-xs"
+                  className="text-xs mt-2"
                   onClick={() => handleSelectScanner(scanner)}
                 >
                   Select
@@ -74,9 +94,11 @@ export const columns = (handleSelectScanner: any): ColumnDef<ItemType>[] => [
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(scanner.public)}
+                onClick={() =>
+                  navigator.clipboard.writeText(scanner.scannerAddress)
+                }
               >
-                Copy Public Key
+                Copy Scanner Address
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
