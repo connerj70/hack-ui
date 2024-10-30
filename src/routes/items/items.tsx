@@ -1,10 +1,10 @@
+// src/components/Items.tsx
+
 import { useEffect, useMemo, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   ColumnFiltersState,
-  Row,
   SortingState,
   VisibilityState,
   flexRender,
@@ -13,7 +13,10 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  ColumnDef,
+  FilterFn,
 } from "@tanstack/react-table";
+import { Input } from "@/components/ui/input";
 
 import {
   Table,
@@ -24,12 +27,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useNavigate } from "react-router-dom";
-import { columns } from "./itemColumns";
-import { ItemType } from "@/types/itemTypes";
-
 import { useAuth } from "@/contexts/useAuth";
 import { useToast } from "@/components/ui/use-toast";
 import MapComponent from "@/components/MapComponent";
+
+// Define the structure of each item
+interface ItemType {
+  description: string;
+  id: {
+    id: string;
+  };
+  itemAddress: string;
+  name: string;
+  url: string;
+}
 
 export default function Items() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -48,7 +59,7 @@ export default function Items() {
           return;
         }
 
-        const jwt = await currentUser.getIdToken(); // Ensure currentUser is not null before calling this
+        const jwt = await currentUser.getIdToken();
 
         const resp = await fetch(`${import.meta.env.VITE_API_URL}/item/user`, {
           method: "GET",
@@ -59,50 +70,113 @@ export default function Items() {
         });
 
         if (!resp.ok) {
-          // Handle HTTP errors here, for example:
           throw new Error(`Failed to fetch items: ${resp.statusText}`);
         }
 
         const body = await resp.json();
 
+        // Assuming the response structure is { items: ItemType[] }
         setItems(body.items);
       } catch (error) {
         console.error("An unexpected error occurred:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch items.",
+          variant: "destructive",
+        });
       }
     };
 
     fetchItems();
-  }, [currentUser]);
+  }, [currentUser, toast]);
 
-  function globalFilterFn(
-    row: Row<ItemType>,
-    _columnIds: string,
-    filterValue: string
-  ): boolean {
-    // If filterValue is empty, return true for all rows
+  // Define the custom global filter function
+  const customGlobalFilter: FilterFn<ItemType> = (row, filterValue) => {
     if (!filterValue) return true;
 
-    const lowercasedFilterValue = filterValue.toLowerCase();
-    // Determine if the row should be included based on your filter criteria
-    const matchesPublic = row.original.public
-      .toLowerCase()
-      .includes(lowercasedFilterValue);
-    const matchesDescription = row.original.description
-      .toLowerCase()
-      .includes(lowercasedFilterValue);
+    const lowercasedFilter = filterValue.toLowerCase();
+    const { name, description } = row.original;
 
-    // Return true if either condition is met, false otherwise
-    return matchesPublic || matchesDescription;
-  }
+    return (
+      name.toLowerCase().includes(lowercasedFilter) ||
+      description.toLowerCase().includes(lowercasedFilter)
+    );
+  };
 
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const table = useReactTable({
+  // Define the columns
+  const columnsDefinition: ColumnDef<ItemType>[] = useMemo(
+    () => [
+      {
+        accessorKey: "name",
+        header: "Name",
+        cell: ({ row }) => {
+          const item = row.original;
+
+          return (
+            <div className="flex items-center">
+              <div className="text-sm font-medium leading-none break-words">
+                {item.name}
+              </div>
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "itemAddress",
+        header: "Item Address",
+        cell: ({ row }) => {
+          const item = row.original;
+          return (
+            <div className="text-sm text-gray-700 whitespace-normal break-all">
+              {item.itemAddress}
+            </div>
+          );
+        },
+      },
+      // Add more columns as needed, e.g., description, url, etc.
+      // For demonstration, let's add an 'Actions' column
+      {
+        id: "actions",
+        enableHiding: false,
+        header: "Actions",
+        cell: ({ row }) => {
+          const item = row.original;
+
+          // Define your action components here, similar to ActionsCell in Scanners.tsx
+          return (
+            <div className="flex justify-end">
+              {/* Example action buttons */}
+              <Button
+                variant="ghost"
+                onClick={() => navigate(`/items/${item.id.id}`)}
+              >
+                View
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => navigate(`/items/edit/${item.id.id}`)}
+              >
+                Edit
+              </Button>
+            </div>
+          );
+        },
+      },
+    ],
+    [navigate]
+  );
+
+  const table = useReactTable<ItemType>({
     data: items,
-    columns: columns(toast, navigate, currentUser),
+    columns: columnsDefinition,
+    filterFns: {
+      customGlobalFilter, // Registering the custom filter function
+    },
+
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    globalFilterFn,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -118,7 +192,9 @@ export default function Items() {
     },
   });
 
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth < 768 : false
+  );
 
   useEffect(() => {
     const handleResize = () => {
@@ -132,7 +208,7 @@ export default function Items() {
   const memoizedMap = useMemo(() => {
     const width = isMobile ? "100vw" : "50vw";
     const height = isMobile ? "40vh" : "100vh";
-    return <MapComponent data={items} width={width} height={height} />;
+    return <MapComponent width={width} height={height} />;
   }, [items, isMobile]);
 
   return (
@@ -198,12 +274,11 @@ export default function Items() {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={columns?.length}
+                      colSpan={columnsDefinition?.length || 1}
                       className="h-24 text-center"
                     >
                       <p>
-                        No Items. Click "Create Item" Button to Create Pallet
-                        Tag (check if user has sol)
+                        No Items. Click "Create Item" Button to Create an Item.
                       </p>
                     </TableCell>
                   </TableRow>

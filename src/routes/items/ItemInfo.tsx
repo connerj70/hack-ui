@@ -124,7 +124,9 @@ export default function ItemInfo() {
         <div className="flex flex-col w-full md:w-1/2 max-w-4xl mx-auto md:px-4 lg:px-8 pt-10 overflow-auto">
           <div className="flex-1 space-y-4 pt-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-3xl font-bold tracking-tight pl-4">History</h2>
+              <h2 className="text-3xl font-bold tracking-tight pl-4">
+                History
+              </h2>
             </div>
 
             <div className="flex items-center py-4">
@@ -181,7 +183,7 @@ export default function ItemInfo() {
                       {!loadingData ? (
                         <p>
                           No Items. Click "Create Item" Button to Create Pallet
-                          Tag (check if user has sol)
+                          Tag
                         </p>
                       ) : (
                         <Progress value={progress} className="w-[60%]" />

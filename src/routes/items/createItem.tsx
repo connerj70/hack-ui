@@ -74,7 +74,8 @@ export default function CreateItem() {
           navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
         } else {
           toast({
-            title: "Error creating item (check if you have enough SOL in your wallet)",
+            title:
+              "Error creating item (check if you have enough Sui in your wallet)",
             description: "An error occurred while creating your item",
           });
         }
@@ -83,13 +84,16 @@ export default function CreateItem() {
 
       const respBody = await resp.json();
 
-      setItemSecret(respBody.item.itemSecret);
+      console.log(respBody);
+
+      setItemSecret(respBody.item);
       setOpen(true);
     } catch (error) {
       if (error instanceof Error) {
         const errorMessage = error.message;
         toast({
-          title: "Error creating item (check if you have enough SOL in your wallet)",
+          title:
+            "Error creating item (check if you have enough Sui in your wallet)",
           description: errorMessage,
         });
       }
