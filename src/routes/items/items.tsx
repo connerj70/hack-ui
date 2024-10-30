@@ -13,7 +13,6 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-  ColumnDef,
   FilterFn,
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
@@ -30,6 +29,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/useAuth";
 import { useToast } from "@/components/ui/use-toast";
 import MapComponent from "@/components/MapComponent";
+import { getItemColumns } from "./itemColumns";
+
 
 // Define the structure of each item
 interface ItemType {
@@ -75,8 +76,17 @@ export default function Items() {
 
         const body = await resp.json();
 
-        // Assuming the response structure is { items: ItemType[] }
-        setItems(body.items);
+
+
+
+        console.log("Fetched items:", body); // Debugging line
+
+        // Safeguard: Ensure body.items is an array
+        if (Array.isArray(body)) {
+          setItems(body);
+        } else {
+          throw new Error("Invalid data format: 'items' is not an array.");
+        }
       } catch (error) {
         console.error("An unexpected error occurred:", error);
         toast({
@@ -95,7 +105,7 @@ export default function Items() {
     if (!filterValue) return true;
 
     const lowercasedFilter = filterValue.toLowerCase();
-    const { name, description } = row.original;
+    const { name = "", description = "" } = row.original;
 
     return (
       name.toLowerCase().includes(lowercasedFilter) ||
@@ -105,67 +115,10 @@ export default function Items() {
 
   const [globalFilter, setGlobalFilter] = useState("");
 
-  // Define the columns
-  const columnsDefinition: ColumnDef<ItemType>[] = useMemo(
-    () => [
-      {
-        accessorKey: "name",
-        header: "Name",
-        cell: ({ row }) => {
-          const item = row.original;
-
-          return (
-            <div className="flex items-center">
-              <div className="text-sm font-medium leading-none break-words">
-                {item.name}
-              </div>
-            </div>
-          );
-        },
-      },
-      {
-        accessorKey: "itemAddress",
-        header: "Item Address",
-        cell: ({ row }) => {
-          const item = row.original;
-          return (
-            <div className="text-sm text-gray-700 whitespace-normal break-all">
-              {item.itemAddress}
-            </div>
-          );
-        },
-      },
-      // Add more columns as needed, e.g., description, url, etc.
-      // For demonstration, let's add an 'Actions' column
-      {
-        id: "actions",
-        enableHiding: false,
-        header: "Actions",
-        cell: ({ row }) => {
-          const item = row.original;
-
-          // Define your action components here, similar to ActionsCell in Scanners.tsx
-          return (
-            <div className="flex justify-end">
-              {/* Example action buttons */}
-              <Button
-                variant="ghost"
-                onClick={() => navigate(`/items/${item.id.id}`)}
-              >
-                View
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => navigate(`/items/edit/${item.id.id}`)}
-              >
-                Edit
-              </Button>
-            </div>
-          );
-        },
-      },
-    ],
-    [navigate]
+  // Import columns from columns.ts
+  const columnsDefinition = useMemo(
+    () => getItemColumns(toast, navigate, currentUser),
+    [toast, navigate, currentUser]
   );
 
   const table = useReactTable<ItemType>({
@@ -174,6 +127,7 @@ export default function Items() {
     filterFns: {
       customGlobalFilter, // Registering the custom filter function
     },
+    // globalFilterFn: "customGlobalFilter", // Assigning the custom filter function for global filtering
 
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

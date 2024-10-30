@@ -1,4 +1,5 @@
-// Import necessary components and types
+// src/components/columns.ts
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,7 +8,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import { ColumnDef } from "@tanstack/react-table";
 import { Loader2, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,7 @@ interface ItemType {
   url: string;
 }
 
-export const columns = (
+export const getItemColumns = (
   toast: any,
   navigate: any,
   currentUser: User | null
@@ -45,6 +45,18 @@ export const columns = (
     },
   },
   {
+    accessorKey: "itemAddress",
+    header: "Item Address",
+    cell: ({ row }) => {
+      const item = row.original;
+      return (
+        <div className="text-sm text-gray-700 whitespace-normal break-all">
+          {item.itemAddress}
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => {
@@ -53,12 +65,6 @@ export const columns = (
         <div className="mx-auto max-w-4xl">
           <p className="text-sm font-medium leading-none break-words">
             {item.description}
-          </p>
-          <p
-            className="text-xs leading-none text-muted-foreground break-words whitespace-normal"
-            style={{ overflowWrap: "anywhere" }}
-          >
-            {item.itemAddress}
           </p>
         </div>
       );
@@ -133,6 +139,10 @@ export const columns = (
         }
       };
 
+      const navigateToShippingInfo = () => {
+        navigate(`/items/${item.id.id}`);
+      };
+
       return (
         <div className="flex justify-end">
           <DropdownMenu>
@@ -160,23 +170,12 @@ export const columns = (
                 >
                   View Details
                 </a>
-                {/* If 'secret' is not available, remove or adjust the following button */}
-                {/* <Button
-                  onClick={() =>
-                    navigate(`/events/create?itemSecret=${item.secret}`)
-                  }
-                  className="text-xs px-2 py-0"
-                >
-                  Scan Item
-                </Button> */}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleDelete}>
                 <div className="text-red-500">Delete Item</div>
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => navigate(`/items/${item.id.id}`)}
-              >
+              <DropdownMenuItem onClick={navigateToShippingInfo}>
                 Shipping Info
               </DropdownMenuItem>
             </DropdownMenuContent>
