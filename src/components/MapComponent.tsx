@@ -1,15 +1,29 @@
 import React, { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { ItemType } from "@/types/itemTypes";
 
 interface MapComponentProps {
   data: ItemType[];
-  width?: string;  // default to "100vw" if not provided
+  width?: string; // default to "100vw" if not provided
   height?: string; // default to "40vh" if not provided
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ data, width = "100vw", height = "40vh" }) => {
+type ItemType = {
+  description: string;
+  id: {
+    id: string;
+  };
+  itemAddress: string;
+  name: string;
+  url: string;
+  selected?: boolean; // Added 'selected' property
+};
+
+const MapComponent: React.FC<MapComponentProps> = ({
+  data,
+  width = "100vw",
+  height = "40vh",
+}) => {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
 
@@ -37,22 +51,26 @@ const MapComponent: React.FC<MapComponentProps> = ({ data, width = "100vw", heig
     const map = mapRef.current;
     if (!map) return;
 
-    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
 
-    data.forEach(item => {
+    data.forEach((item) => {
       if (!item.lastTransaction || !item.lastTransaction.memo) return;
 
-      const coords = item.lastTransaction.memo.match(/(\d+\.\d+),\s*(-?\d+\.\d+)/);
+      const coords = item.lastTransaction.memo.match(
+        /(\d+\.\d+),\s*(-?\d+\.\d+)/
+      );
       if (!coords) return;
 
       const latitude = parseFloat(coords[1]);
       const longitude = parseFloat(coords[2]);
       const link = `https://explorer.solana.com/tx/${item.lastTransaction.signature}?cluster=devnet`;
-      const info = `/items/${item.public}`
+      const info = `/items/${item.public}`;
       const content = `
         <div>
-        <p class="text-sm text-gray-600 font-bold mt-1">${new Date(item.lastTransaction.blockTime * 1000).toLocaleString()}</p>
+        <p class="text-sm text-gray-600 font-bold mt-1">${new Date(
+          item.lastTransaction.blockTime * 1000
+        ).toLocaleString()}</p>
           
           <a href="${link}" target="_blank" rel="noopener noreferrer" class="text-blue-700 hover:underline center">Last solana Transaction</a>
           <p class="text-sm font-bold mt-1">${item.description}</p>
@@ -69,7 +87,9 @@ const MapComponent: React.FC<MapComponentProps> = ({ data, width = "100vw", heig
     });
   }, [data]);
 
-  return <div id="map" style={{ width: width, height: height }} className="w-full" />;
+  return (
+    <div id="map" style={{ width: width, height: height }} className="w-full" />
+  );
 };
 
 export default MapComponent;

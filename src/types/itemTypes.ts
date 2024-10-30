@@ -1,14 +1,12 @@
 export type ItemType = {
-  mint: "string";
-  owner: "string";
-  tokenAmount: number;
-  public: string;
-  secret: string;
-  tokenAccount: string;
   description: string;
-  type: "string";
-  lastTransaction: TransactionData;
-  selected?: boolean;
+  id: {
+    id: string;
+  };
+  itemAddress: string;
+  name: string;
+  url: string;
+  selected?: boolean; // Added 'selected' property
 };
 
 export interface TransactionData {
