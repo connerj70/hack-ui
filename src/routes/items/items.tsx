@@ -25,11 +25,21 @@ import {
 } from "@/components/ui/table";
 import { useNavigate } from "react-router-dom";
 import { columns } from "./itemColumns";
-import { ItemType } from "@/types/itemTypes";
 
 import { useAuth } from "@/contexts/useAuth";
 import { useToast } from "@/components/ui/use-toast";
 import MapComponent from "@/components/MapComponent";
+
+// Define the structure of each item
+interface ItemType {
+  description: string;
+  id: {
+    id: string;
+  };
+  itemAddress: string;
+  name: string;
+  url: string;
+}
 
 export default function Items() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -48,7 +58,7 @@ export default function Items() {
           return;
         }
 
-        const jwt = await currentUser.getIdToken(); // Ensure currentUser is not null before calling this
+        const jwt = await currentUser.getIdToken();
 
         const resp = await fetch(`${import.meta.env.VITE_API_URL}/item/user`, {
           method: "GET",
@@ -59,40 +69,40 @@ export default function Items() {
         });
 
         if (!resp.ok) {
-          // Handle HTTP errors here, for example:
           throw new Error(`Failed to fetch items: ${resp.statusText}`);
         }
 
         const body = await resp.json();
 
-        setItems(body.items);
+        // Assuming the response structure is { items: ItemType[] }
+        setItems(body);
       } catch (error) {
         console.error("An unexpected error occurred:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch items.",
+          variant: "destructive",
+        });
       }
     };
 
     fetchItems();
-  }, [currentUser]);
+  }, [currentUser, toast]);
 
   function globalFilterFn(
     row: Row<ItemType>,
-    _columnIds: string,
+    _columnIds: string[],
     filterValue: string
   ): boolean {
-    // If filterValue is empty, return true for all rows
     if (!filterValue) return true;
 
-    const lowercasedFilterValue = filterValue.toLowerCase();
-    // Determine if the row should be included based on your filter criteria
-    const matchesPublic = row.original.public
-      .toLowerCase()
-      .includes(lowercasedFilterValue);
-    const matchesDescription = row.original.description
-      .toLowerCase()
-      .includes(lowercasedFilterValue);
+    const lowercasedFilter = filterValue.toLowerCase();
+    const { name, description } = row.original;
 
-    // Return true if either condition is met, false otherwise
-    return matchesPublic || matchesDescription;
+    return (
+      name.toLowerCase().includes(lowercasedFilter) ||
+      description.toLowerCase().includes(lowercasedFilter)
+    );
   }
 
   const [globalFilter, setGlobalFilter] = useState("");
@@ -198,12 +208,13 @@ export default function Items() {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={columns?.length}
+                      colSpan={
+                        columns(toast, navigate, currentUser)?.length || 1
+                      }
                       className="h-24 text-center"
                     >
                       <p>
-                        No Items. Click "Create Item" Button to Create Pallet
-                        Tag (check if user has sol)
+                        No Items. Click "Create Item" Button to Create an Item.
                       </p>
                     </TableCell>
                   </TableRow>

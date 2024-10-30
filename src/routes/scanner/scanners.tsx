@@ -240,7 +240,7 @@ export default function Scanners() {
                       {!loadingData ? (
                         <p>
                           No Scanners. Click "Create Scanner" Button (check if
-                          you have enough SOL)
+                          you have enough Sui)
                         </p>
                       ) : (
                         <Progress value={progress} className="w-[60%]" />

@@ -108,7 +108,7 @@ export default function CreateEvent() {
       if (!resp.ok) {
         toast({
           title:
-            "Error creating event (check if you have enough SOL in your wallet)",
+            "Error creating event (check if you have enough Sui in your wallet)",
           description: "An error occurred while creating your item",
         });
 
@@ -126,7 +126,7 @@ export default function CreateEvent() {
         const errorMessage = error.message;
         toast({
           title:
-            "Error creating event (check if you have enough SOL in your wallet)",
+            "Error creating event (check if you have enough Sui in your wallet)",
           description: errorMessage,
         });
       }
