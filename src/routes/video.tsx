@@ -131,7 +131,7 @@ const QRScanner: React.FC = () => {
       }
       const jwt = await currentUser.getIdToken();
       const res: Response = await fetch(
-        `${import.meta.env.VITE_API_URL}/event/scan`,
+        `${import.meta.env.VITE_API_URL}/sui/scan`,
         {
           method: "POST",
           headers: {
@@ -183,10 +183,9 @@ const QRScanner: React.FC = () => {
         QR Code Scanner {selectedScanner?.name && `(${selectedScanner.name})`}
       </h1>
 
-      {/* Remove or comment out these debug lines in production */}
-      {/* <p>scannerSecret: {selectedScanner?.secret}</p>
+      <p>scannerSecret: {selectedScanner?.secret}</p>
       <p>itemSecret: {qrCode}</p>
-      <p>message: {"test test"}</p> */}
+      <p>message: {"test test"}</p>
 
       {error && (
         <div className="mt-5 text-center pb-8">
