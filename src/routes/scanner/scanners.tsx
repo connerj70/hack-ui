@@ -50,16 +50,18 @@ const Scanners: FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Function to handle selecting a scanner
-
   // Function to handle deletion of a scanner
   const handleDeleteScanner = useCallback(
     (deletedScannerId: string) => {
       setScanners((prevScanners) =>
         prevScanners.filter((scanner) => scanner.id.id !== deletedScannerId)
       );
+      // If the deleted scanner was selected, deselect it
+      if (selectedScanner && selectedScanner.id.id === deletedScannerId) {
+        setSelectedScanner(null);
+      }
     },
-    [setScanners]
+    [setScanners, setSelectedScanner, selectedScanner]
   );
 
   // Fetch scanners from the API
@@ -132,7 +134,7 @@ const Scanners: FC = () => {
         const scannerItems: ScannerType[] = body.scanners.map(
           (scanner: ScannerType) => ({
             ...scanner,
-            selected: selectedScanner?.secretKey === scanner.scannerAddress,
+            selected: selectedScanner?.id.id === scanner.id.id, // Corrected comparison
           })
         );
 
