@@ -31,7 +31,6 @@ import { useToast } from "@/components/ui/use-toast";
 import MapComponent from "@/components/MapComponent";
 import { getItemColumns } from "./itemColumns";
 
-
 // Define the structure of each item
 interface ItemType {
   description: string;
@@ -75,9 +74,6 @@ export default function Items() {
         }
 
         const body = await resp.json();
-
-
-
 
         console.log("Fetched items:", body); // Debugging line
 

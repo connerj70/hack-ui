@@ -29,8 +29,12 @@ import { useAuth } from "@/contexts/useAuth";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
 import MapComponent from "@/components/MapComponent";
-import { scannerColumns as getScannerColumns } from "./ScannerColumns";
-import { ScannerType } from "@/types/scannerTypes";
+import {
+  scannerColumns as getScannerColumns,
+  ScannerType,
+} from "./ScannerColumns";
+
+
 
 const Scanners: FC = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -108,6 +112,7 @@ const Scanners: FC = () => {
             description: "Failed to fetch scanners.",
             variant: "destructive",
           });
+          setLoadingData(false);
           return;
         }
 
@@ -121,6 +126,7 @@ const Scanners: FC = () => {
             description: body.message || "Failed to fetch scanners.",
             variant: "destructive",
           });
+          setLoadingData(false);
           return;
         }
 
@@ -130,6 +136,7 @@ const Scanners: FC = () => {
             description: "Invalid data format received.",
             variant: "destructive",
           });
+          setLoadingData(false);
           return;
         }
 

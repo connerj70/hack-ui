@@ -25,20 +25,13 @@ export interface ScannerType {
   selected?: boolean; // Added 'selected' property
 }
 
-// Define the ToastOptions interface for better type safety
-interface ToastOptions {
-  title: string;
-  description: string;
-  variant?: "default" | "destructive" | "success" | "warning";
-}
-
 // Define the props for the ActionsCell component
 interface ActionsCellProps {
   scanner: ScannerType;
   setSelectedScanner: (scanner: ScannerType) => void;
   handleDeleteScanner: (id: string) => void;
   currentUser: User | null;
-  toast: (options: ToastOptions) => void;
+  toast: any;
 }
 
 // ActionsCell Component to handle actions like Select and Delete
@@ -188,7 +181,7 @@ export const scannerColumns = (
   setSelectedScanner: (scanner: ScannerType) => void,
   handleDeleteScanner: (id: string) => void,
   currentUser: User | null,
-  toast: (options: ToastOptions) => void
+  toast: any
 ): ColumnDef<ScannerType>[] => [
   {
     accessorKey: "name",
