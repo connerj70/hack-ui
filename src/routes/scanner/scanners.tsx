@@ -1,6 +1,6 @@
 // src/components/Scanners.tsx
 
-import React, { useEffect, useMemo, useState, FC, useCallback } from "react";
+import { useEffect, useMemo, useState, FC, useCallback } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +13,6 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-  ColumnDef,
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 
@@ -30,16 +29,7 @@ import { useAuth } from "@/contexts/useAuth";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
 import MapComponent from "@/components/MapComponent";
-import { User as FirebaseUser } from "firebase/auth";
-import { MoreHorizontal } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { scannerColumns as getScannerColumns } from "./ScannerColumns";
 
 // Define the ScannerType interface, including the optional 'selected' property
 interface ScannerType {
@@ -51,15 +41,6 @@ interface ScannerType {
   name: string;
   url: string;
   selected?: boolean; // Added 'selected' property
-}
-
-// Define the props for the ActionsCell component
-interface ActionsCellProps {
-  scanner: ScannerType;
-  handleSelectScanner: (scanner: ScannerType) => void;
-  currentUser: FirebaseUser | null;
-  toast: ReturnType<typeof useToast>["toast"];
-  setScanners: React.Dispatch<React.SetStateAction<ScannerType[]>>;
 }
 
 const Scanners: FC = () => {
@@ -79,6 +60,18 @@ const Scanners: FC = () => {
     const timer = setTimeout(() => setProgress(66), 500);
     return () => clearTimeout(timer);
   }, []);
+
+  // Function to handle selecting a scanner
+
+  // Function to handle deletion of a scanner
+  const handleDeleteScanner = useCallback(
+    (deletedScannerId: string) => {
+      setScanners((prevScanners) =>
+        prevScanners.filter((scanner) => scanner.id.id !== deletedScannerId)
+      );
+    },
+    [setScanners]
+  );
 
   // Fetch scanners from the API
   useEffect(() => {
@@ -175,258 +168,20 @@ const Scanners: FC = () => {
     }
   }, [currentUser, selectedScanner, toast]);
 
-  // Define the global filter function
-  // const globalFilterFn = useCallback(
-  //   (
-  //     row: Row<ScannerType>,
-  //     _columnIds: string[],
-  //     filterValue: string
-  //   ): boolean => {
-  //     if (!filterValue) return true;
-
-  //     const lowercasedFilterValue = filterValue.toLowerCase();
-  //     const matchesName = row.original.name
-  //       .toLowerCase()
-  //       .includes(lowercasedFilterValue);
-  //     const matchesDescription = row.original.description
-  //       .toLowerCase()
-  //       .includes(lowercasedFilterValue);
-  //     const matchesScannerAddress = row.original.scannerAddress
-  //       .toLowerCase()
-  //       .includes(lowercasedFilterValue);
-
-  //     return matchesName || matchesDescription || matchesScannerAddress;
-  //   },
-  //   []
-  // );
-
+  // Global filter state
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const handleSelectScanner = useCallback(
-    (scanner: ScannerType) => {
-      setSelectedScanner({
-        description: scanner.description,
-        secretKey: scanner.scannerAddress,
-      });
-
-      toast({
-        title: "Scanner Selected:",
-        description: scanner.name,
-        variant: "default",
-      });
-    },
-    [setSelectedScanner, toast]
-  );
-
-  // Define the ActionsCell component within Scanners.tsx
-  const ActionsCell: FC<ActionsCellProps> = ({
-    scanner,
-    handleSelectScanner,
-    currentUser,
-    toast,
-    setScanners,
-  }) => {
-    const [isLoading, setIsLoading] = useState(false);
-
-    // Function to handle deletion of a scanner
-    const handleDelete = async () => {
-      if (!currentUser) {
-        toast({
-          title: "Error",
-          description: "You must be logged in to perform this action.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const confirmDelete = window.confirm(
-        `Are you sure you want to delete scanner "${scanner.name}"? This action cannot be undone.`
-      );
-
-      if (!confirmDelete) return;
-
-      setIsLoading(true);
-      try {
-        const jwt = await currentUser.getIdToken();
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/scanner/${scanner.id.id}`,
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${jwt}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          const errorBody = await response.json();
-          throw new Error(
-            errorBody.message || `HTTP error! Status: ${response.status}`
-          );
-        }
-
-        const result = await response.json();
-        console.log("Delete successful:", result);
-        toast({
-          title: "Delete Successful",
-          description: `Scanner "${scanner.name}" has been successfully deleted.`,
-          variant: "default",
-        });
-        // Remove the deleted scanner from the state without reloading
-        setScanners((prevScanners) =>
-          prevScanners.filter((s) => s.id.id !== scanner.id.id)
-        );
-      } catch (error: any) {
-        console.error("Error during deletion:", error);
-        toast({
-          title: "Delete Failed",
-          description: error.message || "Failed to delete the scanner.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    return (
-      <div className="flex justify-end items-center">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="h-8 w-8 p-0"
-              aria-label="Open actions menu"
-            >
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel className="flex flex-col">
-              <div className="text-lg font-semibold">Actions</div>
-              <a
-                href={`https://explorer.sui.io/address/${scanner.id.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500 text-xs hover:underline pr-8"
-              >
-                View Details
-              </a>
-
-              <Button
-                variant="ghost"
-                className="text-xs mt-2 p-0"
-                onClick={() => handleSelectScanner(scanner)}
-              >
-                Select
-              </Button>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() =>
-                navigator.clipboard.writeText(scanner.scannerAddress).then(
-                  () => {
-                    toast({
-                      title: "Copied",
-                      description: "Scanner address copied to clipboard.",
-                      variant: "default",
-                    });
-                  },
-                  (err) => {
-                    console.error("Clipboard copy failed:", err);
-                    toast({
-                      title: "Error",
-                      description: "Failed to copy scanner address.",
-                      variant: "destructive",
-                    });
-                  }
-                )
-              }
-            >
-              Copy Scanner Address
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleDelete} disabled={isLoading}>
-              <div
-                className={`text-red-500 ${
-                  isLoading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              >
-                Delete Scanner
-              </div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        {isLoading && (
-          <span className="ml-2 text-sm text-gray-500">Deleting...</span>
-        )}
-      </div>
-    );
-  };
-
-  // Define the columns within Scanners.tsx
-  const columnsDefinition: ColumnDef<ScannerType>[] = useMemo(
-    () => [
-      {
-        accessorKey: "name",
-        header: "Name",
-        cell: ({ row }) => {
-          const scanner = row.original;
-
-          return (
-            <div className="flex items-center">
-              <div className="text-sm font-medium leading-none break-words">
-                {scanner.name}
-                {scanner.selected && (
-                  <span className="text-green-500 pl-2" aria-label="Selected">
-                    ✓
-                  </span>
-                )}
-              </div>
-            </div>
-          );
-        },
-      },
-      {
-        accessorKey: "scannerAddress",
-        header: "Scanner Address",
-        cell: ({ row }) => {
-          const scanner = row.original;
-          return (
-            <div className="text-sm text-gray-700 whitespace-normal break-all">
-              {scanner.scannerAddress}
-            </div>
-          );
-        },
-      },
-      {
-        id: "actions",
-        enableHiding: false,
-        header: "Actions",
-        cell: ({ row }) => {
-          const scanner = row.original;
-
-          return (
-            <ActionsCell
-              scanner={scanner}
-              handleSelectScanner={handleSelectScanner}
-              currentUser={currentUser}
-              toast={toast}
-              setScanners={setScanners}
-            />
-          );
-        },
-      },
-    ],
-    [handleSelectScanner, currentUser, toast]
-  );
-
+  // Initialize the table with the necessary configurations and column definitions
   const table = useReactTable({
     data: scanners,
-    columns: columnsDefinition,
+    columns: getScannerColumns(
+      setSelectedScanner,
+      handleDeleteScanner,
+      currentUser,
+      toast
+    ), // Invoke the function with required parameters
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -531,7 +286,14 @@ const Scanners: FC = () => {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={columnsDefinition.length || 1}
+                      colSpan={
+                        getScannerColumns(
+                          setSelectedScanner,
+                          handleDeleteScanner,
+                          currentUser,
+                          toast
+                        ).length || 1
+                      }
                       className="h-24 text-center"
                     >
                       {!loadingData ? (
