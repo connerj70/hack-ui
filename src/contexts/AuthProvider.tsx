@@ -60,7 +60,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const handleSetSelectedScanner = (scanner: ScannerType | null) => {
     setSelectedScanner(scanner);
-    localStorage.setItem(SCANNER_STORAGE_KEY, JSON.stringify(scanner));
+    if (scanner) {
+      localStorage.setItem(SCANNER_STORAGE_KEY, JSON.stringify(scanner));
+    } else {
+      localStorage.removeItem(SCANNER_STORAGE_KEY);
+    }
   };
 
   const value = {

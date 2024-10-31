@@ -18,13 +18,18 @@ import { User } from "firebase/auth";
 // Define the ScannerType interface, including the optional 'selected' property
 export interface ScannerType {
   description: string;
-  id: {
-    id: string;
-  };
+  id: { id: string }; // `id` is an object containing another `id` string
   scannerAddress: string;
   name: string;
   url: string;
   selected?: boolean; // Added 'selected' property
+}
+
+// Define the ToastOptions interface for better type safety
+interface ToastOptions {
+  title: string;
+  description: string;
+  variant?: "default" | "destructive" | "success" | "warning";
 }
 
 // Define the props for the ActionsCell component
@@ -34,13 +39,6 @@ interface ActionsCellProps {
   handleDeleteScanner: (id: string) => void;
   currentUser: User | null;
   toast: (options: ToastOptions) => void;
-}
-
-// Define the ToastOptions interface for better type safety
-interface ToastOptions {
-  title: string;
-  description: string;
-  variant?: "default" | "destructive" | "success" | "warning";
 }
 
 // ActionsCell Component to handle actions like Select and Delete
@@ -55,6 +53,11 @@ const ActionsCell: React.FC<ActionsCellProps> = ({
 
   // Function to handle deletion of a scanner
   const handleDelete = async () => {
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete the scanner "${scanner.name}"?`
+    );
+    if (!confirmDelete) return;
+
     if (!currentUser) {
       toast({
         title: "Error",
@@ -68,7 +71,7 @@ const ActionsCell: React.FC<ActionsCellProps> = ({
     try {
       const jwt = await currentUser.getIdToken();
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/scanner/${scanner.id.id}`,
+        `${import.meta.env.VITE_API_URL}/scanner/${scanner.id.id}`, // Accessing nested id
         {
           method: "DELETE",
           headers: {
@@ -128,7 +131,7 @@ const ActionsCell: React.FC<ActionsCellProps> = ({
           <DropdownMenuLabel>
             <div className="text-lg">Actions</div>
             <a
-              href={`https://explorer.sui.io/address/${scanner.id.id}`}
+              href={`https://explorer.sui.io/address/${scanner.id.id}`} // Accessing nested id
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-500 text-xs hover:underline pr-8"
@@ -185,7 +188,7 @@ export const scannerColumns = (
   setSelectedScanner: (scanner: ScannerType) => void,
   handleDeleteScanner: (id: string) => void,
   currentUser: User | null,
-  toast: any
+  toast: (options: ToastOptions) => void
 ): ColumnDef<ScannerType>[] => [
   {
     accessorKey: "name",
