@@ -12,7 +12,7 @@ const QRScanner: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState(false);
-  const { selectedScanner, currentUser } = useAuth(); // Ensure 'user' is destructured if used
+  const { selectedScanner, currentUser } = useAuth(); // Ensure 'currentUser' is destructured correctly
 
   useEffect(() => {
     let animationFrameId: number;
@@ -112,10 +112,21 @@ const QRScanner: React.FC = () => {
     };
   }, [scanKey]); // Depend on scanKey to allow retries
 
+  const handleRetry = () => {
+    setQrCode(null);
+    setError(null);
+    setScanKey((prevKey) => prevKey + 1); // Change scanKey to re-run useEffect
+  };
+
   const handleScan = async () => {
     setSubmitting(true);
     try {
       if (!currentUser) {
+        toast({
+          title: "User not authenticated",
+          description: "Please log in to perform this action.",
+          variant: "destructive",
+        });
         return;
       }
       const jwt = await currentUser.getIdToken();
@@ -133,26 +144,33 @@ const QRScanner: React.FC = () => {
             message: "test test",
           }),
         }
-      ).catch((error) => {
-        throw new Error(error);
-      });
+      );
 
       if (!res.ok) {
         toast({
           title: "Airdrop Failed",
-          description: "Try again later",
+          description: "Try again later.",
+          variant: "destructive",
         });
         return;
       }
 
-      if (res.ok) {
-        alert("SUCCESS");
-      }
+      // Assuming the response contains JSON data
+      const data = await res.json();
+      toast({
+        title: "Airdrop Successful",
+        description: "The item has been successfully scanned and processed.",
+        variant: "default",
+      });
+      console.log("Airdrop Success:", data);
+      // Optionally reset the scanner after successful submission
+      handleRetry();
     } catch (error) {
       console.error("Error during airdrop:", error);
       toast({
         title: "Airdrop Failed",
-        description: "Try again later",
+        description: "Try again later.",
+        variant: "destructive",
       });
     } finally {
       setSubmitting(false);
@@ -165,9 +183,17 @@ const QRScanner: React.FC = () => {
         QR Code Scanner {selectedScanner?.name && `(${selectedScanner.name})`}
       </h1>
 
-      <p>scannerSecret: {selectedScanner?.secret}</p>
+      {/* Remove or comment out these debug lines in production */}
+      {/* <p>scannerSecret: {selectedScanner?.secret}</p>
       <p>itemSecret: {qrCode}</p>
-      <p>message: {"test test"}</p>
+      <p>message: {"test test"}</p> */}
+
+      {error && (
+        <div className="mt-5 text-center pb-8">
+          <p className="text-red-500">{error}</p>
+          <Button onClick={handleRetry}>Retry</Button>
+        </div>
+      )}
 
       {qrCode ? (
         <div className="mt-5 text-center">
@@ -175,12 +201,25 @@ const QRScanner: React.FC = () => {
           <code className="block bg-gray-100 p-2 rounded break-all">
             {qrCode}
           </code>
-          <Button onClick={handleScan} variant="ghost" className="h-8 w-8 p-0">
-            Scan Again
-          </Button>
+          <div className="flex justify-center space-x-4 mt-4">
+            <Button
+              onClick={handleScan}
+              disabled={submitting}
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition disabled:opacity-50"
+            >
+              {submitting ? "Submitting..." : "Submit"}
+            </Button>
+            <Button
+              onClick={handleRetry}
+              variant="ghost"
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+            >
+              Scan Again
+            </Button>
+          </div>
         </div>
       ) : (
-        <div className="relative w-full max-w-[400px]">
+        <div className="relative w-full max-w-md">
           <video
             key={scanKey} // Re-initialize video when scanKey changes
             ref={videoRef}
@@ -190,11 +229,10 @@ const QRScanner: React.FC = () => {
             playsInline
           />
           {isScanning && (
-            <p className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-75 text-gray-700 px-3 py-1 rounded mt-2">
+            <p className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-75 text-gray-700 px-3 py-1 rounded">
               Scanning for QR Code...
             </p>
           )}
-          <Button onClick={handleScan}>submit</Button>
         </div>
       )}
 
