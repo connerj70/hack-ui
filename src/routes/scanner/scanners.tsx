@@ -122,20 +122,13 @@ const Scanners: FC = () => {
           return;
         }
 
-        const scannerItems: ScannerType[] = body.scanners
-          .filter((scanner: ScannerType) => scanner.id && scanner.id.id) // Ensure scanner has an id object with id string
-          .map((scanner: ScannerType) => ({
-            ...scanner,
-            selected: selectedScanner?.id.id === scanner.id.id, // Corrected comparison
-          }));
-
-        setScanners(scannerItems);
+        setScanners(body.scanners);
         setLoadingData(false);
       } catch (error) {
         console.error("An unexpected error occurred:", error);
         toast({
           title: "Error",
-          description: "An unexpected error occurred.",
+          description: `An unexpected error occurred. ${error}`,
           variant: "destructive",
         });
         setLoadingData(false);
