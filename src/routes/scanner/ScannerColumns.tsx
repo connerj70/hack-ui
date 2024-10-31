@@ -14,7 +14,6 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
 import { User } from "firebase/auth";
-import { ScannerInfo } from "@/contexts/AuthProvider";
 
 // Define the ScannerType interface, including the optional 'selected' property
 interface ScannerType {
@@ -31,7 +30,7 @@ interface ScannerType {
 // Define the props for the ActionsCell component
 interface ActionsCellProps {
   scanner: ScannerType;
-  setSelectedScanner: (scanner: ScannerInfo | null) => void;
+  setSelectedScanner: (scanner: ScannerType) => void;
   handleDeleteScanner: (id: string) => void;
   currentUser: User | null;
   toast: any;

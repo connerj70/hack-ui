@@ -30,18 +30,7 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
 import MapComponent from "@/components/MapComponent";
 import { scannerColumns as getScannerColumns } from "./ScannerColumns";
-
-// Define the ScannerType interface, including the optional 'selected' property
-interface ScannerType {
-  description: string;
-  id: {
-    id: string;
-  };
-  scannerAddress: string;
-  name: string;
-  url: string;
-  selected?: boolean; // Added 'selected' property
-}
+import { ScannerType } from "@/types/scannerTypes";
 
 const Scanners: FC = () => {
   const [sorting, setSorting] = useState<SortingState>([]);

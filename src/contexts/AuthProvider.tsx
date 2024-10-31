@@ -6,19 +6,15 @@ import {
   signOut,
 } from "firebase/auth";
 import { auth } from "@/firebase-config"; // Ensure this is correctly pointing to your Firebase configuration
-
-export interface ScannerInfo {
-  description: string;
-  secretKey: string;
-}
+import { ScannerType } from "@/types/scannerTypes";
 
 interface AuthContextType {
   currentUser: User | null;
   setCurrentUser: (user: User | null) => void;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  selectedScanner: ScannerInfo | null;
-  setSelectedScanner: (scanner: ScannerInfo) => void;
+  selectedScanner: ScannerType | null;
+  setSelectedScanner: (scanner: ScannerType) => void;
   location: string;
   setLocation: (location: string) => void;
 }
@@ -36,7 +32,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   // Initialize selectedScanner from localStorage
-  const [selectedScanner, setSelectedScanner] = useState<ScannerInfo | null>(
+  const [selectedScanner, setSelectedScanner] = useState<ScannerType | null>(
     () => {
       const storedScanner = localStorage.getItem(SCANNER_STORAGE_KEY);
       return storedScanner ? JSON.parse(storedScanner) : null;
@@ -44,7 +40,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   );
   const [loading, setLoading] = useState(true);
   const [location, setLocation] = useState("");
-
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -63,7 +58,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     await signOut(auth);
   };
 
-  const handleSetSelectedScanner = (scanner: ScannerInfo | null) => {
+  const handleSetSelectedScanner = (scanner: ScannerType | null) => {
     setSelectedScanner(scanner);
     localStorage.setItem(SCANNER_STORAGE_KEY, JSON.stringify(scanner));
   };
