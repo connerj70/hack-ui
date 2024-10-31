@@ -37,7 +37,6 @@ const ActionsCell: React.FC<ActionsCellProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
-  // Function to handle deletion of a scanner
   const handleDelete = async () => {
     const confirmDelete = window.confirm(
       `Are you sure you want to delete the scanner "${scanner.name}"?`
@@ -56,8 +55,20 @@ const ActionsCell: React.FC<ActionsCellProps> = ({
     setIsLoading(true);
     try {
       const jwt = await currentUser.getIdToken();
+      const scannerId = scanner.id?.id; // Use optional chaining
+
+      if (!scannerId) {
+        toast({
+          title: "Error",
+          description: "Invalid scanner ID.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/scanner/${scanner.id.id}`, // Accessing nested id
+        `${import.meta.env.VITE_API_URL}/scanner/${scannerId}`, // Accessing nested id
         {
           method: "DELETE",
           headers: {
@@ -91,7 +102,7 @@ const ActionsCell: React.FC<ActionsCellProps> = ({
         description: "The scanner has been successfully deleted.",
         variant: "success",
       });
-      handleDeleteScanner(scanner.id.id); // Update state instead of reloading
+      handleDeleteScanner(scannerId); // Update state instead of reloading
     } catch (error) {
       console.error("Error during deletion:", error);
       // Additional error handling can be added here if needed

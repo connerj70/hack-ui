@@ -29,10 +29,7 @@ import { useAuth } from "@/contexts/useAuth";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
 import MapComponent from "@/components/MapComponent";
-import {
-  scannerColumns as getScannerColumns,
-
-} from "./ScannerColumns";
+import { scannerColumns as getScannerColumns } from "./ScannerColumns";
 import { ScannerType } from "@/types/scannerTypes";
 
 const Scanners: FC = () => {
@@ -95,11 +92,44 @@ const Scanners: FC = () => {
           }
         );
 
+        if (resp.status === 304) {
+          console.log("Data not modified since last request.");
+          setLoadingData(false);
+          return;
+        }
+
         const body = await resp.json();
 
         console.log("Fetched scanner:", body); // Debugging line
 
-        setScanners(body.scanners);
+        if (!body.success) {
+          toast({
+            title: "Error",
+            description: body.message || "Failed to fetch scanners.",
+            variant: "destructive",
+          });
+          setLoadingData(false);
+          return;
+        }
+
+        if (!Array.isArray(body.scanners)) {
+          toast({
+            title: "Error",
+            description: "Invalid data format received.",
+            variant: "destructive",
+          });
+          setLoadingData(false);
+          return;
+        }
+
+        const scannerItems: ScannerType[] = body.scanners
+          .filter((scanner: ScannerType) => scanner.id && scanner.id.id) // Ensure scanner has an id object with id string
+          .map((scanner: ScannerType) => ({
+            ...scanner,
+            selected: selectedScanner?.id.id === scanner.id.id, // Corrected comparison
+          }));
+
+        setScanners(scannerItems);
         setLoadingData(false);
       } catch (error) {
         console.error("An unexpected error occurred:", error);
