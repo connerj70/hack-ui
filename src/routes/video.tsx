@@ -14,6 +14,7 @@ const QRScanner: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const { selectedScanner, currentUser } = useAuth(); // Ensure 'currentUser' is destructured correctly
 
+  console.log("toekn ----> ", currentUser?.getIdToken());
   useEffect(() => {
     let animationFrameId: number;
     let stream: MediaStream | null = null;
