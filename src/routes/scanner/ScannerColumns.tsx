@@ -14,6 +14,7 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
 import { User } from "firebase/auth";
+import { ScannerInfo } from "@/contexts/AuthProvider";
 
 // Define the ScannerType interface, including the optional 'selected' property
 interface ScannerType {
@@ -30,15 +31,17 @@ interface ScannerType {
 // Define the props for the ActionsCell component
 interface ActionsCellProps {
   scanner: ScannerType;
-  handleSelectScanner: (scanner: ScannerType) => void;
+  setSelectedScanner: (scanner: ScannerInfo | null) => void;
+  handleDeleteScanner: (id: string) => void;
   currentUser: User | null;
   toast: any;
 }
 
-// ActionsCell Component to handle actions like Delete
+// ActionsCell Component to handle actions like Select and Delete
 const ActionsCell: React.FC<ActionsCellProps> = ({
   scanner,
-  handleSelectScanner,
+  setSelectedScanner,
+  handleDeleteScanner,
   currentUser,
   toast,
 }) => {
@@ -70,6 +73,19 @@ const ActionsCell: React.FC<ActionsCellProps> = ({
       );
 
       if (!response.ok) {
+        if (response.status === 403) {
+          toast({
+            title: "Access Denied",
+            description: "You do not have permission to delete this scanner.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: `Failed to delete the scanner. Status: ${response.status}`,
+            variant: "destructive",
+          });
+        }
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
@@ -77,16 +93,12 @@ const ActionsCell: React.FC<ActionsCellProps> = ({
       console.log("Delete successful:", result);
       toast({
         title: "Delete Successful",
-        description: "The item has been successfully deleted.",
+        description: "The scanner has been successfully deleted.",
       });
-      window.location.reload(); // Refresh the page to reflect changes
+      handleDeleteScanner(scanner.id.id); // Update state instead of reloading
     } catch (error) {
       console.error("Error during deletion:", error);
-      toast({
-        title: "Delete Failed",
-        description: "Failed to delete the item.",
-        variant: "destructive",
-      });
+      // Additional error handling can be added here if needed
     } finally {
       setIsLoading(false);
     }
@@ -119,7 +131,7 @@ const ActionsCell: React.FC<ActionsCellProps> = ({
 
             <Button
               className="text-xs mt-2"
-              onClick={() => handleSelectScanner(scanner)}
+              onClick={() => setSelectedScanner(scanner)}
             >
               Select
             </Button>
@@ -127,7 +139,12 @@ const ActionsCell: React.FC<ActionsCellProps> = ({
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() =>
-              navigator.clipboard.writeText(scanner.scannerAddress)
+              navigator.clipboard.writeText(scanner.scannerAddress).then(() => {
+                toast({
+                  title: "Copied",
+                  description: "Scanner address copied to clipboard.",
+                });
+              })
             }
           >
             Copy Scanner Address
@@ -146,8 +163,9 @@ const ActionsCell: React.FC<ActionsCellProps> = ({
 };
 
 // Main columns definition
-export const columns = (
-  handleSelectScanner: (scanner: ScannerType) => void,
+export const scannerColumns = (
+  setSelectedScanner: (scanner: ScannerType) => void,
+  handleDeleteScanner: (id: string) => void,
   currentUser: User | null,
   toast: any
 ): ColumnDef<ScannerType>[] => [
@@ -161,7 +179,11 @@ export const columns = (
         <div className="flex items-center">
           <div className="text-sm font-medium leading-none break-words">
             {scanner.name}
-            {scanner.selected && <span className="text-green-500 pl-2">✓</span>}
+            {scanner.selected && (
+              <span className="text-green-500 pl-2" aria-label="Selected">
+                ✓
+              </span>
+            )}
           </div>
         </div>
       );
@@ -190,7 +212,8 @@ export const columns = (
       return (
         <ActionsCell
           scanner={scanner}
-          handleSelectScanner={handleSelectScanner}
+          setSelectedScanner={setSelectedScanner}
+          handleDeleteScanner={handleDeleteScanner}
           currentUser={currentUser}
           toast={toast}
         />
