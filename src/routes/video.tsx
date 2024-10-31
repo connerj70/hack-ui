@@ -148,8 +148,8 @@ const QRScanner: React.FC = () => {
 
       if (!res.ok) {
         toast({
-          title: "Airdrop Failed",
-          description: "Try again later.",
+          title: "sScan Failed",
+          description: "Try again later. or contact support",
           variant: "destructive",
         });
         return;
@@ -158,7 +158,7 @@ const QRScanner: React.FC = () => {
       // Assuming the response contains JSON data
       const data = await res.json();
       toast({
-        title: "Airdrop Successful",
+        title: "Scan Successful",
         description: "The item has been successfully scanned and processed.",
         variant: "default",
       });
