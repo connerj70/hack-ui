@@ -14,7 +14,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   selectedScanner: ScannerType | null;
-  setSelectedScanner: (scanner: ScannerType) => void;
+  setSelectedScanner: (scanner: ScannerType | null) => void;
   location: string;
   setLocation: (location: string) => void;
 }

@@ -185,7 +185,7 @@ export const scannerColumns = (
   setSelectedScanner: (scanner: ScannerType) => void,
   handleDeleteScanner: (id: string) => void,
   currentUser: User | null,
-  toast: (options: ToastOptions) => void
+  toast: any
 ): ColumnDef<ScannerType>[] => [
   {
     accessorKey: "name",
