@@ -131,7 +131,7 @@ const QRScanner: React.FC = () => {
       }
       const jwt = await currentUser.getIdToken();
       const res: Response = await fetch(
-        `${import.meta.env.VITE_API_URL}/sui/scan`,
+        `${import.meta.env.VITE_API_URL}/event/sui/scan`,
         {
           method: "POST",
           headers: {
