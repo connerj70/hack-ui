@@ -6,7 +6,6 @@ export type ItemType = {
   itemAddress: string;
   name: string;
   url: string;
-  selected?: boolean; // Added 'selected' property
 };
 
 export interface TransactionData {

@@ -100,8 +100,8 @@ export const UserNav: React.FC<UserNavProps> = ({ user }) => {
       }
 
       if (res.ok) {
-        const sol = await res.json();
-        setSuiBalance(sol.sol + suiBalance);
+       
+        setSuiBalance(10 + suiBalance);
       }
     } catch (error) {
       console.error("Error during airdrop:", error);

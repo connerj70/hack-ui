@@ -4,6 +4,7 @@ export interface ScannerType {
     id: string;
   };
   scannerAddress: string;
+  secret: string;
   name: string;
   url: string;
 }

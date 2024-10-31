@@ -1,5 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import jsQR from "jsqr";
+import { useAuth } from "@/contexts/useAuth";
+import { toast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
 
 const QRScanner: React.FC = () => {
   const [scanKey, setScanKey] = useState<number>(0); // Used to reset the scanner
@@ -8,6 +11,8 @@ const QRScanner: React.FC = () => {
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState<boolean>(false);
+  const [submitting, setSubmitting] = useState(false);
+  const { selectedScanner, currentUser } = useAuth(); // Ensure 'user' is destructured if used
 
   useEffect(() => {
     let animationFrameId: number;
@@ -107,80 +112,95 @@ const QRScanner: React.FC = () => {
     };
   }, [scanKey]); // Depend on scanKey to allow retries
 
-  const handleRetry = () => {
-    setQrCode(null);
-    setError(null);
-    setScanKey((prevKey) => prevKey + 1); // Change scanKey to re-run useEffect
+  const handleScan = async () => {
+    setSubmitting(true);
+    try {
+      if (!currentUser) {
+        return;
+      }
+      const jwt = await currentUser.getIdToken();
+      const res: Response = await fetch(
+        `${import.meta.env.VITE_API_URL}/event/scan`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+          body: JSON.stringify({
+            scannerSecret: selectedScanner?.secret,
+            itemSecret: qrCode,
+            message: "test test",
+          }),
+        }
+      ).catch((error) => {
+        throw new Error(error);
+      });
+
+      if (!res.ok) {
+        toast({
+          title: "Airdrop Failed",
+          description: "Try again later",
+        });
+        return;
+      }
+
+      if (res.ok) {
+        alert("SUCCESS");
+      }
+    } catch (error) {
+      console.error("Error during airdrop:", error);
+      toast({
+        title: "Airdrop Failed",
+        description: "Try again later",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <div style={styles.container}>
-      <h1>QR Code Scanner</h1>
-      {error && (
-        <div style={styles.message}>
-          <p>{error}</p>
-          <button onClick={handleRetry} style={styles.button}>
-            Retry
-          </button>
-        </div>
-      )}
+    <div className="flex flex-col items-center p-5">
+      <h1 className="text-2xl font-semibold mb-4">
+        QR Code Scanner {selectedScanner?.name && `(${selectedScanner.name})`}
+      </h1>
+
+      <p>scannerSecret: {selectedScanner?.secret}</p>
+      <p>itemSecret: {qrCode}</p>
+      <p>message: {"test test"}</p>
+
       {qrCode ? (
-        <div style={styles.message}>
-          <p>QR Code Detected:</p>
-          <code>{qrCode}</code>
-          <button onClick={handleRetry} style={styles.button}>
+        <div className="mt-5 text-center">
+          <p className="mb-2">QR Code Detected:</p>
+          <code className="block bg-gray-100 p-2 rounded break-all">
+            {qrCode}
+          </code>
+          <Button onClick={handleScan} variant="ghost" className="h-8 w-8 p-0">
             Scan Again
-          </button>
+          </Button>
         </div>
       ) : (
-        <div style={styles.scanner}>
+        <div className="relative w-full max-w-[400px]">
           <video
             key={scanKey} // Re-initialize video when scanKey changes
             ref={videoRef}
-            style={styles.video}
+            className="w-full h-auto rounded-lg"
             autoPlay
             muted // Ensure video is muted to comply with autoplay policies
             playsInline
           />
-          {isScanning && <p>Scanning for QR Code...</p>}
+          {isScanning && (
+            <p className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-75 text-gray-700 px-3 py-1 rounded mt-2">
+              Scanning for QR Code...
+            </p>
+          )}
+          <Button onClick={handleScan}>submit</Button>
         </div>
       )}
-      <canvas ref={canvasRef} style={styles.canvas} />
+
+      <canvas ref={canvasRef} className="hidden" />
     </div>
   );
-};
-
-// Inline styles for simplicity; consider using CSS or styled-components for larger projects
-const styles: { [key: string]: React.CSSProperties } = {
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    padding: "20px",
-  },
-  scanner: {
-    position: "relative",
-    width: "100%",
-    maxWidth: "400px",
-  },
-  video: {
-    width: "100%",
-    height: "auto",
-    borderRadius: "8px",
-  },
-  canvas: {
-    display: "none",
-  },
-  message: {
-    marginTop: "20px",
-    textAlign: "center",
-  },
-  button: {
-    marginTop: "10px",
-    padding: "10px 20px",
-    fontSize: "16px",
-    cursor: "pointer",
-  },
 };
 
 export default QRScanner;

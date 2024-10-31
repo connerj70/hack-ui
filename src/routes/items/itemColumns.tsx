@@ -13,17 +13,7 @@ import { Loader2, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { User } from "@firebase/auth";
 import { useState } from "react";
-
-// Define the structure of each item
-interface ItemType {
-  description: string;
-  id: {
-    id: string;
-  };
-  itemAddress: string;
-  name: string;
-  url: string;
-}
+import { ItemType } from "@/types/itemTypes";
 
 export const getItemColumns = (
   toast: any,

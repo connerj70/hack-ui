@@ -7,8 +7,6 @@ import Scanners from "./routes/scanner/scanners";
 import Items from "./routes/items/items";
 import CreateItem from "./routes/items/createItem";
 import Profile from "./routes/profile";
-// import Events from "./routes/events/events";
-import CreateEvent from "./routes/events/createEvent";
 import AuthenticatedLayout from "./routes/PageLayout";
 import ErrorPage from "./error-page";
 import "./globals.css";
@@ -56,19 +54,15 @@ const router = createBrowserRouter([
         element: <CreateItem />,
       },
       { path: "items/:pubKey", element: <ItemInfo /> },
-      
-      {
-        path: "events/create",
-        element: <CreateEvent />,
-      },
+
       {
         path: "profile",
         element: <Profile />,
       },
       {
-        path:"qr-scanner",
-        element: <QRScanner/>
-      }
+        path: "qr-scanner",
+        element: <QRScanner />,
+      },
     ],
   },
   {

@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/useAuth";
+import QRCode from "react-qr-code";
 
 const formSchema = z.object({
   description: z.string(),
@@ -117,6 +118,9 @@ export default function CreateItem() {
               <AlertDialogDescription>
                 Save your item secret key
               </AlertDialogDescription>
+              <div className="flex flex-col items-center py-8">
+                <QRCode value={itemSecret} />
+              </div>
               <Textarea className="pt-8 py-4" defaultValue={itemSecret} />
             </AlertDialogHeader>
             <AlertDialogFooter>
