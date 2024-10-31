@@ -128,7 +128,7 @@ const ActionsCell: React.FC<ActionsCellProps> = ({
           <DropdownMenuLabel>
             <div className="text-lg">Actions</div>
             <a
-              href={`https://explorer.sui.io/address/${scanner?.id?.id}`} // Accessing nested id
+              href={`https://suiscan.xyz/devnet/object/${scanner?.id?.id}`} // Accessing nested id
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-500 text-xs hover:underline pr-8"

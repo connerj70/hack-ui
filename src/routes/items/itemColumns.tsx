@@ -163,7 +163,7 @@ export const getItemColumns = (
               <DropdownMenuLabel>
                 <p className="text-lg">Actions</p>
                 <a
-                  href={`https://suiscan.xyz/devnet/account/${item.itemAddress}`}
+                  href={`https://suiscan.xyz/devnet/object/${item?.id?.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-500 text-xs hover:underline pr-8"

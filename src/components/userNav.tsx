@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "./ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { User } from "firebase/auth";
+import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 
 interface UserNavProps {
   user: User | null;
@@ -39,24 +40,20 @@ export const UserNav: React.FC<UserNavProps> = ({ user }) => {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              // Make sure you are sending the necessary authorization token
               Authorization: `Bearer ${jwt}`,
             },
           }
         );
 
         if (!response.ok) {
-          // If the server response wasn't ok, throw an error
           throw new Error("Failed to fetch Solana balance");
         }
 
         const data = await response.json();
 
-        console.log("DATA ", data);
         setSuiBalance(data.balance);
       } catch (error) {
         console.error("Error fetching Solana balance:", error);
-        // Optionally, handle the error, e.g., by showing an error message or setting the balance to null
       }
     };
 
@@ -80,7 +77,7 @@ export const UserNav: React.FC<UserNavProps> = ({ user }) => {
       if (!user) {
         return;
       }
-      const jwt = await user.getIdToken(); // Adjust according to how you get the JWT
+      const jwt = await user.getIdToken();
       const res: Response = await fetch(
         `${import.meta.env.VITE_API_URL}/user/airdrop`,
         {
@@ -130,13 +127,31 @@ export const UserNav: React.FC<UserNavProps> = ({ user }) => {
       <DropdownMenuContent className="w-72" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
+            {/* User Email */}
             <p className="text-sm font-medium leading-none break-words">
               {user?.email || "User"}
             </p>
-            <p className="text-xs leading-none text-muted-foreground break-words whitespace-normal">
-              {user?.displayName}
-            </p>
+
+            {/* Display Name and Link Icon on the Same Line */}
+            <div className="flex items-center">
+              <p className="text-xs leading-none text-muted-foreground break-words whitespace-normal flex-1 min-w-0">
+                {user?.displayName}
+              </p>
+              {user?.displayName && (
+                <a
+                  href={`https://suiscan.xyz/devnet/account/${user.displayName}/portfolio`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary transition-colors flex-shrink-0"
+                  aria-label={`Open profile for ${user.displayName}`}
+                >
+                  <OpenInNewWindowIcon className="w-4 h-4" />
+                </a>
+              )}
+            </div>
           </div>
+
+          {/* Sui Balance and Airdrop Button */}
           <div className="flex items-center justify-between pt-2">
             <Badge>Sui: {suiBalance?.toFixed(2).toString()}</Badge>
             <Button
