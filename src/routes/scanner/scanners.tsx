@@ -98,14 +98,7 @@ const Scanners: FC = () => {
 
         console.log("Fetched scanner:", body); // Debugging line
 
-        const scannerItems: ScannerType[] = body.scanners
-          .filter((scanner: ScannerType) => scanner.id && scanner.id.id) // Ensure scanner has an id object with id string
-          .map((scanner: ScannerType) => ({
-            ...scanner,
-            selected: selectedScanner?.id.id === scanner.id.id, // Corrected comparison
-          }));
-
-        setScanners(scannerItems);
+        setScanners(body.scanners);
         setLoadingData(false);
       } catch (error) {
         console.error("An unexpected error occurred:", error);
@@ -136,7 +129,8 @@ const Scanners: FC = () => {
       setSelectedScanner,
       handleDeleteScanner,
       currentUser,
-      toast
+      toast,
+      selectedScanner
     ), // Invoke the function with required parameters
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -249,7 +243,8 @@ const Scanners: FC = () => {
                           setSelectedScanner,
                           handleDeleteScanner,
                           currentUser,
-                          toast
+                          toast,
+                          selectedScanner
                         ).length || 1
                       }
                       className="h-24 text-center"

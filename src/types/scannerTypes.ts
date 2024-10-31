@@ -6,7 +6,6 @@ export interface ScannerType {
   scannerAddress: string;
   name: string;
   url: string;
-  selected?: boolean; // Added 'selected' property
 }
 
 export type ScannerCreateType = {

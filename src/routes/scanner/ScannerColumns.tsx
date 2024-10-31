@@ -14,16 +14,9 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
 import { User } from "firebase/auth";
+import { ScannerType } from "@/types/scannerTypes";
 
 // Define the ScannerType interface, including the optional 'selected' property
-export interface ScannerType {
-  description: string;
-  id: { id: string }; // `id` is an object containing another `id` string
-  scannerAddress: string;
-  name: string;
-  url: string;
-  selected?: boolean; // Added 'selected' property
-}
 
 // Define the props for the ActionsCell component
 interface ActionsCellProps {
@@ -181,7 +174,8 @@ export const scannerColumns = (
   setSelectedScanner: (scanner: ScannerType) => void,
   handleDeleteScanner: (id: string) => void,
   currentUser: User | null,
-  toast: any
+  toast: any,
+  selectedScanner: any
 ): ColumnDef<ScannerType>[] => [
   {
     accessorKey: "name",
@@ -193,7 +187,7 @@ export const scannerColumns = (
         <div className="flex items-center">
           <div className="text-sm font-medium leading-none break-words">
             {scanner.name}
-            {scanner.selected && (
+            {scanner.id.id === selectedScanner.id.id && (
               <span className="text-green-500 pl-2" aria-label="Selected">
                 ✓
               </span>
