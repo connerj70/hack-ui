@@ -34,8 +34,6 @@ import {
   ScannerType,
 } from "./ScannerColumns";
 
-
-
 const Scanners: FC = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -96,49 +94,9 @@ const Scanners: FC = () => {
           }
         );
 
-        if (!resp.ok) {
-          if (resp.status === 403) {
-            // Handle 403 Forbidden
-            toast({
-              title: "Access Denied",
-              description: "You do not have permission to view scanners.",
-              variant: "destructive",
-            });
-            throw new Error("403 Forbidden");
-          }
-          console.error("Failed to fetch user scanners");
-          toast({
-            title: "Error",
-            description: "Failed to fetch scanners.",
-            variant: "destructive",
-          });
-          setLoadingData(false);
-          return;
-        }
-
         const body = await resp.json();
 
         console.log("Fetched scanner:", body); // Debugging line
-
-        if (!body.success) {
-          toast({
-            title: "Error",
-            description: body.message || "Failed to fetch scanners.",
-            variant: "destructive",
-          });
-          setLoadingData(false);
-          return;
-        }
-
-        if (!Array.isArray(body.scanners)) {
-          toast({
-            title: "Error",
-            description: "Invalid data format received.",
-            variant: "destructive",
-          });
-          setLoadingData(false);
-          return;
-        }
 
         const scannerItems: ScannerType[] = body.scanners
           .filter((scanner: ScannerType) => scanner.id && scanner.id.id) // Ensure scanner has an id object with id string
