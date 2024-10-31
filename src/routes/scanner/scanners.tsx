@@ -31,8 +31,9 @@ import { useToast } from "@/components/ui/use-toast";
 import MapComponent from "@/components/MapComponent";
 import {
   scannerColumns as getScannerColumns,
-  ScannerType,
+
 } from "./ScannerColumns";
+import { ScannerType } from "@/types/scannerTypes";
 
 const Scanners: FC = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
