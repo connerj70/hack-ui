@@ -1,5 +1,7 @@
 // src/components/Items.tsx
 
+"use client"; // Ensure this is at the top if using Next.js or similar frameworks
+
 import { useEffect, useMemo, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
@@ -30,6 +32,7 @@ import { useAuth } from "@/contexts/useAuth";
 import { useToast } from "@/components/ui/use-toast";
 import MapComponent from "@/components/MapComponent";
 import { getItemColumns } from "./itemColumns";
+import { Progress } from "@/components/ui/progress"; // Importing Progress
 
 // Define the structure of each item
 interface ItemType {
@@ -51,9 +54,22 @@ export default function Items() {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [progress, setProgress] = useState(0); // Progress state
 
   useEffect(() => {
     const fetchItems = async () => {
+      setIsLoading(true); // Start loading
+      setProgress(0); // Initialize progress
+
+      // Increment progress
+      const progressInterval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev < 90) return prev + 10;
+          return prev;
+        });
+      }, 200); // Increment every 200ms
+
       try {
         if (!currentUser) {
           return;
@@ -77,7 +93,7 @@ export default function Items() {
 
         console.log("Fetched items:", body); // Debugging line
 
-        // Safeguard: Ensure body.items is an array
+        // Safeguard: Ensure body is an array
         if (Array.isArray(body)) {
           setItems(body);
         } else {
@@ -90,6 +106,14 @@ export default function Items() {
           description: "Failed to fetch items.",
           variant: "destructive",
         });
+      } finally {
+        clearInterval(progressInterval); // Stop incrementing
+        setProgress(100); // Complete progress
+        // Optional: Reset loading state after a short delay to show 100%
+        setTimeout(() => {
+          setIsLoading(false);
+          setProgress(0); // Reset progress for future loads
+        }, 500); // 500ms delay
       }
     };
 
@@ -168,6 +192,8 @@ export default function Items() {
       >
         {memoizedMap}
         <div className="flex flex-col w-full md:w-1/2 max-w-4xl mx-auto md:px-4 lg:px-8 pt-10 overflow-auto">
+          {/* Progress Bar */}
+
           <div className="flex-1 space-y-4 pt-6">
             <div className="flex items-center justify-between">
               <h2 className="text-3xl font-bold tracking-tight pl-4">Items</h2>
@@ -227,14 +253,20 @@ export default function Items() {
                       colSpan={columnsDefinition?.length || 1}
                       className="h-24 text-center"
                     >
-                      <p>
-                        No Items. Click "Create Item" Button to Create an Item.
-                      </p>
+                      {isLoading ? (
+                        <div className="mb-4">
+                          <Progress value={progress} className="h-2 w-full" />
+                        </div>
+                      ) : (
+                        <p>No Items. Click the "Create Item" button (ensure
+                          you have enough SUI).</p>
+                      )}
                     </TableCell>
                   </TableRow>
                 )}
               </TableBody>
             </Table>
+
             <div className="flex items-center justify-end space-x-2 py-4 pr-4">
               <div className="space-x-2">
                 <Button

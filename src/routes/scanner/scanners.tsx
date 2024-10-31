@@ -281,10 +281,7 @@ const Scanners: FC = () => {
                           you have enough SUI).
                         </p>
                       ) : (
-                        <Progress
-                          value={progress}
-                          className="w-[60%] mx-auto"
-                        />
+                        <Progress value={progress} className="h-2 w-full" />
                       )}
                     </TableCell>
                   </TableRow>
