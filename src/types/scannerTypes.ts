@@ -1,10 +1,13 @@
-export type ScannerType = {
-  id: string;
-  secretKey: string;
+export interface ScannerType {
   description: string;
-  public: string;
-  selected: boolean;
-};
+  id: {
+    id: string;
+  };
+  scannerAddress: string;
+  name: string;
+  url: string;
+  selected?: boolean; // Added 'selected' property
+}
 
 export type ScannerCreateType = {
   description: string;
@@ -28,7 +31,6 @@ export type GetScannerResponseType = {
       ],
       ["description", "test"],
       ["public", "true"]
-
     ];
   };
 };

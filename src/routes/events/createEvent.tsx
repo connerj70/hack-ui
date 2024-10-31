@@ -42,7 +42,7 @@ export default function CreateEvent() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      scannerSecret: selectedScanner?.secretKey || "",
+      scannerSecret: selectedScanner?.scannerAddress || "",
       itemSecret: itemSecret || "",
       message: location || "",
     },

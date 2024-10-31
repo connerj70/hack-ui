@@ -30,18 +30,7 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
 import MapComponent from "@/components/MapComponent";
 import { scannerColumns as getScannerColumns } from "./ScannerColumns";
-
-// Define the ScannerType interface, including the optional 'selected' property
-interface ScannerType {
-  description: string;
-  id: {
-    id: string;
-  };
-  scannerAddress: string;
-  name: string;
-  url: string;
-  selected?: boolean; // Added 'selected' property
-}
+import { ScannerType } from "@/types/scannerTypes";
 
 const Scanners: FC = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -61,16 +50,18 @@ const Scanners: FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Function to handle selecting a scanner
-
   // Function to handle deletion of a scanner
   const handleDeleteScanner = useCallback(
     (deletedScannerId: string) => {
       setScanners((prevScanners) =>
         prevScanners.filter((scanner) => scanner.id.id !== deletedScannerId)
       );
+      // If the deleted scanner was selected, deselect it
+      if (selectedScanner && selectedScanner.id.id === deletedScannerId) {
+        setSelectedScanner(null);
+      }
     },
-    [setScanners]
+    [setScanners, setSelectedScanner, selectedScanner]
   );
 
   // Fetch scanners from the API
@@ -143,7 +134,7 @@ const Scanners: FC = () => {
         const scannerItems: ScannerType[] = body.scanners.map(
           (scanner: ScannerType) => ({
             ...scanner,
-            selected: selectedScanner?.secretKey === scanner.scannerAddress,
+            selected: selectedScanner?.id.id === scanner.id.id, // Corrected comparison
           })
         );
 

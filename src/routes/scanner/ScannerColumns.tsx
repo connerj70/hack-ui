@@ -14,10 +14,9 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
 import { User } from "firebase/auth";
-import { ScannerInfo } from "@/contexts/AuthProvider";
 
 // Define the ScannerType interface, including the optional 'selected' property
-interface ScannerType {
+export interface ScannerType {
   description: string;
   id: {
     id: string;
@@ -31,10 +30,17 @@ interface ScannerType {
 // Define the props for the ActionsCell component
 interface ActionsCellProps {
   scanner: ScannerType;
-  setSelectedScanner: (scanner: ScannerInfo | null) => void;
+  setSelectedScanner: (scanner: ScannerType) => void;
   handleDeleteScanner: (id: string) => void;
   currentUser: User | null;
-  toast: any;
+  toast: (options: ToastOptions) => void;
+}
+
+// Define the ToastOptions interface for better type safety
+interface ToastOptions {
+  title: string;
+  description: string;
+  variant?: "default" | "destructive" | "success" | "warning";
 }
 
 // ActionsCell Component to handle actions like Select and Delete
@@ -94,6 +100,7 @@ const ActionsCell: React.FC<ActionsCellProps> = ({
       toast({
         title: "Delete Successful",
         description: "The scanner has been successfully deleted.",
+        variant: "success",
       });
       handleDeleteScanner(scanner.id.id); // Update state instead of reloading
     } catch (error) {
@@ -139,12 +146,23 @@ const ActionsCell: React.FC<ActionsCellProps> = ({
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() =>
-              navigator.clipboard.writeText(scanner.scannerAddress).then(() => {
-                toast({
-                  title: "Copied",
-                  description: "Scanner address copied to clipboard.",
-                });
-              })
+              navigator.clipboard
+                .writeText(scanner.scannerAddress)
+                .then(() => {
+                  toast({
+                    title: "Copied",
+                    description: "Scanner address copied to clipboard.",
+                    variant: "success",
+                  });
+                })
+                .catch((err) => {
+                  console.error("Failed to copy:", err);
+                  toast({
+                    title: "Error",
+                    description: "Failed to copy scanner address.",
+                    variant: "destructive",
+                  });
+                })
             }
           >
             Copy Scanner Address
