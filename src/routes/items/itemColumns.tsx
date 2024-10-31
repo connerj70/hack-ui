@@ -56,34 +56,34 @@ export const getItemColumns = (
       );
     },
   },
-  {
-    accessorKey: "description",
-    header: "Description",
-    cell: ({ row }) => {
-      const item = row.original;
-      return (
-        <div className="mx-auto max-w-4xl">
-          <p className="text-sm font-medium leading-none break-words">
-            {item.description}
-          </p>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "url",
-    header: "Image",
-    cell: ({ row }) => {
-      const item = row.original;
-      return (
-        <img
-          src={item.url}
-          alt={item.name}
-          className="w-16 h-16 object-cover rounded"
-        />
-      );
-    },
-  },
+  // {
+  //   accessorKey: "description",
+  //   header: "Description",
+  //   cell: ({ row }) => {
+  //     const item = row.original;
+  //     return (
+  //       <div className="mx-auto max-w-4xl">
+  //         <p className="text-sm font-medium leading-none break-words">
+  //           {item.description}
+  //         </p>
+  //       </div>
+  //     );
+  //   },
+  // },
+  // {
+  //   accessorKey: "url",
+  //   header: "Image",
+  //   cell: ({ row }) => {
+  //     const item = row.original;
+  //     return (
+  //       <img
+  //         src={item.url}
+  //         alt={item.name}
+  //         className="w-16 h-16 object-cover rounded"
+  //       />
+  //     );
+  //   },
+  // },
   {
     id: "actions",
     header: "Actions",
