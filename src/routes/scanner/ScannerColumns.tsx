@@ -55,7 +55,7 @@ const ActionsCell: React.FC<ActionsCellProps> = ({
     setIsLoading(true);
     try {
       const jwt = await currentUser.getIdToken();
-      const scannerId = scanner.id?.id; // Use optional chaining
+      const scannerId = scanner?.id?.id; // Use optional chaining
 
       if (!scannerId) {
         toast({
@@ -128,7 +128,7 @@ const ActionsCell: React.FC<ActionsCellProps> = ({
           <DropdownMenuLabel>
             <div className="text-lg">Actions</div>
             <a
-              href={`https://explorer.sui.io/address/${scanner.id.id}`} // Accessing nested id
+              href={`https://explorer.sui.io/address/${scanner?.id?.id}`} // Accessing nested id
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-500 text-xs hover:underline pr-8"
@@ -198,7 +198,7 @@ export const scannerColumns = (
         <div className="flex items-center">
           <div className="text-sm font-medium leading-none break-words">
             {scanner.name}
-            {scanner.id.id === selectedScanner.id.id && (
+            {scanner?.id?.id === selectedScanner?.id?.id && (
               <span className="text-green-500 pl-2" aria-label="Selected">
                 ✓
               </span>

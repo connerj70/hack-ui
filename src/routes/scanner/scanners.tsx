@@ -122,11 +122,13 @@ const Scanners: FC = () => {
           return;
         }
 
+        console.log("selected scanner ", selectedScanner);
+
         const scannerItems: ScannerType[] = body.scanners
           .filter((scanner: ScannerType) => scanner.id && scanner.id.id) // Ensure scanner has an id object with id string
           .map((scanner: ScannerType) => ({
             ...scanner,
-            selected: selectedScanner?.id.id === scanner.id.id, // Corrected comparison
+            selected: selectedScanner?.id?.id === scanner?.id?.id, // Corrected comparison
           }));
 
         setScanners(scannerItems);
