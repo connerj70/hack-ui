@@ -113,6 +113,8 @@ const Scanners: FC = () => {
 
         const body = await resp.json();
 
+        console.log("Fetched scanner:", body); // Debugging line
+
         if (!body.success) {
           toast({
             title: "Error",
