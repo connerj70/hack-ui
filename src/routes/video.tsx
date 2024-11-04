@@ -39,6 +39,16 @@ const QRScanner: React.FC = () => {
   };
 
   useEffect(() => {
+    const fetchLocation = async () => {
+      const location = await getCurrentLocation();
+      setLocation(
+        `Latitude: ${location.latitude}, Longitude: ${location.longitude}`
+      );
+    };
+    fetchLocation();
+  }, []);
+
+  useEffect(() => {
     let animationFrameId: number;
     let stream: MediaStream | null = null;
     let isComponentMounted = true;
@@ -159,8 +169,6 @@ const QRScanner: React.FC = () => {
       try {
         const location = await getCurrentLocation();
         locationMessage = `Latitude: ${location.latitude}, Longitude: ${location.longitude}`;
-        console.log("Location:", location);
-        setLocation(locationMessage);
       } catch (locationError) {
         console.error("Error getting location:", locationError);
         locationMessage = "Location permission denied or error occurred";
@@ -242,7 +250,7 @@ const QRScanner: React.FC = () => {
           <div className="flex justify-center space-x-4 mt-4">
             <Button
               onClick={handleScan}
-              disabled={submitting}
+              disabled={submitting && !qrCode && !location && !selectedScanner}
               className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition disabled:opacity-50"
             >
               {submitting ? "Submitting..." : "Submit"}
