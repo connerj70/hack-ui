@@ -28,9 +28,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/useAuth";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
-import MapComponent from "@/components/MapComponent";
 import { scannerColumns as getScannerColumns } from "./ScannerColumns";
 import { ScannerType } from "@/types/scannerTypes";
+import MapComponentScanner from "@/components/MapComponentScanner";
 
 const Scanners: FC = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -193,7 +193,7 @@ const Scanners: FC = () => {
     // Assuming MapComponent accepts width and height as strings with units
     const width = isMobile ? "100vw" : "50vw";
     const height = isMobile ? "40vh" : "100vh";
-    return <MapComponent width={width} height={height} />;
+    return <MapComponentScanner width={width} height={height} />;
   }, [scanners, isMobile]);
 
   return (

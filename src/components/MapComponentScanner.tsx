@@ -13,7 +13,7 @@ interface MapComponentProps {
   height?: string;
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({
+const MapComponentScanner: React.FC<MapComponentProps> = ({
   width = "100vw",
   height = "40vh",
 }) => {
@@ -53,13 +53,16 @@ const MapComponent: React.FC<MapComponentProps> = ({
       try {
         const jwt = await currentUser?.getIdToken();
 
-        const resp = await fetch(`${import.meta.env.VITE_API_URL}/item/map`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${jwt}`,
-          },
-        });
+        const resp = await fetch(
+          `${import.meta.env.VITE_API_URL}/scanner/map`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${jwt}`,
+            },
+          }
+        );
 
         if (!resp.ok) {
           throw new Error(`Failed to fetch items: ${resp.statusText}`);
@@ -129,4 +132,4 @@ const MapComponent: React.FC<MapComponentProps> = ({
   );
 };
 
-export default MapComponent;
+export default MapComponentScanner;
