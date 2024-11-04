@@ -5,7 +5,7 @@
   "repository": "git@github.com:connerj70/hack-ui.git",
   "author": "conner-jensen <conner@pomerene.xyz>",
   "scripts": {
-    "dev": "vite",
+    "local": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"

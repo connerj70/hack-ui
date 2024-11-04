@@ -13,8 +13,31 @@ const QRScanner: React.FC = () => {
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState(false);
   const { selectedScanner, currentUser } = useAuth(); // Ensure 'currentUser' is destructured correctly
+  const [location, setLocation] = useState<string>("");
 
-  console.log("toekn ----> ", currentUser?.getIdToken());
+  // Function to get user's current location
+  const getCurrentLocation = () => {
+    return new Promise<{ latitude: number; longitude: number }>(
+      (resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject(new Error("Geolocation is not supported by your browser"));
+        } else {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              resolve({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              });
+            },
+            (error) => {
+              reject(error);
+            }
+          );
+        }
+      }
+    );
+  };
+
   useEffect(() => {
     let animationFrameId: number;
     let stream: MediaStream | null = null;
@@ -130,7 +153,21 @@ const QRScanner: React.FC = () => {
         });
         return;
       }
+
+      // Get user's location
+      let locationMessage = "Location unavailable";
+      try {
+        const location = await getCurrentLocation();
+        locationMessage = `Latitude: ${location.latitude}, Longitude: ${location.longitude}`;
+        setLocation(locationMessage);
+      } catch (locationError) {
+        console.error("Error getting location:", locationError);
+        locationMessage = "Location permission denied or error occurred";
+      }
+
       const jwt = await currentUser.getIdToken();
+
+      console.log(jwt);
       const res: Response = await fetch(
         `${import.meta.env.VITE_API_URL}/event/sui/scan`,
         {
@@ -142,15 +179,15 @@ const QRScanner: React.FC = () => {
           body: JSON.stringify({
             scannerSecret: selectedScanner?.secret,
             itemSecret: qrCode,
-            message: "test test",
+            message: locationMessage, // Replaced with user's GPS data
           }),
         }
       );
 
       if (!res.ok) {
         toast({
-          title: "sScan Failed",
-          description: "Try again later. or contact support",
+          title: "Scan Failed",
+          description: "Try again later or contact support",
           variant: "destructive",
         });
         return;
@@ -163,13 +200,13 @@ const QRScanner: React.FC = () => {
         description: "The item has been successfully scanned and processed.",
         variant: "default",
       });
-      console.log("Airdrop Success:", data);
+      console.log("Scan Success:", data);
       // Optionally reset the scanner after successful submission
       handleRetry();
     } catch (error) {
-      console.error("Error during airdrop:", error);
+      console.error("Error during scan:", error);
       toast({
-        title: "Airdrop Failed",
+        title: "Scan Failed",
         description: "Try again later.",
         variant: "destructive",
       });
@@ -186,7 +223,7 @@ const QRScanner: React.FC = () => {
 
       <p>scannerSecret: {selectedScanner?.secret}</p>
       <p>itemSecret: {qrCode}</p>
-      <p>message: {"test test"}</p>
+      <p>message: {location}</p>
 
       {error && (
         <div className="mt-5 text-center pb-8">
