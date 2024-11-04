@@ -159,6 +159,7 @@ const QRScanner: React.FC = () => {
       try {
         const location = await getCurrentLocation();
         locationMessage = `Latitude: ${location.latitude}, Longitude: ${location.longitude}`;
+        console.log("Location:", location);
         setLocation(locationMessage);
       } catch (locationError) {
         console.error("Error getting location:", locationError);
