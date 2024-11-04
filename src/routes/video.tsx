@@ -41,9 +41,7 @@ const QRScanner: React.FC = () => {
   useEffect(() => {
     const fetchLocation = async () => {
       const location = await getCurrentLocation();
-      setLocation(
-        `Latitude: ${location.latitude}, Longitude: ${location.longitude}`
-      );
+      setLocation(`${location.latitude},${location.longitude}`);
     };
     fetchLocation();
   }, []);
@@ -150,6 +148,7 @@ const QRScanner: React.FC = () => {
     setQrCode(null);
     setError(null);
     setScanKey((prevKey) => prevKey + 1); // Change scanKey to re-run useEffect
+    alert("Scan successful");
   };
 
   const handleScan = async () => {
@@ -162,16 +161,6 @@ const QRScanner: React.FC = () => {
           variant: "destructive",
         });
         return;
-      }
-
-      // Get user's location
-      let locationMessage = "Location unavailable";
-      try {
-        const location = await getCurrentLocation();
-        locationMessage = `Latitude: ${location.latitude}, Longitude: ${location.longitude}`;
-      } catch (locationError) {
-        console.error("Error getting location:", locationError);
-        locationMessage = "Location permission denied or error occurred";
       }
 
       const jwt = await currentUser.getIdToken();
@@ -188,7 +177,7 @@ const QRScanner: React.FC = () => {
           body: JSON.stringify({
             scannerSecret: selectedScanner?.secret,
             itemSecret: qrCode,
-            message: locationMessage, // Replaced with user's GPS data
+            message: location, // Replaced with user's GPS data
           }),
         }
       );

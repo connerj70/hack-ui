@@ -1,31 +1,41 @@
-import React, { useEffect, useRef } from "react";
-import mapboxgl from "mapbox-gl";
+import React, { useEffect, useRef, useState } from "react";
+import mapboxgl, { Marker, Popup } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-// import { ScannerType } from "@/types/scannerTypes";
-// import { ItemType } from "@/types/itemTypes";
+import { useAuth } from "@/contexts/useAuth";
+
+interface ItemLocation {
+  name: string;
+  message: string;
+}
 
 interface MapComponentProps {
-  // data: ItemType[] | ScannerType[];
-  width?: string; // default to "100vw" if not provided
-  height?: string; // default to "40vh" if not provided
+  width?: string;
+  height?: string;
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({
-  // data,
   width = "100vw",
   height = "40vh",
 }) => {
   const mapRef = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const markersRef = useRef<Marker[]>([]);
+  const [items, setItems] = useState<ItemLocation[]>([]);
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     if (!mapRef.current) {
-      mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || "";
+      const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+      if (!mapboxToken) {
+        console.error("Mapbox access token is not set.");
+        return;
+      }
+
+      mapboxgl.accessToken = mapboxToken;
       mapRef.current = new mapboxgl.Map({
         container: "map",
         style: "mapbox://styles/mapbox/streets-v11",
         center: [-111.237, 40.626],
-        zoom: 0,
+        zoom: 2,
         attributionControl: false,
       });
     }
@@ -39,44 +49,90 @@ const MapComponent: React.FC<MapComponentProps> = ({
   }, []);
 
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
+    const fetchData = async () => {
+      try {
+        const jwt = await currentUser?.getIdToken();
 
+        const resp = await fetch(`${import.meta.env.VITE_API_URL}/item/map`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
+
+        if (!resp.ok) {
+          throw new Error(`Failed to fetch items: ${resp.statusText}`);
+        }
+
+        const body = await resp.json();
+        setItems(body);
+      } catch (error) {
+        console.error("Error fetching items:", error);
+      }
+    };
+
+    fetchData();
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    // Clear existing markers
     markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
 
-    // data.forEach((item) => {
-    // if (!item.lastTransaction || !item.lastTransaction.memo) return;
+    const bounds = new mapboxgl.LngLatBounds();
+    let hasValidMarkers = false;
 
-    // const coords = item.lastTransaction.memo.match(
-    //   /(\d+\.\d+),\s*(-?\d+\.\d+)/
-    // );
-    // if (!coords) return;
+    items.forEach((item) => {
+      // Add validation checks
+      if (!item?.message) {
+        console.warn(`Missing message for item "${item?.name}"`);
+        return;
+      }
 
-    // const latitude = parseFloat(coords[1]);
-    // const longitude = parseFloat(coords[2]);
-    // const link = `https://explorer.solana.com/tx/${item.lastTransaction.signature}?cluster=devnet`;
-    // const info = `/items/${item.public}`;
-    // const content = `
-    //   <div>
-    //   <p class="text-sm text-gray-600 font-bold mt-1">${new Date(
-    //     item.lastTransaction.blockTime * 1000
-    //   ).toLocaleString()}</p>
+      // Parse the message to extract latitude and longitude
+      const coordinates = item.message.split(",");
+      if (coordinates.length !== 2) {
+        console.warn(
+          `Invalid coordinate format for item "${item.name}": ${item.message}`
+        );
+        return;
+      }
 
-    //     <a href="${link}" target="_blank" rel="noopener noreferrer" class="text-blue-700 hover:underline center">Last solana Transaction</a>
-    //     <p class="text-sm font-bold mt-1">${item.description}</p>
-    //     <a href="${info}" target="_blank" rel="noopener noreferrer" class="text-green-700 hover:underline center">info</a>
+      const latitude = parseFloat(coordinates[0]);
+      const longitude = parseFloat(coordinates[1]);
 
-    //   </div>`;
+      if (isNaN(latitude) || isNaN(longitude)) {
+        console.warn(
+          `Invalid coordinates for item "${item.name}": ${item.message}`
+        );
+        return;
+      }
 
-    // const marker = new mapboxgl.Marker()
-    //   .setLngLat([longitude, latitude])
-    //   .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(content))
-    //   .addTo(map);
+      // Create a popup with the item's name
+      const popup = new Popup({ offset: 25 }).setText(
+        item.name || "Unnamed Location"
+      );
 
-    // markersRef.current.push(marker);
-  });
-  // }, [data]);
+      // Create a marker and add it to the map
+      const marker = new Marker({ color: "#FF0000" })
+        .setLngLat([longitude, latitude])
+        .setPopup(popup)
+        .addTo(mapRef.current!);
+
+      // Store the marker for future cleanup
+      markersRef.current.push(marker);
+      bounds.extend([longitude, latitude]);
+      hasValidMarkers = true;
+    });
+
+    // Only adjust bounds if we have valid markers
+    if (hasValidMarkers) {
+      mapRef.current.fitBounds(bounds, { padding: 50 });
+    }
+  }, [items]);
 
   return (
     <div id="map" style={{ width: width, height: height }} className="w-full" />
