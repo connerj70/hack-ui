@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/table";
 import { useParams } from "react-router-dom";
 import { columns } from "./itemColumnsTx";
-import { TransactionData } from "@/types/itemTypes";
+
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/useAuth";
 import MapComponentHistory from "@/components/MapComponentHistory";
@@ -35,7 +35,7 @@ export default function ItemInfo() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [items, setItems] = useState<TransactionData[]>([]);
+  const [items, setItems] = useState<[]>([]);
   const { currentUser } = useAuth();
   const [progress, setProgress] = useState(13);
   const [loadingData, setLoadingData] = useState(true);
