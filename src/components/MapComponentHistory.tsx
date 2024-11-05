@@ -20,6 +20,7 @@ const MapComponentScanner: React.FC<MapComponentProps> = ({
 }) => {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<Marker[]>([]);
+  const lineRef = useRef<mapboxgl.GeoJSONSource | null>(null);
   const [items, setItems] = useState<ItemLocation[]>([]);
   const { currentUser } = useAuth();
   const params = useParams();
@@ -39,6 +40,40 @@ const MapComponentScanner: React.FC<MapComponentProps> = ({
         center: [-111.237, 40.626],
         zoom: 2,
         attributionControl: false,
+      });
+
+      // Add the line source and layer when the map loads
+      mapRef.current.on("load", () => {
+        mapRef.current?.addSource("route", {
+          type: "geojson",
+          data: {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "LineString",
+              coordinates: [],
+            },
+          },
+        });
+
+        mapRef.current?.addLayer({
+          id: "route",
+          type: "line",
+          source: "route",
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-color": "#888",
+            "line-width": 3,
+            "line-dasharray": [2, 1], // Optional: creates a dashed line
+          },
+        });
+
+        lineRef.current = mapRef.current?.getSource(
+          "route"
+        ) as mapboxgl.GeoJSONSource;
       });
     }
 
@@ -87,24 +122,25 @@ const MapComponentScanner: React.FC<MapComponentProps> = ({
     markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
 
+    // Collect valid coordinates for the line
+    const coordinates: [number, number][] = [];
+
     items.forEach((item) => {
-      // Add validation checks
       if (!item?.message) {
         console.warn(`Missing message for item "${item?.name}"`);
         return;
       }
 
-      // Parse the message to extract latitude and longitude
-      const coordinates = item.message.split(",");
-      if (coordinates.length !== 2) {
+      const coords = item.message.split(",");
+      if (coords.length !== 2) {
         console.warn(
           `Invalid coordinate format for item "${item.name}": ${item.message}`
         );
         return;
       }
 
-      const latitude = parseFloat(coordinates[0]);
-      const longitude = parseFloat(coordinates[1]);
+      const latitude = parseFloat(coords[0]);
+      const longitude = parseFloat(coords[1]);
 
       if (isNaN(latitude) || isNaN(longitude)) {
         console.warn(
@@ -112,6 +148,9 @@ const MapComponentScanner: React.FC<MapComponentProps> = ({
         );
         return;
       }
+
+      // Add coordinates for the line
+      coordinates.push([longitude, latitude]);
 
       // Create a popup with the item's name
       const popup = new Popup({ offset: 25 }).setText(
@@ -127,6 +166,18 @@ const MapComponentScanner: React.FC<MapComponentProps> = ({
       // Store the marker for future cleanup
       markersRef.current.push(marker);
     });
+
+    // Update the line on the map if we have coordinates and the line source is ready
+    if (coordinates.length >= 2 && lineRef.current) {
+      lineRef.current.setData({
+        type: "Feature",
+        properties: {},
+        geometry: {
+          type: "LineString",
+          coordinates: coordinates,
+        },
+      });
+    }
   }, [items]);
 
   return (
