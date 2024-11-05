@@ -39,7 +39,7 @@ export default function ItemInfo() {
   const { currentUser } = useAuth();
   const [progress, setProgress] = useState(13);
   const [loadingData, setLoadingData] = useState(true);
-  const [data, setData] = useState([]);
+
 
   useEffect(() => {
     console.log(params);
@@ -53,7 +53,7 @@ export default function ItemInfo() {
       try {
         const jwt = await currentUser.getIdToken();
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/event/${params.pubKey}`,
+          `${import.meta.env.VITE_API_URL}/item/${params.pubKey}`,
           {
             method: "GET",
             headers: {
@@ -64,7 +64,7 @@ export default function ItemInfo() {
         );
         const responseData = await response.json();
 
-        setData(responseData);
+        
         setItems(responseData);
         setLoadingData(false);
       } catch (error) {
@@ -112,8 +112,8 @@ export default function ItemInfo() {
   const memoizedMap = useMemo(() => {
     const width = isMobile ? "100vw" : "50vw";
     const height = isMobile ? "40vh" : "100vh";
-    return <MapComponentHistory data={data} width={width} height={height} />;
-  }, [data, isMobile]);
+    return <MapComponentHistory  width={width} height={height} />;
+  }, [ isMobile]);
 
   return (
     <>

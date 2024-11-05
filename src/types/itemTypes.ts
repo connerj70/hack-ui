@@ -8,11 +8,18 @@ export type ItemType = {
   url: string;
 };
 
-export interface TransactionData {
-  blockTime: number;
-  confirmationStatus: string;
-  err: null;
-  memo: string;
-  signature: string;
-  slot: number;
+export interface ItemId {
+  id: string;
 }
+
+export interface ItemScan {
+  combinedSignature: string;
+  id: ItemId;
+  itemAddress: string;
+  itemBytes: string;
+  message: string;
+  name: string;
+  scannerAddress: string;
+  url: string;
+}
+

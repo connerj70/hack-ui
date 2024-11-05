@@ -1,117 +1,137 @@
-import React, { useEffect } from "react";
-import mapboxgl from "mapbox-gl";
+import React, { useEffect, useRef, useState } from "react";
+import mapboxgl, { Marker, Popup } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { Feature, LineString } from "geojson";
+import { useAuth } from "@/contexts/useAuth";
+import { useParams } from "react-router-dom";
 
-interface GeoJSONFeature {
-  type: "Feature";
-  properties: any;
-  geometry: LineString;
-}
-
-interface MapData {
-  blockTime: number;
-  confirmationStatus: string;
-  err: null | string;
-  memo: string;
-  signature: string;
-  slot: number;
+interface ItemLocation {
+  name: string;
+  message: string;
 }
 
 interface MapComponentProps {
-  data: MapData[];
-  width?: string;  // default to "100vw" if not provided
-  height?: string; // default to "40vh" if not provided
+  width?: string;
+  height?: string;
 }
 
-const MapComponentHistory: React.FC<MapComponentProps> = ({data, width = "100vw", height = "40vh" }) => {
+const MapComponentScanner: React.FC<MapComponentProps> = ({
+  width = "100vw",
+  height = "40vh",
+}) => {
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const markersRef = useRef<Marker[]>([]);
+  const [items, setItems] = useState<ItemLocation[]>([]);
+  const { currentUser } = useAuth();
+  const params = useParams();
+
   useEffect(() => {
-    mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || "";
+    if (!mapRef.current) {
+      const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+      if (!mapboxToken) {
+        console.error("Mapbox access token is not set.");
+        return;
+      }
 
-    const map = new mapboxgl.Map({
-      container: "map",
-      style: "mapbox://styles/mapbox/streets-v11",
-      center: [-111.7943618, 40.6959141],
-      zoom: 2,
-      attributionControl: false,
-    });
+      mapboxgl.accessToken = mapboxToken;
+      mapRef.current = new mapboxgl.Map({
+        container: "map",
+        style: "mapbox://styles/mapbox/streets-v11",
+        center: [-111.237, 40.626],
+        zoom: 2,
+        attributionControl: false,
+      });
+    }
 
-    map.on("load", () => {
-      // Collect coordinates from data for the line
-      const coordinates = data
-        .map((item) => {
-          const matchResults = item.memo.match(/[\w.:-]+/g);
-          if (matchResults) {
-            const [, , , lat, lng] = matchResults; // Skip the first two matches
-            return [parseFloat(lng), parseFloat(lat)];
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const jwt = await currentUser?.getIdToken();
+
+        const resp = await fetch(
+          `${import.meta.env.VITE_API_URL}/item/map/${params.pubKey}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${jwt}`,
+            },
           }
-          return [0, 0]; // Default fall back to [0, 0] if no match
-        })
-        .filter((coord) => coord[0] !== 0 && coord[1] !== 0); // Filter out default coordinates
+        );
 
-      // Define a GeoJSON object for the line
-      const lineData: GeoJSONFeature = {
-        type: "Feature",
-        properties: {},
-        geometry: {
-          type: "LineString",
-          coordinates: coordinates,
-        },
-      };
-
-      // Add lineData as a source to the map
-      map.addSource("lineSource", {
-        type: "geojson",
-        data: lineData as Feature<LineString>,
-      });
-
-      // Add a layer to display the line
-      map.addLayer({
-        id: "lineLayer",
-        type: "line",
-        source: "lineSource",
-        layout: {
-          "line-join": "round",
-          "line-cap": "round",
-        },
-        paint: {
-          "line-color": "#ff0000", // Red line
-          "line-width": 5,
-        },
-      });
-
-      // Add markers and popups to the map for each data item
-      data.forEach((item) => {
-        const matchResults = item.memo.match(/[\w.:-]+/g);
-        if (matchResults) {
-          const [, , , lat, lng] = matchResults;
-          const latitude = parseFloat(lat);
-          const longitude = parseFloat(lng);
-          const link = `https://explorer.solana.com/tx/${item.signature}?cluster=devnet`;
-
-          const content = `
-            <div>
-              <p><strong>Timestamp:</strong> ${new Date(
-                item.blockTime * 1000
-              ).toLocaleString()}</p>
-              <p><strong>Latitude:</strong> ${latitude}</p>
-              <p><strong>Longitude:</strong> ${longitude}</p>
-              <a href="${link}" target="_blank" rel="noopener noreferrer" class="text-blue-700 hover:underline center">Solana Transaction</a>
-          
-            </div>`;
-
-          new mapboxgl.Marker()
-            .setLngLat([longitude, latitude])
-            .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(content))
-            .addTo(map);
+        if (!resp.ok) {
+          throw new Error(`Failed to fetch items: ${resp.statusText}`);
         }
-      });
+
+        const body = await resp.json();
+        setItems(body);
+      } catch (error) {
+        console.error("Error fetching items:", error);
+      }
+    };
+
+    fetchData();
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    // Clear existing markers
+    markersRef.current.forEach((marker) => marker.remove());
+    markersRef.current = [];
+
+    items.forEach((item) => {
+      // Add validation checks
+      if (!item?.message) {
+        console.warn(`Missing message for item "${item?.name}"`);
+        return;
+      }
+
+      // Parse the message to extract latitude and longitude
+      const coordinates = item.message.split(",");
+      if (coordinates.length !== 2) {
+        console.warn(
+          `Invalid coordinate format for item "${item.name}": ${item.message}`
+        );
+        return;
+      }
+
+      const latitude = parseFloat(coordinates[0]);
+      const longitude = parseFloat(coordinates[1]);
+
+      if (isNaN(latitude) || isNaN(longitude)) {
+        console.warn(
+          `Invalid coordinates for item "${item.name}": ${item.message}`
+        );
+        return;
+      }
+
+      // Create a popup with the item's name
+      const popup = new Popup({ offset: 25 }).setText(
+        item.name || "Unnamed Location"
+      );
+
+      // Create a marker and add it to the map
+      const marker = new Marker({ color: "#FF0000" })
+        .setLngLat([longitude, latitude])
+        .setPopup(popup)
+        .addTo(mapRef.current!);
+
+      // Store the marker for future cleanup
+      markersRef.current.push(marker);
     });
+  }, [items]);
 
-    return () => map.remove(); // Clean up the map instance on unmount
-  }, [data]);
-
-  return <div id="map" style={{ width: width, height: height }} className="w-full" />;
+  return (
+    <div id="map" style={{ width: width, height: height }} className="w-full" />
+  );
 };
 
-export default MapComponentHistory;
+export default MapComponentScanner;
