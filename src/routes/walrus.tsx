@@ -1,4 +1,6 @@
 // src/App.tsx
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import React, { useState, FormEvent } from "react";
 
 // Define the structure of the uploaded blob information
@@ -15,14 +17,8 @@ interface UploadedBlob {
 }
 
 const Walrus: React.FC = () => {
-  const [publisherUrl, setPublisherUrl] = useState<string>(
-    "https://publisher.walrus-testnet.walrus.space"
-  );
-  const [aggregatorUrl, setAggregatorUrl] = useState<string>(
-    "https://aggregator.walrus-testnet.walrus.space"
-  );
   const [file, setFile] = useState<File | null>(null);
-  const [epochs, setEpochs] = useState<number>(1);
+  //   const [epochs, setEpochs] = useState<number>(1);
   const [uploadedBlobs, setUploadedBlobs] = useState<UploadedBlob[]>([]);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -63,8 +59,8 @@ const Walrus: React.FC = () => {
       throw new Error("No file selected.");
     }
 
-    const basePublisherUrl = publisherUrl;
-    const numEpochs = epochs;
+    const basePublisherUrl = "https://publisher.walrus-testnet.walrus.space";
+    const numEpochs = 1;
 
     const response = await fetch(
       `${basePublisherUrl}/v1/store?epochs=${numEpochs}`,
@@ -108,6 +104,8 @@ const Walrus: React.FC = () => {
       throw new Error("Unhandled successful response!");
     }
 
+    const aggregatorUrl = "https://aggregator.walrus-testnet.walrus.space";
+
     const blobUrl = `${aggregatorUrl}/v1/${info.blobId}`;
     const suiUrl = `${info.suiBaseUrl}/${info.suiRef}`;
     const isImage = media_type.startsWith("image");
@@ -129,80 +127,17 @@ const Walrus: React.FC = () => {
 
   return (
     <div>
-      <header className="container my-3">
-        <h1>Walrus Blob Upload</h1>
-        <p className="lead">
-          An example uploading and displaying files with Walrus.
-        </p>
-      </header>
-
       <main className="container">
         <div className="row align-items-start gx-5">
           <section className="col-lg-5 mb-3">
-            <h2>Blob Upload</h2>
-            <p>
-              Upload blobs to Walrus, and display them on this page. See the{" "}
-              <a
-                href="https://docs.walrus.site"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Walrus documentation
-              </a>{" "}
-              for more information. The file size is limited to 10 MiB on the
-              default publisher. Use the{" "}
-              <a
-                href="https://docs.walrus.site/usage/client-cli.html"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                CLI tool
-              </a>{" "}
-              to store bigger files.
-            </p>
-
             <form id="upload-form" onSubmit={handleSubmit} className="mb-3">
               <fieldset disabled={isUploading}>
                 <div className="row g-3">
-                  <div className="col-lg-6">
-                    <label htmlFor="publisher-url-input" className="form-label">
-                      Walrus publisher URL
-                    </label>
-                    <input
-                      id="publisher-url-input"
-                      type="url"
-                      className="form-control"
-                      placeholder="https://publisher.walrus-testnet.walrus.space"
-                      value={publisherUrl}
-                      onChange={(e) => setPublisherUrl(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="col-lg-6">
-                    <label
-                      htmlFor="aggregator-url-input"
-                      className="form-label"
-                    >
-                      Walrus aggregator URL
-                    </label>
-                    <input
-                      id="aggregator-url-input"
-                      type="url"
-                      className="form-control"
-                      placeholder="https://aggregator.walrus-testnet.walrus.space"
-                      value={aggregatorUrl}
-                      onChange={(e) => setAggregatorUrl(e.target.value)}
-                      required
-                    />
-                  </div>
-
                   <div className="col-12">
                     <label htmlFor="file-input" className="form-label">
-                      Blob to upload (<strong>Max 10 MiB size</strong> on the
-                      default publisher!)
+                      upload a file
                     </label>
-                    <input
+                    <Input
                       id="file-input"
                       type="file"
                       className="form-control"
@@ -216,26 +151,7 @@ const Walrus: React.FC = () => {
                   </div>
 
                   <div className="col-12">
-                    <label htmlFor="epochs-input" className="form-label">
-                      Epochs
-                    </label>
-                    <input
-                      id="epochs-input"
-                      type="number"
-                      value={epochs}
-                      min={1}
-                      placeholder="Epochs"
-                      className="form-control"
-                      onChange={(e) => setEpochs(parseInt(e.target.value, 10))}
-                      required
-                    />
-                    <div className="form-text">
-                      The number of Walrus epochs for which to store the blob.
-                    </div>
-                  </div>
-
-                  <div className="col-12">
-                    <button
+                    <Button
                       id="submit"
                       type="submit"
                       className="btn btn-primary"
@@ -248,7 +164,7 @@ const Walrus: React.FC = () => {
                         ></span>
                       )}
                       <span>{isUploading ? "Uploading ..." : "Upload"}</span>
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </fieldset>
