@@ -108,7 +108,7 @@ const Walrus: React.FC = () => {
 
     const blobUrl = `${aggregatorUrl}/v1/${info.blobId}`;
     const suiUrl = `${info.suiBaseUrl}/${info.suiRef}`;
-    const isImage = media_type.startsWith("image");
+    // const isImage = media_type.startsWith("image");
 
     const newBlob: UploadedBlob = {
       status: info.status,
