@@ -215,7 +215,7 @@ const QRScanner: React.FC<{ blobId: string | undefined }> = ({ blobId }) => {
   };
 
   return (
-    <div className="flex flex-col items-center p-5">
+    <div className="flex flex-col items-center pb-10">
       <h1 className="text-2xl font-semibold mb-4">
         QR Code Scanner: {selectedScanner?.name && `(${selectedScanner.name})`}
       </h1>
@@ -260,11 +260,11 @@ const QRScanner: React.FC<{ blobId: string | undefined }> = ({ blobId }) => {
             muted // Ensure video is muted to comply with autoplay policies
             playsInline
           />
-          {isScanning && (
+          {/* {isScanning && (
             <p className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-75 text-gray-700 px-3 py-1 rounded">
               Scanning for QR Code...
             </p>
-          )}
+          )} */}
         </div>
       )}
 
