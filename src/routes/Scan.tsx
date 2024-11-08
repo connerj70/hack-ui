@@ -8,12 +8,12 @@ import PDFViewer from "@/components/walrus/WalrusPDFViewer";
 import { Loader2 } from "lucide-react";
 import QRScanner from "./video";
 
-const SUI_NETWORK = "testnet";
-const SUI_VIEW_TX_URL = `https://suiscan.xyz/${SUI_NETWORK}/tx`;
-const SUI_VIEW_OBJECT_URL = `https://suiscan.xyz/${SUI_NETWORK}/object`;
+export const SUI_NETWORK = "testnet";
+export const SUI_VIEW_TX_URL = `https://suiscan.xyz/${SUI_NETWORK}/tx`;
+export const SUI_VIEW_OBJECT_URL = `https://suiscan.xyz/${SUI_NETWORK}/object`;
 
 // Define the structure of the uploaded blob information
-interface UploadedBlob {
+export interface UploadedBlob {
   status: string;
   blobId: string;
   endEpoch: number;

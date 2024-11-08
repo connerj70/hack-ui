@@ -42,7 +42,7 @@ export function MainNav({
       </Link>
 
       <Link
-        to="/qr-scanner"
+        to="/scan"
         className={`text-sm font-medium transition-colors hover:text-primary ${
           location.pathname === "/qr-scanner"
             ? "text-primary"
