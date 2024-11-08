@@ -61,7 +61,9 @@ const PDFViewer: React.FC<UploadedBlobProps> = ({ blob }) => {
           >
             <Page
               pageNumber={pageNumber}
-              width={800} // Increased width for larger display
+              scale={window.innerWidth < 768 ? 0.6 : 1} // Adjust scale as needed
+              renderTextLayer={false}
+              renderAnnotationLayer={false}
             />
           </Document>
         </div>

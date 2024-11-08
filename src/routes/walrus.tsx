@@ -115,71 +115,62 @@ const Walrus: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="grid grid-cols-1 lg:grid-cols-8 gap-8">
-        {/* Upload Section */}
-        <div className="lg:col-span-3">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">
-                Upload File
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <fieldset disabled={isUploading}>
-                  <div className="space-y-4">
-                    <div>
-                      <label
-                        htmlFor="file-input"
-                        className="block text-sm font-medium mb-2"
-                      >
-                        Choose a PDF File
-                      </label>
-                      <Input
-                        id="file-input"
-                        type="file"
-                        accept="application/pdf"
-                        className="cursor-pointer"
-                        onChange={(e) => {
-                          if (e.target.files && e.target.files[0]) {
-                            setFile(e.target.files[0]);
-                          }
-                        }}
-                        required
-                      />
-                    </div>
-
-                    <Button
-                      type="submit"
-                      className="w-full flex items-center justify-center"
-                      disabled={isUploading}
+    <div className="w-full">
+      <div>
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Upload File</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <fieldset disabled={isUploading}>
+                <div className="space-y-4">
+                  <div>
+                    <label
+                      htmlFor="file-input"
+                      className="block text-sm font-medium mb-2"
                     >
-                      {isUploading && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      )}
-                      {isUploading ? "Uploading..." : "Upload"}
-                    </Button>
+                      Choose a PDF File
+                    </label>
+                    <Input
+                      id="file-input"
+                      type="file"
+                      accept="application/pdf"
+                      className="cursor-pointer"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          setFile(e.target.files[0]);
+                        }
+                      }}
+                      required
+                    />
                   </div>
-                </fieldset>
-              </form>
 
-              {errorMessage && (
-                <Alert variant="destructive" className="mt-4">
-                  <AlertDescription>{errorMessage}</AlertDescription>
-                </Alert>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                  <Button
+                    type="submit"
+                    className="w-full flex items-center justify-center"
+                    disabled={isUploading}
+                  >
+                    {isUploading && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    {isUploading ? "Uploading..." : "Upload"}
+                  </Button>
+                </div>
+              </fieldset>
+            </form>
 
-        {/* Uploaded Files Section */}
-        {uploadedBlob && (
-          <div className="lg:col-span-5">
-            <PDFViewer blob={uploadedBlob} />
-          </div>
-        )}
+            {errorMessage && (
+              <Alert variant="destructive" className="mt-4">
+                <AlertDescription>{errorMessage}</AlertDescription>
+              </Alert>
+            )}
+          </CardContent>
+        </Card>
+        {uploadedBlob && <PDFViewer blob={uploadedBlob} />}
       </div>
+
+      {/* Uploaded Files Section */}
     </div>
   );
 };
