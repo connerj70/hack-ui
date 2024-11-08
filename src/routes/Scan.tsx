@@ -23,7 +23,7 @@ interface UploadedBlob {
   mediaType: string;
 }
 
-const Walrus: React.FC = () => {
+const Scan: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -179,4 +179,4 @@ const Walrus: React.FC = () => {
   );
 };
 
-export default Walrus;
+export default Scan;

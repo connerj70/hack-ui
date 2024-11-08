@@ -16,8 +16,7 @@ import { AuthProvider } from "./contexts/AuthProvider";
 import RequireAuth from "./routes/RequireAuth";
 import ItemInfo from "./routes/items/ItemInfo";
 import Explore from "./routes/explore/explore";
-import QRScanner from "./routes/video";
-import Walrus from "./routes/walrus";
+import Scan from "./routes/Scan";
 
 const router = createBrowserRouter([
   {
@@ -61,12 +60,8 @@ const router = createBrowserRouter([
         element: <Profile />,
       },
       {
-        path: "qr-scanner",
-        element: <QRScanner />,
-      },
-      {
-        path: "walrus",
-        element: <Walrus />,
+        path: "scan",
+        element: <Scan />,
       },
     ],
   },
