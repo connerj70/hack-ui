@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/useAuth";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 
-const QRScanner: React.FC = () => {
+const QRScanner: React.FC<{ blobId: string | undefined }> = ({ blobId }) => {
   const [scanKey, setScanKey] = useState<number>(0); // Used to reset the scanner
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -178,6 +178,7 @@ const QRScanner: React.FC = () => {
             scannerSecret: selectedScanner?.secret,
             itemSecret: qrCode,
             message: location, // Replaced with user's GPS data
+            blobId, // Replace with actual blobId
           }),
         }
       );
@@ -216,12 +217,8 @@ const QRScanner: React.FC = () => {
   return (
     <div className="flex flex-col items-center p-5">
       <h1 className="text-2xl font-semibold mb-4">
-        QR Code Scanner {selectedScanner?.name && `(${selectedScanner.name})`}
+        QR Code Scanner: {selectedScanner?.name && `(${selectedScanner.name})`}
       </h1>
-
-      <p>scannerSecret: {selectedScanner?.secret}</p>
-      <p>itemSecret: {qrCode}</p>
-      <p>message: {location}</p>
 
       {error && (
         <div className="mt-5 text-center pb-8">

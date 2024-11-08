@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import PDFViewer from "@/components/walrus/WalrusPDFViewer";
 import { Loader2 } from "lucide-react";
+import QRScanner from "./video";
 
 const SUI_NETWORK = "testnet";
 const SUI_VIEW_TX_URL = `https://suiscan.xyz/${SUI_NETWORK}/tx`;
@@ -45,11 +46,13 @@ const Walrus: React.FC = () => {
         // Optionally, reset the file input
         setFile(null);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      setErrorMessage(
-        error.message || "Something went wrong when storing the blob."
-      );
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage("Something went wrong when storing the blob.");
+      }
     } finally {
       setIsUploading(false);
     }
@@ -115,62 +118,63 @@ const Walrus: React.FC = () => {
   };
 
   return (
-    <div className="w-full">
-      <div>
-        <Card className="w-full">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">Upload File</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <fieldset disabled={isUploading}>
-                <div className="space-y-4">
-                  <div>
-                    <label
-                      htmlFor="file-input"
-                      className="block text-sm font-medium mb-2"
-                    >
-                      Choose a PDF File
-                    </label>
-                    <Input
-                      id="file-input"
-                      type="file"
-                      accept="application/pdf"
-                      className="cursor-pointer"
-                      onChange={(e) => {
-                        if (e.target.files && e.target.files[0]) {
-                          setFile(e.target.files[0]);
-                        }
-                      }}
-                      required
-                    />
-                  </div>
-
-                  <Button
-                    type="submit"
-                    className="w-full flex items-center justify-center"
-                    disabled={isUploading}
+    <div className="flex flex-col items-center p-5">
+      <QRScanner blobId={uploadedBlob?.blobId} />
+      <Card className="w-84">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Upload File</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <fieldset disabled={isUploading}>
+              <div className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="file-input"
+                    className="block text-sm font-medium mb-2"
                   >
-                    {isUploading && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    {isUploading ? "Uploading..." : "Upload"}
-                  </Button>
+                    Choose a Bill of Lading (PDF File)
+                  </label>
+                  <Input
+                    id="file-input"
+                    type="file"
+                    accept="application/pdf"
+                    className="cursor-pointer"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setFile(e.target.files[0]);
+                      }
+                    }}
+                    required
+                  />
                 </div>
-              </fieldset>
-            </form>
 
-            {errorMessage && (
-              <Alert variant="destructive" className="mt-4">
-                <AlertDescription>{errorMessage}</AlertDescription>
-              </Alert>
-            )}
-          </CardContent>
-        </Card>
-        {uploadedBlob && <PDFViewer blob={uploadedBlob} />}
-      </div>
+                <Button
+                  type="submit"
+                  className="w-full flex items-center justify-center"
+                  disabled={isUploading}
+                >
+                  {isUploading && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  {isUploading ? "Uploading..." : "Upload"}
+                </Button>
+              </div>
+            </fieldset>
+          </form>
 
-      {/* Uploaded Files Section */}
+          {errorMessage && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
+      {uploadedBlob && (
+        <div className="pt-10">
+          <PDFViewer blob={uploadedBlob} />
+        </div>
+      )}
     </div>
   );
 };
