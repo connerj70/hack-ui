@@ -26,13 +26,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/useAuth";
 import QRCode from "react-qr-code";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { SUI_VIEW_OBJECT_URL, SUI_VIEW_TX_URL, UploadedBlob } from "../Scan";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import PDFViewer from "@/components/walrus/WalrusPDFViewer";
+import { CopyIcon, DownloadIcon } from "@radix-ui/react-icons";
 
 const formSchema = z.object({
   description: z.string(),
@@ -41,7 +41,7 @@ const formSchema = z.object({
 export default function CreateItem() {
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [isOpen, setOpen] = useState(false);
   const [itemSecret, setItemSecret] = useState("");
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -49,7 +49,7 @@ export default function CreateItem() {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [uploadedBlob, setUploadedBlob] = useState<UploadedBlob | null>(null);
-
+  const [des, setDescription] = useState("");
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -153,7 +153,10 @@ export default function CreateItem() {
         return;
       }
 
+      setDescription(values.description);
       const jwt = await currentUser.getIdToken();
+
+      console.log("blob id ===", uploadedBlob?.blobId);
 
       const resp = await fetch(`${import.meta.env.VITE_API_URL}/item/create`, {
         method: "POST",
@@ -163,7 +166,7 @@ export default function CreateItem() {
         },
         body: JSON.stringify({
           description: values.description,
-          blodId: uploadedBlob?.blobId,
+          blobId: uploadedBlob?.blobId,
         }),
       });
 
@@ -206,28 +209,70 @@ export default function CreateItem() {
     navigate("/items");
   }
 
+  const handleDownload = () => {
+    const content = `Your Item Secret Key:\n${itemSecret}\n\nVisit: https://www.pomerene.net/`;
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `item-secret-${des}.txt`;
+    link.click();
+
+    // Clean up the URL object
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCopy = () => {
+    const content = `Your Item Secret Key:\n${itemSecret}\n\nVisit: https://www.pomerene.net/`;
+    navigator.clipboard
+      .writeText(content)
+      .then(() => {
+        // Optionally, you can show a success message or toast here
+        alert("Secret key copied to clipboard!");
+      })
+      .catch((err) => {
+        console.error("Failed to copy: ", err);
+      });
+  };
+
   return (
     <>
       <div className="lg:p-8 p-4 pt-10">
-        <AlertDialog open={open}>
+        <AlertDialog open={isOpen} onOpenChange={handleClose}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Item secret</AlertDialogTitle>
+              <AlertDialogTitle>Item Secret</AlertDialogTitle>
               <AlertDialogDescription>
-                Save your item secret key
+                Please save your item secret key. You can download it or copy it
+                to your clipboard.
               </AlertDialogDescription>
-              <div className="flex flex-col items-center py-8">
-                <QRCode value={itemSecret} />
-              </div>
-              <Textarea className="pt-8 py-4" defaultValue={itemSecret} />
             </AlertDialogHeader>
-            <AlertDialogFooter>
+            <div className="flex flex-col items-center py-8">
+              <QRCode value={itemSecret} size={200} />
+            </div>
+            <div className="flex justify-center space-x-4 mt-4">
+              <Button
+                variant={"ghost"}
+                onClick={handleCopy}
+                className="flex items-center"
+              >
+                <CopyIcon className="w-5 h-5 mr-2" aria-hidden="true" />
+                Copy to Clipboard
+              </Button>
+              <Button variant={"ghost"} onClick={handleDownload} className="flex items-center">
+                <DownloadIcon className="w-5 h-5 mr-2" aria-hidden="true" />
+                Download Secret
+              </Button>
+            </div>
+            <AlertDialogFooter className="mt-6">
               <AlertDialogAction onClick={handleClose}>
-                I've saved my secret key
+                I've Saved My Secret Key
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
@@ -261,58 +306,50 @@ export default function CreateItem() {
 
           {/* file upload */}
           <div className="flex flex-col items-center py-5">
-            <Card className="w-84">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">
-                  Upload Bill of Lading
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <fieldset disabled={isUploading}>
-                    <div className="space-y-4">
-                      <div>
-                        <label
-                          htmlFor="file-input"
-                          className="block text-sm font-medium mb-2"
-                        >
-                          Choose a Bill of Lading (PDF File)
-                        </label>
-                        <Input
-                          id="file-input"
-                          type="file"
-                          accept="application/pdf"
-                          className="cursor-pointer"
-                          onChange={(e) => {
-                            if (e.target.files && e.target.files[0]) {
-                              setFile(e.target.files[0]);
-                            }
-                          }}
-                          required
-                        />
-                      </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <fieldset disabled={isUploading}>
+                <div className="space-y-4">
+                  <div>
+                    <label
+                      htmlFor="file-input"
+                      className="block text-sm font-medium mb-2"
+                    >
+                      Choose a Bill of Lading (PDF File)
+                    </label>
+                    <Input
+                      id="file-input"
+                      type="file"
+                      accept="application/pdf"
+                      className="cursor-pointer"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          setFile(e.target.files[0]);
+                        }
+                      }}
+                      required
+                    />
+                  </div>
 
-                      <Button
-                        type="submit"
-                        className="w-full flex items-center justify-center"
-                        disabled={isUploading}
-                      >
-                        {isUploading && (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        )}
-                        {isUploading ? "Uploading..." : "Upload"}
-                      </Button>
-                    </div>
-                  </fieldset>
-                </form>
+                  <Button
+                    type="submit"
+                    className="w-full flex items-center justify-center"
+                    disabled={isUploading}
+                  >
+                    {isUploading && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    {isUploading ? "Uploading..." : "Upload"}
+                  </Button>
+                </div>
+              </fieldset>
+            </form>
 
-                {errorMessage && (
-                  <Alert variant="destructive" className="mt-4">
-                    <AlertDescription>{errorMessage}</AlertDescription>
-                  </Alert>
-                )}
-              </CardContent>
-            </Card>
+            {errorMessage && (
+              <Alert variant="destructive" className="mt-4">
+                <AlertDescription>{errorMessage}</AlertDescription>
+              </Alert>
+            )}
+
             {uploadedBlob && (
               <div className="pt-10">
                 <PDFViewer blob={uploadedBlob} />

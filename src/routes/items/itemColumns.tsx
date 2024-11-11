@@ -35,13 +35,15 @@ export const getItemColumns = (
     },
   },
   {
-    accessorKey: "itemAddress",
-    header: "Item Address",
+    accessorKey: "description",
+    header: "Description",
     cell: ({ row }) => {
       const item = row.original;
       return (
-        <div className="text-sm text-gray-700 whitespace-normal break-all">
-          {item.itemAddress}
+        <div className="mx-auto max-w-4xl">
+          <p className="text-sm font-medium leading-none break-words">
+            {item.description}
+          </p>
         </div>
       );
     },

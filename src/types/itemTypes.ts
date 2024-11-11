@@ -6,6 +6,7 @@ export type ItemType = {
   itemAddress: string;
   name: string;
   url: string;
+  blob_id:string
 };
 
 export interface ItemId {

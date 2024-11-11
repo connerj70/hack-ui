@@ -42,6 +42,17 @@ export function MainNav({
       </Link>
 
       <Link
+        to="/events"
+        className={`text-sm font-medium transition-colors hover:text-primary ${
+          location.pathname === "/events"
+            ? "text-primary"
+            : "text-muted-foreground"
+        }`}
+      >
+        Events
+      </Link>
+
+      <Link
         to="/scan"
         className={`text-sm font-medium transition-colors hover:text-primary ${
           location.pathname === "/qr-scanner"

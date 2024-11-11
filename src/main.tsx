@@ -17,6 +17,7 @@ import RequireAuth from "./routes/RequireAuth";
 import ItemInfo from "./routes/items/ItemInfo";
 import Explore from "./routes/explore/explore";
 import Scan from "./routes/Scan";
+import { DataTableDemo } from "./routes/events/page";
 
 const router = createBrowserRouter([
   {
@@ -62,6 +63,10 @@ const router = createBrowserRouter([
       {
         path: "scan",
         element: <Scan />,
+      },
+      {
+        path: "events",
+        element: <DataTableDemo />,
       },
     ],
   },
