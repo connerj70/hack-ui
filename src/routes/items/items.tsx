@@ -1,14 +1,9 @@
-// src/components/Items.tsx
-
 "use client"; // Ensure this is at the top if using Next.js or similar frameworks
 
 import { useEffect, useMemo, useState } from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Button } from "@/components/ui/button";
 import {
-  ColumnFiltersState,
+  ColumnDef,
   SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -17,8 +12,17 @@ import {
   useReactTable,
   FilterFn,
 } from "@tanstack/react-table";
+import { Toaster } from "@/components/ui/toaster";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-
 import {
   Table,
   TableBody,
@@ -31,8 +35,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/useAuth";
 import { useToast } from "@/components/ui/use-toast";
 import MapComponent from "@/components/MapComponent";
-import { getItemColumns } from "./itemColumns";
-import { Progress } from "@/components/ui/progress"; // Importing Progress
+import { Progress } from "@/components/ui/progress";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
 // Define the structure of each item
 interface ItemType {
@@ -47,15 +51,190 @@ interface ItemType {
 
 export default function Items() {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
-  const [items, setItems] = useState<ItemType[]>([]);
+  const [globalFilter, setGlobalFilter] = useState<string>("");
+  const [data, setData] = useState<ItemType[]>([]);
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false); // Loading state
   const [progress, setProgress] = useState(0); // Progress state
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth < 768 : false
+  );
+
+  // Define a global filter function
+  const customGlobalFilter: FilterFn<ItemType> = useMemo(
+    () => (row, filterValue) => {
+      if (!filterValue) return true;
+
+      const lowercasedFilter = filterValue.toLowerCase();
+      const { name = "", description = "" } = row.original;
+
+      return (
+        name.toLowerCase().includes(lowercasedFilter) ||
+        description.toLowerCase().includes(lowercasedFilter)
+      );
+    },
+    []
+  );
+
+  // Define columns inside the component to access delete handler
+  const columns = useMemo<ColumnDef<ItemType, any>[]>(
+    () => [
+      {
+        accessorKey: "name",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Name
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => (
+          <div className="capitalize">{row.getValue("name")}</div>
+        ),
+      },
+      {
+        accessorKey: "itemAddress",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Item Address
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => (
+          <div className="lowercase">{row.getValue("itemAddress")}</div>
+        ),
+      },
+      {
+        accessorKey: "description",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Description
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => <div>{row.getValue("description")}</div>,
+      },
+      {
+        accessorKey: "url",
+        header: () => <div className="text-right">URL</div>,
+        cell: ({ row }) => (
+          <div className="text-right">
+            <a
+              href={row.getValue("url")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500"
+            >
+              Visit
+            </a>
+          </div>
+        ),
+      },
+      {
+        id: "actions",
+        enableHiding: false,
+        header: () => <div>Actions</div>,
+        cell: ({ row }) => {
+          const item = row.original;
+
+          // Delete item handler
+          const handleDelete = async () => {
+            const confirmDelete = window.confirm(
+              "Are you sure you want to delete this item?"
+            );
+            if (!confirmDelete) return;
+
+            try {
+              if (!currentUser) {
+                toast({
+                  title: "Error",
+                  description: "User not authenticated.",
+                  variant: "destructive",
+                });
+                return;
+              }
+
+              const jwt = await currentUser.getIdToken();
+              const response = await fetch(
+                `${import.meta.env.VITE_API_URL}/item/${item.id.id}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${jwt}`,
+                  },
+                }
+              );
+
+              if (!response.ok) {
+                throw new Error(
+                  `Failed to delete item: ${response.statusText}`
+                );
+              }
+
+              // Remove the deleted item from the data
+              setData((prevData) =>
+                prevData.filter((e) => e.id.id !== item.id.id)
+              );
+
+              toast({
+                title: "Success",
+                description: "Item deleted successfully.",
+                variant: "default",
+              });
+            } catch (error) {
+              console.error("Failed to delete item:", error);
+              toast({
+                title: "Error",
+                description: "Failed to delete item.",
+                variant: "destructive",
+              });
+            }
+          };
+
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() => navigator.clipboard.writeText(item.id.id)}
+                >
+                  Copy Item ID
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => navigate(`/items/${item.id.id}`)}
+                >
+                  View Item Details
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleDelete}>
+                  Delete Item
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
+      },
+    ],
+    [currentUser, navigate, toast]
+  );
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -95,7 +274,7 @@ export default function Items() {
 
         // Safeguard: Ensure body is an array
         if (Array.isArray(body)) {
-          setItems(body);
+          setData(body);
         } else {
           throw new Error("Invalid data format: 'items' is not an array.");
         }
@@ -120,55 +299,24 @@ export default function Items() {
     fetchItems();
   }, [currentUser, toast]);
 
-  // Define the custom global filter function
-  const customGlobalFilter: FilterFn<ItemType> = (row, filterValue) => {
-    if (!filterValue) return true;
-
-    const lowercasedFilter = filterValue.toLowerCase();
-    const { name = "", description = "" } = row.original;
-
-    return (
-      name.toLowerCase().includes(lowercasedFilter) ||
-      description.toLowerCase().includes(lowercasedFilter)
-    );
-  };
-
-  const [globalFilter, setGlobalFilter] = useState("");
-
-  // Import columns from columns.ts
-  const columnsDefinition = useMemo(
-    () => getItemColumns(toast, navigate, currentUser),
-    [toast, navigate, currentUser]
-  );
-
-  const table = useReactTable<ItemType>({
-    data: items,
-    columns: columnsDefinition,
+  const table = useReactTable({
+    data,
+    columns,
     filterFns: {
       customGlobalFilter, // Registering the custom filter function
     },
-    // globalFilterFn: "customGlobalFilter", // Assigning the custom filter function for global filtering
-
+    globalFilterFn: customGlobalFilter, // Assigning the custom filter function for global filtering
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter, // Set the global filter
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-      globalFilter,
+      globalFilter, // Use globalFilter state
     },
   });
-
-  const [isMobile, setIsMobile] = useState(
-    typeof window !== "undefined" ? window.innerWidth < 768 : false
-  );
 
   useEffect(() => {
     const handleResize = () => {
@@ -183,7 +331,7 @@ export default function Items() {
     const width = isMobile ? "100vw" : "50vw";
     const height = isMobile ? "40vh" : "100vh";
     return <MapComponent width={width} height={height} />;
-  }, [items, isMobile]);
+  }, [data, isMobile]);
 
   return (
     <>
@@ -193,6 +341,11 @@ export default function Items() {
         {memoizedMap}
         <div className="flex flex-col w-full md:w-1/2 max-w-4xl mx-auto md:px-4 lg:px-8 pt-10 overflow-auto">
           {/* Progress Bar */}
+          {isLoading && (
+            <div className="mb-4">
+              <Progress value={progress} className="h-2 w-full" />
+            </div>
+          )}
 
           <div className="flex-1 space-y-4 pt-6">
             <div className="flex items-center justify-between">
@@ -231,7 +384,7 @@ export default function Items() {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ? (
+                {table.getRowModel().rows.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow
                       key={row.id}
@@ -250,7 +403,7 @@ export default function Items() {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={columnsDefinition?.length || 1}
+                      colSpan={columns.length}
                       className="h-24 text-center"
                     >
                       {isLoading ? (
@@ -258,8 +411,7 @@ export default function Items() {
                           <Progress value={progress} className="h-2 w-full" />
                         </div>
                       ) : (
-                        <p>No Items. Click the "Create Item" button (ensure
-                          you have enough SUI).</p>
+                        <p>No Items. Click the "Create Item" button.</p>
                       )}
                     </TableCell>
                   </TableRow>
