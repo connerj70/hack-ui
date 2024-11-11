@@ -52,7 +52,7 @@ export default function Root() {
             </a>
           </div>
           <Link
-            to="/signup"
+            to="/login"
             className={cn(
               buttonVariants({ variant: "default" }),
               "rounded-full"
@@ -155,13 +155,13 @@ export default function Root() {
               Get Started
             </Link>
           </div>
-          <Link
+          {/* <Link
             to="/explore"
             className="uppercase flex items-center md:justify-center w-full mt-8"
           >
             Explore the network
             <ArrowRightIcon style={{ width: "20px", height: "20px" }} />
-          </Link>
+          </Link> */}
         </div>
       </div>
       <div className="p-48 rounded flex flex-col bg-white w-100 max-h-96 mt-4 md:mt-6 justify-center items-center">
