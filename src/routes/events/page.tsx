@@ -5,7 +5,6 @@ import {
   ColumnDef,
   ColumnFiltersState,
   SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -13,12 +12,11 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -87,7 +85,7 @@ export const columns: ColumnDef<EventDetails>[] = [
   },
   {
     accessorKey: "message",
-    header: () => <div className="text-right">message</div>,
+    header: () => <div className="text-right">Message</div>,
     cell: ({ row }) => {
       return (
         <div className="text-right font-medium">{row.getValue("message")}</div>
@@ -98,7 +96,7 @@ export const columns: ColumnDef<EventDetails>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original;
+      const event = row.original;
 
       return (
         <DropdownMenu>
@@ -111,13 +109,12 @@ export const columns: ColumnDef<EventDetails>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id.id)}
+              onClick={() => navigator.clipboard.writeText(event.id.id)}
             >
-              Copy payment ID
+              Copy Event ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem>View Event Details</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -130,9 +127,6 @@ export function DataTableDemo() {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
   const [data, setData] = React.useState<EventDetails[]>([]);
   const { currentUser } = useAuth();
 
@@ -153,14 +147,14 @@ export function DataTableDemo() {
             },
           }
         );
-        const data = await response.json();
-        setData(data.events);
+        const result = await response.json();
+        setData(result.events);
       } catch (error) {
-        console.error("Failed to fetch payments:", error);
+        console.error("Failed to fetch events:", error);
       }
     };
     fetchData();
-  }, []);
+  }, [currentUser]);
 
   const table = useReactTable({
     data,
@@ -171,13 +165,9 @@ export function DataTableDemo() {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
-      columnVisibility,
-      rowSelection,
     },
   });
 
@@ -185,62 +175,34 @@ export function DataTableDemo() {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter messages..."
+          value={(table.getColumn("message")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("message")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
