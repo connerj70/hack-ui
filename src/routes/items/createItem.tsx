@@ -1,3 +1,4 @@
+import { useAuth } from "@/contexts/useAuth";
 import { ChangeEvent, FormEvent, useState } from "react";
 
 export const SUI_NETWORK = "testnet";
@@ -15,6 +16,12 @@ export interface UploadedBlob {
 }
 
 export default function CreateItem() {
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [uploadedBlob, setUploadedBlob] = useState<UploadedBlob | null>(null);
+  const { currentUser } = useAuth();
+
   // Define the shape of the form data
   interface FormData {
     name: string;
@@ -52,51 +59,92 @@ export default function CreateItem() {
   // Handle form submission
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(null);
 
+    // Validation
     if (!formData.pdf) {
-      alert("Please upload a PDF file.");
-      return;
-    }
-
-    if (formData.pdf.size > 10_000_000) {
-      throw new Error("File size should be less than 10MB.");
-    }
-
-    if (!formData.pdf.type.startsWith("application/pdf")) {
-      throw new Error("Invalid file type. Only PDFs are allowed.");
-    }
-
-    // Prepare form data for submission
-    const data = new FormData();
-    data.append("name", formData.name);
-    data.append("description", formData.description);
-    data.append("pdf", formData.pdf);
-
-    const basePublisherUrl = "https://publisher.walrus-testnet.walrus.space";
-    const numEpochs = 1;
-
-    const response = await fetch(
-      `${basePublisherUrl}/v1/store?epochs=${numEpochs}`,
-      {
-        method: "PUT",
-        body: formData.pdf,
+      if (!currentUser) {
+        return;
       }
-    );
 
-    const storageInfo = await response.json();
+      const jwt = await currentUser.getIdToken();
 
-    console.log("storageInfo", storageInfo);
+      console.log("blob id ===", uploadedBlob?.blobId);
+
+      const resp = await fetch(`${import.meta.env.VITE_API_URL}/item/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          description: formData.description,
+          blobId: "",
+        }),
+      });
+
+      console.log("resp", resp);
+    } else {
+      if (formData.pdf.size > 10_000_000) {
+        setError("File size should be less than 10MB.");
+        return;
+      }
+
+      if (!formData.pdf.type.startsWith("application/pdf")) {
+        setError("Invalid file type. Only PDFs are allowed.");
+        return;
+      }
+
+      // Prepare form data for submission
+      const data = new FormData();
+      data.append("name", formData.name);
+      data.append("description", formData.description);
+      data.append("pdf", formData.pdf);
+
+      const basePublisherUrl = "https://publisher.walrus-testnet.walrus.space";
+      const numEpochs = 1;
+
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `${basePublisherUrl}/v1/store?epochs=${numEpochs}`,
+          {
+            method: "PUT",
+            body: data, // Send the entire FormData
+          }
+        );
+
+        const storageInfo = await response.json();
+        setUploadedBlob(storageInfo);
+        console.log("storageInfo", storageInfo);
+        setSuccess("Item created successfully!");
+        setFormData({ name: "", description: "", pdf: null }); // Reset form
+      } catch (err) {
+        console.error(err);
+        setError("An unexpected error occurred.");
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen  p-4">
+    <div className="flex items-center justify-center min-h-screen p-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-lg bg-white p-8 rounded "
+        className="w-full max-w-lg bg-white p-8 rounded"
       >
         <h2 className="text-2xl font-bold mb-6 text-gray-800">
-          Create a new Item
+          Create a New Item
         </h2>
+
+        {/* Display Error Message */}
+        {error && <div className="mb-4 text-red-500">{error}</div>}
+
+        {/* Display Success Message */}
+        {success && <div className="mb-4 text-green-500">{success}</div>}
 
         {/* Name Field */}
         <div className="mb-4">
@@ -165,9 +213,12 @@ export default function CreateItem() {
         <div className="flex items-center justify-between">
           <button
             type="submit"
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            disabled={loading}
+            className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            Submit
+            {loading ? "Submitting..." : "Submit"}
           </button>
         </div>
       </form>
