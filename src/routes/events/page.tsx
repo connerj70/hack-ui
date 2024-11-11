@@ -56,7 +56,7 @@ export function DataTableDemo() {
 
   // Define a global filter function
   const globalFilterFn: FilterFn<EventDetails> = useMemo(
-    () => (row, columnIds, filterValue) => {
+    () => (row, filterValue) => {
       const value = filterValue.toLowerCase();
       const scannerAddress = row.original.scannerAddress.toLowerCase();
       const itemAddress = row.original.itemAddress.toLowerCase();
