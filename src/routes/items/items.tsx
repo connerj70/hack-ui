@@ -1,5 +1,3 @@
-"use client"; // Ensure this is at the top if using Next.js or similar frameworks
-
 import { useEffect, useMemo, useState } from "react";
 import {
   ColumnDef,
@@ -96,21 +94,21 @@ export default function Items() {
           <div className="capitalize">{row.getValue("name")}</div>
         ),
       },
-      {
-        accessorKey: "itemAddress",
-        header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Item Address
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        ),
-        cell: ({ row }) => (
-          <div className="lowercase">{row.getValue("itemAddress")}</div>
-        ),
-      },
+      // {
+      //   accessorKey: "itemAddress",
+      //   header: ({ column }) => (
+      //     <Button
+      //       variant="ghost"
+      //       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      //     >
+      //       Item Address
+      //       <ArrowUpDown className="ml-2 h-4 w-4" />
+      //     </Button>
+      //   ),
+      //   cell: ({ row }) => (
+      //     <div className="lowercase">{row.getValue("itemAddress")}</div>
+      //   ),
+      // },
       {
         accessorKey: "description",
         header: ({ column }) => (
@@ -124,22 +122,7 @@ export default function Items() {
         ),
         cell: ({ row }) => <div>{row.getValue("description")}</div>,
       },
-      {
-        accessorKey: "url",
-        header: () => <div className="text-right">URL</div>,
-        cell: ({ row }) => (
-          <div className="text-right">
-            <a
-              href={row.getValue("url")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500"
-            >
-              Visit
-            </a>
-          </div>
-        ),
-      },
+     
       {
         id: "actions",
         enableHiding: false,
@@ -340,12 +323,7 @@ export default function Items() {
       >
         {memoizedMap}
         <div className="flex flex-col w-full md:w-1/2 max-w-4xl mx-auto md:px-4 lg:px-8 pt-10 overflow-auto">
-          {/* Progress Bar */}
-          {isLoading && (
-            <div className="mb-4">
-              <Progress value={progress} className="h-2 w-full" />
-            </div>
-          )}
+          
 
           <div className="flex-1 space-y-4 pt-6">
             <div className="flex items-center justify-between">
