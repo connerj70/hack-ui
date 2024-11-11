@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "repository": "git@github.com:connerj70/hack-ui.git",
-  "author": "conner-jensen <conner@pomerene.xyz>",
+  "author": "russell-brouillard <russell@pomerene.xyz>",
   "scripts": {
     "local": "vite",
     "build": "tsc && vite build",
@@ -43,7 +43,7 @@
     "lucide-react": "^0.344.0",
     "mapbox-gl": "^3.3.0",
     "match-sorter": "^6.3.4",
-    "pdfjs-dist": "^4.8.69",
+    "pdfjs-dist": "4.4.168",
     "qrcode.react": "^4.1.0",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
