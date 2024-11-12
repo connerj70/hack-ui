@@ -1,5 +1,8 @@
 // src/components/walrus/WalrusPDFViewer.tsx
-import React, { useState } from "react";
+
+"use client"; // Ensure client-side rendering
+
+import React, { useState, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +10,7 @@ import { Button } from "@/components/ui/button";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
   import.meta.url,
-).toString()
+).toString();
 
 interface UploadedBlobProps {
   blob: UploadedBlob;
@@ -26,11 +29,21 @@ interface UploadedBlob {
 const PDFViewer: React.FC<UploadedBlobProps> = ({ blob }) => {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState<number>(1);
+  const [scale, setScale] = useState<number>(1);
 
-  console.log("blob ---", blob);
-  console.log(
-    `https://aggregator.walrus-testnet.walrus.space/v1/${blob.blobId}`
-  );
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setScale(0.6);
+      } else {
+        setScale(1);
+      }
+    };
+
+    handleResize(); // Set initial scale
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
@@ -61,7 +74,7 @@ const PDFViewer: React.FC<UploadedBlobProps> = ({ blob }) => {
           >
             <Page
               pageNumber={pageNumber}
-              scale={window.innerWidth < 768 ? 0.6 : 1} // Adjust scale as needed
+              scale={scale}
               renderTextLayer={false}
               renderAnnotationLayer={false}
             />

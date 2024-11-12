@@ -9,28 +9,26 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import QRCode from "react-qr-code";
 
 interface QrCodeDialogProps {
   qrData: string;
-  triggerText?: string; // Optional prop to customize the trigger button text
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   dialogTitle?: string; // Optional prop to customize the dialog title
   dialogDescription?: string; // Optional prop to customize the dialog description
 }
 
 const QrCodeDialog: FC<QrCodeDialogProps> = ({
   qrData,
-  triggerText = "Show QR Code",
+  open,
+  onOpenChange,
   dialogTitle = "QR Code",
   dialogDescription = "Here is your QR code:",
 }) => {
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">{triggerText}</Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px] flex flex-col items-center">
         <DialogHeader>
           <DialogTitle>{dialogTitle}</DialogTitle>
@@ -40,7 +38,11 @@ const QrCodeDialog: FC<QrCodeDialogProps> = ({
           <QRCode value={qrData} size={256} />
         </div>
         <DialogFooter>
-          <Button variant="secondary" type="button">
+          <Button
+            variant="secondary"
+            type="button"
+            onClick={() => onOpenChange(false)}
+          >
             Close
           </Button>
         </DialogFooter>

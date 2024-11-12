@@ -1,364 +1,292 @@
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Toaster } from "@/components/ui/toaster";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
-import { FormEvent, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { useAuth } from "@/contexts/useAuth";
+import { ChangeEvent, FormEvent, useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox"; // Import the Checkbox component
 import { useNavigate } from "react-router-dom";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { useAuth } from "@/contexts/useAuth";
-import QRCode from "react-qr-code";
+export const SUI_NETWORK = "testnet";
+export const SUI_VIEW_TX_URL = `https://suiscan.xyz/${SUI_NETWORK}/tx`;
+export const SUI_VIEW_OBJECT_URL = `https://suiscan.xyz/${SUI_NETWORK}/object`;
 
-import { SUI_VIEW_OBJECT_URL, SUI_VIEW_TX_URL, UploadedBlob } from "../Scan";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import PDFViewer from "@/components/walrus/WalrusPDFViewer";
-import { CopyIcon, DownloadIcon } from "@radix-ui/react-icons";
-
-const formSchema = z.object({
-  description: z.string(),
-});
+export interface UploadedBlob {
+  status: string;
+  blobId: string;
+  endEpoch: number;
+  suiRefType: string;
+  suiRef: string;
+  suiBaseUrl: string;
+  mediaType: string;
+}
 
 export default function CreateItem() {
-  const { toast } = useToast();
-  const [submitting, setSubmitting] = useState(false);
-  const [isOpen, setOpen] = useState(false);
-  const [itemSecret, setItemSecret] = useState("");
-  const navigate = useNavigate();
-  const { currentUser } = useAuth();
-  const [file, setFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const [uploadedBlob, setUploadedBlob] = useState<UploadedBlob | null>(null);
-  const [des, setDescription] = useState("");
+  const { currentUser } = useAuth();
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-    if (!file) {
-      setErrorMessage("Please select a file to upload.");
-      return;
-    }
+  const nav = useNavigate();
 
-    setIsUploading(true);
-    setErrorMessage(null);
+  // Define the shape of the form data
+  interface FormData {
+    name: string;
+    description: string;
+    pdf: File | null;
+    includePdf: boolean; // State for the checkbox
+  }
 
-    try {
-      const storageInfo = await storeBlob();
-      if (storageInfo) {
-        setUploadedBlob(storageInfo);
-        // Optionally, reset the file input
-        setFile(null);
-      }
-    } catch (error: unknown) {
-      console.error(error);
-      if (error instanceof Error) {
-        setErrorMessage(error.message);
-      } else {
-        setErrorMessage("Something went wrong when storing the blob.");
-      }
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const storeBlob = async (): Promise<UploadedBlob> => {
-    if (!file) {
-      throw new Error("No file selected.");
-    }
-
-    if (file.size > 10_000_000) {
-      throw new Error("File size should be less than 10MB.");
-    }
-
-    if (!file.type.startsWith("application/pdf")) {
-      throw new Error("Invalid file type. Only PDFs are allowed.");
-    }
-
-    const basePublisherUrl = "https://publisher.walrus-testnet.walrus.space";
-    const numEpochs = 1;
-
-    const response = await fetch(
-      `${basePublisherUrl}/v1/store?epochs=${numEpochs}`,
-      {
-        method: "PUT",
-        body: file,
-      }
-    );
-
-    if (response.status === 200) {
-      const storageInfo = await response.json();
-      console.log("Storage Info:", storageInfo);
-
-      if (storageInfo.alreadyCertified) {
-        return {
-          status: "Already certified",
-          blobId: storageInfo.alreadyCertified.blobId,
-          endEpoch: storageInfo.alreadyCertified.endEpoch,
-          suiRefType: "Previous Sui Certified Event",
-          suiRef: storageInfo.alreadyCertified.eventOrObject.Event.txDigest,
-          suiBaseUrl: SUI_VIEW_TX_URL,
-          mediaType: file.type,
-        };
-      } else if (storageInfo.newlyCreated) {
-        return {
-          status: "Newly created",
-          blobId: storageInfo.newlyCreated.blobObject.blobId,
-          endEpoch: storageInfo.newlyCreated.blobObject.storage.endEpoch,
-          suiRefType: "Associated Sui Object",
-          suiRef: storageInfo.newlyCreated.blobObject.id,
-          suiBaseUrl: SUI_VIEW_OBJECT_URL,
-          mediaType: file.type,
-        };
-      } else {
-        throw new Error("Unhandled successful response!");
-      }
-    } else {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.message || "Something went wrong when storing the blob!"
-      );
-    }
-  };
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      description: "",
-    },
+  // Initialize form state
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    description: "",
+    pdf: null,
+    includePdf: false, // Initialize checkbox as unchecked
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setSubmitting(true);
-    try {
-      if (!currentUser) {
-        return;
-      }
+  // Handle input changes for text inputs and textareas
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
 
-      setDescription(values.description);
-      const jwt = await currentUser.getIdToken();
-
-      console.log("blob id ===", uploadedBlob?.blobId);
-
-      const resp = await fetch(`${import.meta.env.VITE_API_URL}/item/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
-        body: JSON.stringify({
-          description: values.description,
-          blobId: uploadedBlob?.blobId,
-        }),
-      });
-
-      if (!resp.ok) {
-        if (resp.status === 403) {
-          // Redirect the user to the login page with a redirect back to the current page after login
-          navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
-        } else {
-          toast({
-            title:
-              "Error creating item (check if you have enough Sui in your wallet)",
-            description: "An error occurred while creating your item",
-          });
-        }
-        return;
-      }
-
-      const respBody = await resp.json();
-
-      console.log(respBody);
-
-      setItemSecret(respBody.item);
-      setOpen(true);
-    } catch (error) {
-      if (error instanceof Error) {
-        const errorMessage = error.message;
-        toast({
-          title:
-            "Error creating item (check if you have enough Sui in your wallet)",
-          description: errorMessage,
-        });
-      }
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  function handleClose() {
-    setOpen(false);
-    navigate("/items");
-  }
-
-  const handleDownload = () => {
-    const content = `Your Item Secret Key:\n${itemSecret}\n\nVisit: https://www.pomerene.net/`;
-    const blob = new Blob([content], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `item-secret-${des}.txt`;
-    link.click();
-
-    // Clean up the URL object
-    URL.revokeObjectURL(url);
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const handleCopy = () => {
-    const content = `Your Item Secret Key:\n${itemSecret}\n\nVisit: https://www.pomerene.net/`;
-    navigator.clipboard
-      .writeText(content)
-      .then(() => {
-        // Optionally, you can show a success message or toast here
-        alert("Secret key copied to clipboard!");
-      })
-      .catch((err) => {
-        console.error("Failed to copy: ", err);
+  // Handle checkbox changes
+  const handleCheckboxChange = (checked: boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      includePdf: checked,
+      pdf: checked ? prev.pdf : null, // Reset pdf if unchecked
+    }));
+  };
+
+  // Handle file input changes separately
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files && e.target.files[0];
+    setFormData((prev) => ({
+      ...prev,
+      pdf: file || null,
+    }));
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+
+    // Destructure formData for easier access
+    const { name, description, pdf, includePdf } = formData;
+
+    // Validation
+    if (includePdf) {
+      if (!pdf) {
+        setError("Please upload a PDF file or uncheck the option.");
+        return;
+      }
+
+      if (pdf.size > 10_000_000) {
+        setError("File size should be less than 10MB.");
+        return;
+      }
+
+      if (!pdf.type.startsWith("application/pdf")) {
+        setError("Invalid file type. Only PDFs are allowed.");
+        return;
+      }
+    }
+
+    try {
+      if (includePdf && pdf) {
+        // Prepare form data for submission
+        const data = new FormData();
+        data.append("name", name);
+        data.append("description", description);
+        data.append("pdf", pdf);
+
+        const basePublisherUrl =
+          "https://publisher.walrus-testnet.walrus.space";
+        const numEpochs = 1;
+
+        setLoading(true);
+
+        const response = await fetch(
+          `${basePublisherUrl}/v1/store?epochs=${numEpochs}`,
+          {
+            method: "PUT",
+            body: pdf, // Send the entire FormData
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to upload PDF.");
+        }
+
+        const storageInfo = await response.json();
+        setUploadedBlob(storageInfo);
+        console.log("storageInfo", storageInfo);
+      }
+
+      // If PDF is not included, handle accordingly
+      if (!includePdf) {
+        if (!currentUser) {
+          setError("User not authenticated.");
+          return;
+        }
+
+        const jwt = await currentUser.getIdToken();
+
+        const resp = await fetch(
+          `${import.meta.env.VITE_API_URL}/item/create`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${jwt}`,
+            },
+            body: JSON.stringify({
+              name,
+              description,
+              blobId: uploadedBlob?.blobId || "", // No PDF uploaded
+            }),
+          }
+        );
+
+        if (!resp.ok) {
+          const errorData = await resp.json();
+          throw new Error(errorData.message || "Failed to create item.");
+        }
+      }
+
+      setSuccess("Item created successfully!");
+      setFormData({
+        name: "",
+        description: "",
+        pdf: null,
+        includePdf: false, // Reset checkbox
       });
+
+      nav("/items");
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <>
-      <div className="lg:p-8 p-4 pt-10">
-        <AlertDialog open={isOpen} onOpenChange={handleClose}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Item Secret</AlertDialogTitle>
-              <AlertDialogDescription>
-                Please save your item secret key. You can download it or copy it
-                to your clipboard.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <div className="flex flex-col items-center py-8">
-              <QRCode value={itemSecret} size={200} />
-            </div>
-            <div className="flex justify-center space-x-4 mt-4">
-              <Button
-                variant={"ghost"}
-                onClick={handleCopy}
-                className="flex items-center"
-              >
-                <CopyIcon className="w-5 h-5 mr-2" aria-hidden="true" />
-                Copy to Clipboard
-              </Button>
-              <Button variant={"ghost"} onClick={handleDownload} className="flex items-center">
-                <DownloadIcon className="w-5 h-5 mr-2" aria-hidden="true" />
-                Download Secret
-              </Button>
-            </div>
-            <AlertDialogFooter className="mt-6">
-              <AlertDialogAction onClick={handleClose}>
-                I've Saved My Secret Key
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+    <div className="flex items-center justify-center min-h-screen p-4">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-lg bg-white p-8 rounded"
+      >
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">
+          Create a New Item
+        </h2>
 
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-          <div className="flex flex-col space-y-2 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Create New Item
-            </h1>
-          </div>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+        {/* Display Error Message */}
+        {error && <div className="mb-4 text-red-500">{error}</div>}
 
-              <Button disabled={submitting} type="submit" className="w-full">
-                {submitting ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : null}
-                Create
-              </Button>
-            </form>
-          </Form>
+        {/* Display Success Message */}
+        {success && <div className="mb-4 text-green-500">{success}</div>}
 
-          {/* file upload */}
-          <div className="flex flex-col items-center py-5">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <fieldset disabled={isUploading}>
-                <div className="space-y-4">
-                  <div>
-                    <label
-                      htmlFor="file-input"
-                      className="block text-sm font-medium mb-2"
-                    >
-                      Choose a Bill of Lading (PDF File)
-                    </label>
-                    <Input
-                      id="file-input"
-                      type="file"
-                      accept="application/pdf"
-                      className="cursor-pointer"
-                      onChange={(e) => {
-                        if (e.target.files && e.target.files[0]) {
-                          setFile(e.target.files[0]);
-                        }
-                      }}
-                      required
-                    />
-                  </div>
-
-                  <Button
-                    type="submit"
-                    className="w-full flex items-center justify-center"
-                    disabled={isUploading}
-                  >
-                    {isUploading && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    {isUploading ? "Uploading..." : "Upload"}
-                  </Button>
-                </div>
-              </fieldset>
-            </form>
-
-            {errorMessage && (
-              <Alert variant="destructive" className="mt-4">
-                <AlertDescription>{errorMessage}</AlertDescription>
-              </Alert>
-            )}
-
-            {uploadedBlob && (
-              <div className="pt-10">
-                <PDFViewer blob={uploadedBlob} />
-              </div>
-            )}
-          </div>
+        {/* Name Field */}
+        <div className="mb-4">
+          <label
+            htmlFor="name"
+            className="block text-gray-700 text-sm font-bold mb-2"
+          >
+            Name
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            required
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-green-300"
+            placeholder="Enter your name"
+          />
         </div>
-      </div>
-      <Toaster />
-    </>
+
+        {/* Description Field */}
+        <div className="mb-4">
+          <label
+            htmlFor="description"
+            className="block text-gray-700 text-sm font-bold mb-2"
+          >
+            Description
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            required
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-green-300"
+            placeholder="Enter a description"
+            rows={4}
+          ></textarea>
+        </div>
+
+        {/* Checkbox to Include PDF */}
+        <div className="mb-4 flex items-center">
+          <Checkbox
+            checked={formData.includePdf}
+            onCheckedChange={handleCheckboxChange}
+            id="includePdf"
+          />
+          <label
+            htmlFor="includePdf"
+            className="ml-2 text-gray-700 text-sm cursor-pointer"
+          >
+            Upload Bill of Lading (Optional)
+          </label>
+        </div>
+
+        {/* PDF Upload Field - Conditionally Rendered */}
+        {formData.includePdf && (
+          <div className="mb-6">
+            <label
+              htmlFor="pdf"
+              className="block text-gray-700 text-sm font-bold mb-2"
+            >
+              Upload Bill of Lading
+            </label>
+            <input
+              type="file"
+              id="pdf"
+              name="pdf"
+              accept="application/pdf"
+              onChange={handleFileChange}
+              className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4
+                file:rounded file:border-0
+                file:text-sm file:font-semibold
+                file:bg-green-50 file:text-green-700
+                hover:file:bg-green-100"
+            />
+          </div>
+        )}
+
+        {/* Submit Button */}
+        <div className="flex items-center justify-between">
+          <button
+            type="submit"
+            disabled={loading}
+            className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            {loading ? "Submitting..." : "Submit"}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

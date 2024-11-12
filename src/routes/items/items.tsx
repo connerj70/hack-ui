@@ -1,4 +1,4 @@
-"use client"; // Ensure this is at the top if using Next.js or similar frameworks
+// src/components/Items.tsx
 
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -38,6 +38,9 @@ import MapComponent from "@/components/MapComponent";
 import { Progress } from "@/components/ui/progress";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
+// Import the modified QrCodeDialog
+import QrCodeDialog from "@/components/QrCodeDialog";
+
 // Define the structure of each item
 interface ItemType {
   description: string;
@@ -50,6 +53,7 @@ interface ItemType {
 }
 
 export default function Items() {
+  // Existing state variables...
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState<string>("");
   const [data, setData] = useState<ItemType[]>([]);
@@ -61,6 +65,10 @@ export default function Items() {
   const [isMobile, setIsMobile] = useState(
     typeof window !== "undefined" ? window.innerWidth < 768 : false
   );
+
+  // New state variables for QR Code Dialog
+  const [qrData, setQrData] = useState<string | null>(null);
+  const [isQrDialogOpen, setIsQrDialogOpen] = useState<boolean>(false);
 
   // Define a global filter function
   const customGlobalFilter: FilterFn<ItemType> = useMemo(
@@ -97,21 +105,6 @@ export default function Items() {
         ),
       },
       {
-        accessorKey: "itemAddress",
-        header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Item Address
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        ),
-        cell: ({ row }) => (
-          <div className="lowercase">{row.getValue("itemAddress")}</div>
-        ),
-      },
-      {
         accessorKey: "description",
         header: ({ column }) => (
           <Button
@@ -123,22 +116,6 @@ export default function Items() {
           </Button>
         ),
         cell: ({ row }) => <div>{row.getValue("description")}</div>,
-      },
-      {
-        accessorKey: "url",
-        header: () => <div className="text-right">URL</div>,
-        cell: ({ row }) => (
-          <div className="text-right">
-            <a
-              href={row.getValue("url")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500"
-            >
-              Visit
-            </a>
-          </div>
-        ),
       },
       {
         id: "actions",
@@ -202,6 +179,51 @@ export default function Items() {
             }
           };
 
+          // Handle QR Code action
+          const handleQR = async (id: string) => {
+            try {
+              const jwt = await currentUser?.getIdToken();
+
+              const resp = await fetch(
+                `${import.meta.env.VITE_API_URL}/item/qr/${id}`,
+                {
+                  method: "GET",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${jwt}`,
+                  },
+                }
+              );
+
+              if (!resp.ok) {
+                throw new Error(`Failed to fetch QR data: ${resp.statusText}`);
+              }
+
+              const body = await resp.json();
+
+              console.log("Fetched QR data:", body); // Debugging line
+
+              // Adjust based on your API response structure
+              // Assuming the QR data is returned as a string in body.qrData
+              const qrString =
+                typeof body === "string" ? body : body.item || "";
+
+              if (qrString) {
+                setQrData(qrString);
+                setIsQrDialogOpen(true);
+              } else {
+                throw new Error("No QR data received.");
+              }
+            } catch (error) {
+              console.error("Error fetching QR data:", error);
+              toast({
+                title: "Error",
+                description: "Failed to fetch QR data.",
+                variant: "destructive",
+              });
+            }
+          };
+
           return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -222,6 +244,10 @@ export default function Items() {
                   onClick={() => navigate(`/items/${item.id.id}`)}
                 >
                   View Item Details
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => handleQR(item.id.id)}>
+                  View QR Code
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleDelete}>
@@ -340,13 +366,6 @@ export default function Items() {
       >
         {memoizedMap}
         <div className="flex flex-col w-full md:w-1/2 max-w-4xl mx-auto md:px-4 lg:px-8 pt-10 overflow-auto">
-          {/* Progress Bar */}
-          {isLoading && (
-            <div className="mb-4">
-              <Progress value={progress} className="h-2 w-full" />
-            </div>
-          )}
-
           <div className="flex-1 space-y-4 pt-6">
             <div className="flex items-center justify-between">
               <h2 className="text-3xl font-bold tracking-tight pl-4">Items</h2>
@@ -442,6 +461,18 @@ export default function Items() {
           </div>
         </div>
       </div>
+
+      {/* Render the QrCodeDialog */}
+      {qrData && (
+        <QrCodeDialog
+          qrData={qrData}
+          open={isQrDialogOpen}
+          onOpenChange={setIsQrDialogOpen}
+          dialogTitle="Item QR Code"
+          dialogDescription="Scan this QR code to view the item:"
+        />
+      )}
+
       <Toaster />
     </>
   );
