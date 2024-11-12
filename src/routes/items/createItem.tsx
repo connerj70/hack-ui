@@ -1,5 +1,7 @@
 import { useAuth } from "@/contexts/useAuth";
 import { ChangeEvent, FormEvent, useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox"; // Import the Checkbox component
+import { useNavigate } from "react-router-dom";
 
 export const SUI_NETWORK = "testnet";
 export const SUI_VIEW_TX_URL = `https://suiscan.xyz/${SUI_NETWORK}/tx`;
@@ -22,11 +24,14 @@ export default function CreateItem() {
   const [uploadedBlob, setUploadedBlob] = useState<UploadedBlob | null>(null);
   const { currentUser } = useAuth();
 
+  const nav = useNavigate();
+
   // Define the shape of the form data
   interface FormData {
     name: string;
     description: string;
     pdf: File | null;
+    includePdf: boolean; // State for the checkbox
   }
 
   // Initialize form state
@@ -34,16 +39,27 @@ export default function CreateItem() {
     name: "",
     description: "",
     pdf: null,
+    includePdf: false, // Initialize checkbox as unchecked
   });
 
-  // Handle input changes
-  const handleChange = (
+  // Handle input changes for text inputs and textareas
+  const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  // Handle checkbox changes
+  const handleCheckboxChange = (checked: boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      includePdf: checked,
+      pdf: checked ? prev.pdf : null, // Reset pdf if unchecked
     }));
   };
 
@@ -62,71 +78,104 @@ export default function CreateItem() {
     setError(null);
     setSuccess(null);
 
+    // Destructure formData for easier access
+    const { name, description, pdf, includePdf } = formData;
+
     // Validation
-    if (!formData.pdf) {
-      if (!currentUser) {
+    if (includePdf) {
+      if (!pdf) {
+        setError("Please upload a PDF file or uncheck the option.");
         return;
       }
 
-      const jwt = await currentUser.getIdToken();
-
-      console.log("blob id ===", uploadedBlob?.blobId);
-
-      const resp = await fetch(`${import.meta.env.VITE_API_URL}/item/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          description: formData.description,
-          blobId: "",
-        }),
-      });
-
-      console.log("resp", resp);
-    } else {
-      if (formData.pdf.size > 10_000_000) {
+      if (pdf.size > 10_000_000) {
         setError("File size should be less than 10MB.");
         return;
       }
 
-      if (!formData.pdf.type.startsWith("application/pdf")) {
+      if (!pdf.type.startsWith("application/pdf")) {
         setError("Invalid file type. Only PDFs are allowed.");
         return;
       }
+    }
 
-      // Prepare form data for submission
-      const data = new FormData();
-      data.append("name", formData.name);
-      data.append("description", formData.description);
-      data.append("pdf", formData.pdf);
+    try {
+      if (includePdf && pdf) {
+        // Prepare form data for submission
+        const data = new FormData();
+        data.append("name", name);
+        data.append("description", description);
+        data.append("pdf", pdf);
 
-      const basePublisherUrl = "https://publisher.walrus-testnet.walrus.space";
-      const numEpochs = 1;
+        const basePublisherUrl =
+          "https://publisher.walrus-testnet.walrus.space";
+        const numEpochs = 1;
 
-      setLoading(true);
-      try {
+        setLoading(true);
+
         const response = await fetch(
           `${basePublisherUrl}/v1/store?epochs=${numEpochs}`,
           {
             method: "PUT",
-            body: data, // Send the entire FormData
+            body: pdf, // Send the entire FormData
           }
         );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to upload PDF.");
+        }
 
         const storageInfo = await response.json();
         setUploadedBlob(storageInfo);
         console.log("storageInfo", storageInfo);
-        setSuccess("Item created successfully!");
-        setFormData({ name: "", description: "", pdf: null }); // Reset form
-      } catch (err) {
-        console.error(err);
-        setError("An unexpected error occurred.");
-      } finally {
-        setLoading(false);
       }
+
+      // If PDF is not included, handle accordingly
+      if (!includePdf) {
+        if (!currentUser) {
+          setError("User not authenticated.");
+          return;
+        }
+
+        const jwt = await currentUser.getIdToken();
+
+        const resp = await fetch(
+          `${import.meta.env.VITE_API_URL}/item/create`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${jwt}`,
+            },
+            body: JSON.stringify({
+              name,
+              description,
+              blobId: uploadedBlob?.blobId || "", // No PDF uploaded
+            }),
+          }
+        );
+
+        if (!resp.ok) {
+          const errorData = await resp.json();
+          throw new Error(errorData.message || "Failed to create item.");
+        }
+      }
+
+      setSuccess("Item created successfully!");
+      setFormData({
+        name: "",
+        description: "",
+        pdf: null,
+        includePdf: false, // Reset checkbox
+      });
+
+      nav("/items");
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "An unexpected error occurred.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -159,7 +208,7 @@ export default function CreateItem() {
             id="name"
             name="name"
             value={formData.name}
-            onChange={handleChange}
+            onChange={handleInputChange}
             required
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-green-300"
             placeholder="Enter your name"
@@ -178,7 +227,7 @@ export default function CreateItem() {
             id="description"
             name="description"
             value={formData.description}
-            onChange={handleChange}
+            onChange={handleInputChange}
             required
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-green-300"
             placeholder="Enter a description"
@@ -186,28 +235,44 @@ export default function CreateItem() {
           ></textarea>
         </div>
 
-        {/* PDF Upload Field */}
-        <div className="mb-6">
-          <label
-            htmlFor="pdf"
-            className="block text-gray-700 text-sm font-bold mb-2"
-          >
-            Upload Bill of Lading
-          </label>
-          <input
-            type="file"
-            id="pdf"
-            name="pdf"
-            accept="application/pdf"
-            onChange={handleFileChange}
-            required
-            className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4
-              file:rounded file:border-0
-              file:text-sm file:font-semibold
-              file:bg-green-50 file:text-green-700
-              hover:file:bg-green-100"
+        {/* Checkbox to Include PDF */}
+        <div className="mb-4 flex items-center">
+          <Checkbox
+            checked={formData.includePdf}
+            onCheckedChange={handleCheckboxChange}
+            id="includePdf"
           />
+          <label
+            htmlFor="includePdf"
+            className="ml-2 text-gray-700 text-sm cursor-pointer"
+          >
+            Upload Bill of Lading (Optional)
+          </label>
         </div>
+
+        {/* PDF Upload Field - Conditionally Rendered */}
+        {formData.includePdf && (
+          <div className="mb-6">
+            <label
+              htmlFor="pdf"
+              className="block text-gray-700 text-sm font-bold mb-2"
+            >
+              Upload Bill of Lading
+            </label>
+            <input
+              type="file"
+              id="pdf"
+              name="pdf"
+              accept="application/pdf"
+              onChange={handleFileChange}
+              className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4
+                file:rounded file:border-0
+                file:text-sm file:font-semibold
+                file:bg-green-50 file:text-green-700
+                hover:file:bg-green-100"
+            />
+          </div>
+        )}
 
         {/* Submit Button */}
         <div className="flex items-center justify-between">
