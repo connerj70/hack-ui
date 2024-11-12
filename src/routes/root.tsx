@@ -95,43 +95,15 @@ export default function Root() {
           </Link>
         </div>
         <Link
-          to="/signup"
+          to="/login"
           className={cn(
             buttonVariants({ variant: mobileMenu ? "outline" : "default" }),
             "rounded-full"
           )}
         >
-          Sign Up
+          login
         </Link>
       </div>
-
-      {/* <div
-        className={
-          "px-4 bg-black text-white flex flex-col gap-4 relative top-0 left-0 w-screen h-screen overscroll-none" +
-          (mobileMenu ? "" : " hidden")
-        }
-      >
-        <ul>
-          <li className="py-4 border-b">
-            <Link to="/about" className="text-sm hover:underline">
-              About
-            </Link>
-          </li>
-          <li className="py-4 border-b">
-            <Link to="/contact" className="text-sm hover:underline">
-              Contact
-            </Link>
-          </li>
-        </ul>
-        <div className="bg-green-200 bg-gradient-to-r from-green-200 to-green-800 border-br-rounded flex justify-between flex-col min-h-72 text-black p-6 rounded-br-3xl">
-          <h2 className="text-sm">Earn rewards with Pomerene</h2>
-          <div className="flex justify-end">
-            <button className="bg-green-500 text-white rounded-full p-4">
-              <ArrowTopRightIcon style={{ height: "20px", width: "20px" }} />
-            </button>
-          </div>
-        </div>
-      </div> */}
 
       <div className="bg-green-100 flex flex-col w-full h-screen bg-green-100 justify-center items-center">
         <div className="px-4 pt-10 pb-10 md:pb-44">

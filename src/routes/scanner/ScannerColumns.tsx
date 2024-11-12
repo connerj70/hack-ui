@@ -210,13 +210,13 @@ export const scannerColumns = (
   },
 
   {
-    accessorKey: "scannerAddress",
-    header: "Scanner Address",
+    accessorKey: "description",
+    header: "Description",
     cell: ({ row }) => {
       const scanner = row.original;
       return (
         <div className="text-sm text-gray-700 whitespace-normal break-all">
-          {scanner.scannerAddress}
+          {scanner.description}
         </div>
       );
     },
