@@ -1,5 +1,7 @@
 // src/components/Items.tsx
 
+"use client"; // Ensure client-side rendering
+
 import { useEffect, useMemo, useState } from "react";
 import {
   ColumnDef,
@@ -37,10 +39,19 @@ import { useToast } from "@/components/ui/use-toast";
 import MapComponent from "@/components/MapComponent";
 import { Progress } from "@/components/ui/progress";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 // Import the modified QrCodeDialog
 import QrCodeDialog from "@/components/QrCodeDialog";
-import { Row } from "react-day-picker";
+import PDFViewer from "@/components/walrus/WalrusPDFViewer";
 
 // Define the structure of each item
 interface ItemType {
@@ -51,10 +62,11 @@ interface ItemType {
   itemAddress: string;
   name: string;
   url: string;
+  blob_id: string;
 }
 
 export default function Items() {
-  // Existing state variables...
+  // State variables
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState<string>("");
   const [data, setData] = useState<ItemType[]>([]);
@@ -67,9 +79,14 @@ export default function Items() {
     typeof window !== "undefined" ? window.innerWidth < 768 : false
   );
 
-  // New state variables for QR Code Dialog
+  // State variables for QR Code Dialog
   const [qrData, setQrData] = useState<string | null>(null);
+  const [qrName, setQrName] = useState<string | null>(null);
   const [isQrDialogOpen, setIsQrDialogOpen] = useState<boolean>(false);
+
+  // State variables for PDF Viewer Dialog
+  const [pdfOpen, setPdfOpen] = useState<boolean>(false);
+  const [selectedBlobId, setSelectedBlobId] = useState<string | null>(null);
 
   // Define a global filter function
   const customGlobalFilter: FilterFn<ItemType> = useMemo(
@@ -207,10 +224,11 @@ export default function Items() {
               // Adjust based on your API response structure
               // Assuming the QR data is returned as a string in body.qrData
               const qrString =
-                typeof body === "string" ? body : body.item || "";
+                typeof body === "string" ? body : body.qrData || "";
 
               if (qrString) {
                 setQrData(qrString);
+                setQrName(item.name);
                 setIsQrDialogOpen(true);
               } else {
                 throw new Error("No QR data received.");
@@ -223,6 +241,12 @@ export default function Items() {
                 variant: "destructive",
               });
             }
+          };
+
+          // Handle View PDF action
+          const handleViewPDF = () => {
+            setSelectedBlobId(item.blob_id); // Assuming 'url' is blobId
+            setPdfOpen(true);
           };
 
           return (
@@ -251,6 +275,10 @@ export default function Items() {
                   View QR Code
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleViewPDF}>
+                  View PDF
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleDelete}>
                   Delete Item
                 </DropdownMenuItem>
@@ -263,6 +291,7 @@ export default function Items() {
     [currentUser, navigate, toast]
   );
 
+  // Fetch items on component mount
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading(true); // Start loading
@@ -326,6 +355,7 @@ export default function Items() {
     fetchItems();
   }, [currentUser, toast]);
 
+  // Initialize React Table
   const table = useReactTable({
     data,
     columns,
@@ -345,6 +375,7 @@ export default function Items() {
     },
   });
 
+  // Handle window resize for responsive design
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -471,8 +502,24 @@ export default function Items() {
           onOpenChange={setIsQrDialogOpen}
           dialogTitle="Item QR Code"
           dialogDescription="Scan this QR code to record the item."
-          name={Row.name}
+          name={qrName}
         />
+      )}
+
+      {/* Render the PDFViewer Dialog */}
+      {selectedBlobId && (
+        <AlertDialog open={pdfOpen} onOpenChange={setPdfOpen}>
+          <AlertDialogContent className="w-full max-w-3xl">
+            <AlertDialogHeader>
+              <AlertDialogTitle>View PDF</AlertDialogTitle>
+
+              <PDFViewer blobId={selectedBlobId} />
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Close</AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
 
       <Toaster />

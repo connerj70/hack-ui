@@ -8,25 +8,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url,
+  "pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url
 ).toString();
 
 interface UploadedBlobProps {
-  blob: UploadedBlob;
-}
-
-interface UploadedBlob {
-  status: string;
   blobId: string;
-  endEpoch: number;
-  suiRefType: string;
-  suiRef: string;
-  suiBaseUrl: string;
-  mediaType: string;
 }
 
-const PDFViewer: React.FC<UploadedBlobProps> = ({ blob }) => {
+const PDFViewer: React.FC<UploadedBlobProps> = ({ blobId }) => {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [scale, setScale] = useState<number>(1);
@@ -68,7 +58,7 @@ const PDFViewer: React.FC<UploadedBlobProps> = ({ blob }) => {
       <CardContent className="flex flex-col items-center">
         <div className="w-full flex justify-center mb-4">
           <Document
-            file={`https://aggregator.walrus-testnet.walrus.space/v1/${blob.blobId}`}
+            file={`https://aggregator.walrus-testnet.walrus.space/v1/${blobId}`}
             onLoadSuccess={onDocumentLoadSuccess}
             className="w-full"
           >

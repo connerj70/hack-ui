@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/useAuth";
 import { ChangeEvent, FormEvent, useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox"; // Import the Checkbox component
+import { Checkbox } from "@/components/ui/checkbox";
 import { useNavigate } from "react-router-dom";
 
 export const SUI_NETWORK = "testnet";
@@ -23,26 +23,22 @@ export default function CreateItem() {
   const [loading, setLoading] = useState<boolean>(false);
   const [uploadedBlob, setUploadedBlob] = useState<UploadedBlob | null>(null);
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
 
-  const nav = useNavigate();
-
-  // Define the shape of the form data
   interface FormData {
     name: string;
     description: string;
     pdf: File | null;
-    includePdf: boolean; // State for the checkbox
+    includePdf: boolean;
   }
 
-  // Initialize form state
   const [formData, setFormData] = useState<FormData>({
     name: "",
     description: "",
     pdf: null,
-    includePdf: false, // Initialize checkbox as unchecked
+    includePdf: false,
   });
 
-  // Handle input changes for text inputs and textareas
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -54,16 +50,14 @@ export default function CreateItem() {
     }));
   };
 
-  // Handle checkbox changes
   const handleCheckboxChange = (checked: boolean) => {
     setFormData((prev) => ({
       ...prev,
       includePdf: checked,
-      pdf: checked ? prev.pdf : null, // Reset pdf if unchecked
+      pdf: checked ? prev.pdf : null,
     }));
   };
 
-  // Handle file input changes separately
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
     setFormData((prev) => ({
@@ -72,94 +66,124 @@ export default function CreateItem() {
     }));
   };
 
-  // Handle form submission
+  const storeBlob = async (file: File): Promise<UploadedBlob> => {
+    if (file.size > 10_000_000) {
+      throw new Error("File size should be less than 10MB.");
+    }
+
+    if (!file.type.startsWith("application/pdf")) {
+      throw new Error("Invalid file type. Only PDFs are allowed.");
+    }
+
+    const basePublisherUrl = "https://walrus-testnet-publisher.nodes.guru";
+    const numEpochs = 1;
+
+    const response = await fetch(
+      `${basePublisherUrl}/v1/store?epochs=${numEpochs}`,
+      {
+        method: "PUT",
+        body: file,
+      }
+    );
+
+    if (response.ok) {
+      const storageInfo = await response.json();
+      console.log("Storage Info:", storageInfo);
+
+      if (storageInfo.alreadyCertified) {
+        return {
+          status: "Already certified",
+          blobId: storageInfo.alreadyCertified.blobId,
+          endEpoch: storageInfo.alreadyCertified.endEpoch,
+          suiRefType: "Previous Sui Certified Event",
+          suiRef: storageInfo.alreadyCertified.eventOrObject.Event.txDigest,
+          suiBaseUrl: SUI_VIEW_TX_URL,
+          mediaType: file.type,
+        };
+      } else if (storageInfo.newlyCreated) {
+        return {
+          status: "Newly created",
+          blobId: storageInfo.newlyCreated.blobObject.blobId,
+          endEpoch: storageInfo.newlyCreated.blobObject.storage.endEpoch,
+          suiRefType: "Associated Sui Object",
+          suiRef: storageInfo.newlyCreated.blobObject.id,
+          suiBaseUrl: SUI_VIEW_OBJECT_URL,
+          mediaType: file.type,
+        };
+      } else {
+        throw new Error("Unhandled successful response!");
+      }
+    } else {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || "Something went wrong when storing the blob!"
+      );
+    }
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+    setLoading(true);
 
-    // Destructure formData for easier access
     const { name, description, pdf, includePdf } = formData;
 
     // Validation
     if (includePdf) {
       if (!pdf) {
         setError("Please upload a PDF file or uncheck the option.");
+        setLoading(false);
         return;
       }
 
       if (pdf.size > 10_000_000) {
         setError("File size should be less than 10MB.");
+        setLoading(false);
         return;
       }
 
       if (!pdf.type.startsWith("application/pdf")) {
         setError("Invalid file type. Only PDFs are allowed.");
+        setLoading(false);
         return;
       }
     }
 
     try {
+      let blobId = "";
+
       if (includePdf && pdf) {
-        // Prepare form data for submission
-        const data = new FormData();
-        data.append("name", name);
-        data.append("description", description);
-        data.append("pdf", pdf);
-
-        const basePublisherUrl =
-          "https://publisher.walrus-testnet.walrus.space";
-        const numEpochs = 1;
-
-        setLoading(true);
-
-        const response = await fetch(
-          `${basePublisherUrl}/v1/store?epochs=${numEpochs}`,
-          {
-            method: "PUT",
-            body: pdf, // Send the entire FormData
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to upload PDF.");
-        }
-
-        const storageInfo = await response.json();
-        setUploadedBlob(storageInfo);
-        console.log("storageInfo", storageInfo);
+        const blob = await storeBlob(pdf);
+        setUploadedBlob(blob);
+        blobId = blob.blobId;
       }
 
-      // If PDF is not included, handle accordingly
-      if (!includePdf) {
-        if (!currentUser) {
-          setError("User not authenticated.");
-          return;
+      if (!currentUser) {
+        throw new Error("User not authenticated.");
+      }
+
+      const jwt = await currentUser.getIdToken();
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/item/create`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+          body: JSON.stringify({
+            name,
+            description,
+            blobId,
+          }),
         }
+      );
 
-        const jwt = await currentUser.getIdToken();
-
-        const resp = await fetch(
-          `${import.meta.env.VITE_API_URL}/item/create`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${jwt}`,
-            },
-            body: JSON.stringify({
-              name,
-              description,
-              blobId: uploadedBlob?.blobId || "", // No PDF uploaded
-            }),
-          }
-        );
-
-        if (!resp.ok) {
-          const errorData = await resp.json();
-          throw new Error(errorData.message || "Failed to create item.");
-        }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to create item.");
       }
 
       setSuccess("Item created successfully!");
@@ -167,10 +191,10 @@ export default function CreateItem() {
         name: "",
         description: "",
         pdf: null,
-        includePdf: false, // Reset checkbox
+        includePdf: false,
       });
 
-      nav("/items");
+      navigate("/items");
     } catch (err: any) {
       console.error(err);
       setError(err.message || "An unexpected error occurred.");
@@ -212,6 +236,7 @@ export default function CreateItem() {
             required
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-green-300"
             placeholder="Enter your name"
+            disabled={loading}
           />
         </div>
 
@@ -232,6 +257,7 @@ export default function CreateItem() {
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-green-300"
             placeholder="Enter a description"
             rows={4}
+            disabled={loading}
           ></textarea>
         </div>
 
@@ -241,6 +267,7 @@ export default function CreateItem() {
             checked={formData.includePdf}
             onCheckedChange={handleCheckboxChange}
             id="includePdf"
+            disabled={loading}
           />
           <label
             htmlFor="includePdf"
@@ -270,6 +297,7 @@ export default function CreateItem() {
                 file:text-sm file:font-semibold
                 file:bg-green-50 file:text-green-700
                 hover:file:bg-green-100"
+              disabled={loading}
             />
           </div>
         )}
