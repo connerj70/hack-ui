@@ -40,6 +40,7 @@ import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
 // Import the modified QrCodeDialog
 import QrCodeDialog from "@/components/QrCodeDialog";
+import { Row } from "react-day-picker";
 
 // Define the structure of each item
 interface ItemType {
@@ -469,7 +470,8 @@ export default function Items() {
           open={isQrDialogOpen}
           onOpenChange={setIsQrDialogOpen}
           dialogTitle="Item QR Code"
-          dialogDescription="Scan this QR code to view the item:"
+          dialogDescription="Scan this QR code to record the item."
+          name={Row.name}
         />
       )}
 
