@@ -172,7 +172,7 @@ const Scan: React.FC = () => {
       </Card>
       {uploadedBlob && (
         <div className="pt-10">
-          <PDFViewer blob={uploadedBlob} />
+          <PDFViewer blobId={uploadedBlob.blobId} />
         </div>
       )}
     </div>

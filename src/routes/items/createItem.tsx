@@ -21,7 +21,6 @@ export default function CreateItem() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [uploadedBlob, setUploadedBlob] = useState<UploadedBlob | null>(null);
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
@@ -155,7 +154,7 @@ export default function CreateItem() {
 
       if (includePdf && pdf) {
         const blob = await storeBlob(pdf);
-        setUploadedBlob(blob);
+      
         blobId = blob.blobId;
       }
 

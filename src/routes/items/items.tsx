@@ -43,7 +43,6 @@ import {
   AlertDialog,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -500,7 +499,7 @@ export default function Items() {
           onOpenChange={setIsQrDialogOpen}
           dialogTitle="Item QR Code"
           dialogDescription="Scan this QR code to record the item."
-          name={qrName}
+          name={qrName!}
         />
       )}
 
