@@ -63,6 +63,7 @@ interface ItemType {
   name: string;
   url: string;
   blob_id: string;
+  qr: string;
 }
 
 export default function Items() {
@@ -198,12 +199,12 @@ export default function Items() {
           };
 
           // Handle QR Code action
-          const handleQR = async (id: string) => {
+          const handleQR = async (item: ItemType) => {
             try {
               const jwt = await currentUser?.getIdToken();
 
               const resp = await fetch(
-                `${import.meta.env.VITE_API_URL}/item/qr/${id}`,
+                `${import.meta.env.VITE_API_URL}/item/qr/${item.id.id}`,
                 {
                   method: "GET",
                   headers: {
@@ -221,13 +222,10 @@ export default function Items() {
 
               console.log("Fetched QR data:", body); // Debugging line
 
-              // Adjust based on your API response structure
-              // Assuming the QR data is returned as a string in body.qrData
-              const qrString =
-                typeof body === "string" ? body : body.qrData || "";
+              const qrData = body;
 
-              if (qrString) {
-                setQrData(qrString);
+              if (qrData) {
+                setQrData(qrData.item);
                 setQrName(item.name);
                 setIsQrDialogOpen(true);
               } else {
@@ -271,7 +269,7 @@ export default function Items() {
                   View Item Details
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => handleQR(item.id.id)}>
+                <DropdownMenuItem onClick={() => handleQR(item)}>
                   View QR Code
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
