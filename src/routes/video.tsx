@@ -1,11 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import jsQR from "jsqr";
 import { useAuth } from "@/contexts/useAuth";
-import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { decodeSuiPrivateKey } from "@mysten/sui/cryptography";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
+import { useToast } from "@/components/ui/use-toast";
+import { ToastAction } from "@radix-ui/react-toast";
+import { useNavigate } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
 
 const QRScanner: React.FC = () => {
   const [scanKey, setScanKey] = useState<number>(0); // Used to reset the scanner
@@ -16,6 +19,8 @@ const QRScanner: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const { selectedScanner, currentUser } = useAuth(); // Ensure 'currentUser' is destructured correctly
   const [location, setLocation] = useState<string>("");
+  const { toast } = useToast();
+  const nav = useNavigate();
 
   // Function to get user's current location
   const getCurrentLocation = () => {
@@ -189,6 +194,14 @@ const QRScanner: React.FC = () => {
           title: "Scan Failed",
           description: "Try again later or contact support",
           variant: "destructive",
+          action: (
+            <ToastAction
+              altText="Goto schedule to undo"
+              onClick={() => nav(-1)}
+            >
+              Back to Dashboard
+            </ToastAction>
+          ),
         });
         return;
       }
@@ -220,7 +233,6 @@ const QRScanner: React.FC = () => {
       <h1 className="text-2xl font-semibold mb-4">
         Selected Scanner: {selectedScanner?.name && `(${selectedScanner.name})`}
       </h1>
-
       {qrCode ? (
         <div className="mt-5 text-center">
           <div className="flex items-center">
@@ -269,8 +281,8 @@ const QRScanner: React.FC = () => {
           )}
         </div>
       )}
-
       <canvas ref={canvasRef} className="hidden" />
+      <Toaster />
     </div>
   );
 };

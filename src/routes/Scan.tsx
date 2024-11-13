@@ -1,11 +1,3 @@
-// src/App.tsx
-import React, { useState, FormEvent } from "react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import PDFViewer from "@/components/walrus/WalrusPDFViewer";
-import { Loader2 } from "lucide-react";
 import QRScanner from "./video";
 
 export const SUI_NETWORK = "testnet";

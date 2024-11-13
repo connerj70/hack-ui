@@ -1,6 +1,6 @@
-"use client";
+// src/routes/events/page.tsx
 
-import * as React from "react";
+import React, { useMemo, useCallback } from "react";
 import {
   ColumnDef,
   SortingState,
@@ -32,8 +32,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useEffect, useMemo } from "react";
 import { useAuth } from "@/contexts/useAuth";
+import useEvents from "./useEvents";
 
 export type EventDetails = {
   combinedSignature: string;
@@ -46,13 +46,131 @@ export type EventDetails = {
   name: string;
   scannerAddress: string;
   url: string;
+  lastTransaction: {
+    digest: string;
+    timestampMs: string;
+    checkpoint: string;
+  };
 };
 
-export function DataTableDemo() {
+// SortableHeader Component
+const SortableHeader: React.FC<{ column: any; title: string }> = ({
+  column,
+  title,
+}) => (
+  <Button
+    variant="ghost"
+    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+    className="flex items-center"
+  >
+    {title}
+    <ArrowUpDown className="ml-2 h-4 w-4" />
+  </Button>
+);
+
+// Actions Dropdown Component
+const ActionsDropdown: React.FC<{
+  event: EventDetails;
+  onDelete: (event: EventDetails) => void;
+}> = ({ event, onDelete }) => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuItem>
+          <a
+            href={`https://suiscan.xyz/devnet/object/${event.id.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full" // Ensures the link fills the DropdownMenuItem
+          >
+            View Item
+          </a>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>View Event Details</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => onDelete(event)}>
+          Delete Event
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+// Custom Hook for defining columns
+const useColumns = (
+  onDelete: (event: EventDetails) => void
+): ColumnDef<EventDetails>[] => {
+  return useMemo(
+    () => [
+      {
+        accessorKey: "itemAddress",
+        header: ({ column }) => (
+          <SortableHeader column={column} title="Item Address" />
+        ),
+        cell: ({ row }) => (
+          <div className="max-w-[200px] break-all text-sm">
+            {row.getValue("itemAddress")}
+          </div>
+        ),
+      },
+      {
+        accessorKey: "scannerAddress",
+        header: ({ column }) => (
+          <SortableHeader column={column} title="Scanner Address" />
+        ),
+        cell: ({ row }) => (
+          <div className="max-w-[200px] break-all text-sm">
+            {row.getValue("scannerAddress")}
+          </div>
+        ),
+      },
+      {
+        accessorKey: "message",
+        header: () => <div className="text-right">Message</div>,
+        cell: ({ row }) => (
+          <div className="text-right font-medium">
+            {row.getValue("message")}
+          </div>
+        ),
+      },
+      {
+        accessorKey: "lastTransaction.timestampMs",
+        header: () => <div className="text-right">Timestamp</div>,
+        cell: ({ row }) => {
+          const timestampMs = row.original.lastTransaction.timestampMs;
+          const date = timestampMs ? new Date(parseInt(timestampMs, 10)) : null;
+          const formattedDate = date ? date.toLocaleString() : "N/A";
+          return <div className="text-right">{formattedDate}</div>;
+        },
+      },
+      {
+        id: "actions",
+        enableHiding: false,
+        cell: ({ row }) => {
+          const event = row.original;
+
+          return <ActionsDropdown event={event} onDelete={onDelete} />;
+        },
+      },
+    ],
+    [onDelete]
+  );
+};
+
+export const DataTableDemo: React.FC = () => {
+  const { currentUser } = useAuth();
+  const { data, deleteEvent } = useEvents(currentUser);
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState<string>("");
-  const [data, setData] = React.useState<EventDetails[]>([]);
-  const { currentUser } = useAuth();
 
   // Define a global filter function
   const globalFilterFn: FilterFn<EventDetails> = useMemo(
@@ -65,159 +183,30 @@ export function DataTableDemo() {
     []
   );
 
-  // Define columns inside the component to access delete handler
-  const columns = useMemo<ColumnDef<EventDetails>[]>(
-    () => [
-      {
-        accessorKey: "itemAddress",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-            >
-              Item Address
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          );
-        },
-        cell: ({ row }) => (
-          <div className="capitalize">{row.getValue("itemAddress")}</div>
-        ),
-      },
-      {
-        accessorKey: "scannerAddress",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-            >
-              Scanner Address
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          );
-        },
-        cell: ({ row }) => (
-          <div className="lowercase">{row.getValue("scannerAddress")}</div>
-        ),
-      },
-      {
-        accessorKey: "message",
-        header: () => <div className="text-right">Message</div>,
-        cell: ({ row }) => {
-          return (
-            <div className="text-right font-medium">
-              {row.getValue("message")}
-            </div>
-          );
-        },
-      },
-      {
-        id: "actions",
-        enableHiding: false,
-        cell: ({ row }) => {
-          const event = row.original;
+  // Handle deletion of an event
+  const handleDelete = useCallback(
+    async (event: EventDetails) => {
+      const confirmDelete = window.confirm(
+        "Are you sure you want to delete this event?"
+      );
+      if (!confirmDelete) return;
 
-          // Delete event handler
-          const handleDelete = async () => {
-            const confirmDelete = window.confirm(
-              "Are you sure you want to delete this event?"
-            );
-            if (!confirmDelete) return;
-
-            try {
-              if (!currentUser) {
-                alert("User not authenticated.");
-                return;
-              }
-
-              const jwt = await currentUser.getIdToken();
-              const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/event/events/${event.id.id}`,
-                {
-                  method: "DELETE",
-                  headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${jwt}`,
-                  },
-                }
-              );
-
-              console.log("tet ", response.json()); // Remove the deleted event from the data
-              setData((prevData) =>
-                prevData.filter((e) => e.id.id !== event.id.id)
-              );
-            } catch (error) {
-              console.error("Failed to delete event:", error);
-              alert("Failed to delete event.");
-            }
-          };
-
-          return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem
-                  onClick={() => navigator.clipboard.writeText(event.id.id)}
-                >
-                  Copy Event ID
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>View Event Details</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleDelete}>
-                  Delete Event
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          );
-        },
-      },
-    ],
-    [currentUser]
+      try {
+        await deleteEvent(event.id.id);
+        // Optionally, you can show a success message here
+        alert("Event deleted successfully.");
+      } catch (error) {
+        console.error("Failed to delete event:", error);
+        alert("Failed to delete event.");
+      }
+    },
+    [deleteEvent]
   );
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (!currentUser) {
-          return;
-        }
-        const jwt = await currentUser.getIdToken();
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/event/events`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${jwt}`,
-            },
-          }
-        );
-        if (!response.ok) {
-          throw new Error(`Failed to fetch events: ${response.statusText}`);
-        }
-        const result = await response.json();
-        setData(result.events);
-      } catch (error) {
-        console.error("Failed to fetch events:", error);
-        alert("Failed to fetch events.");
-      }
-    };
-    fetchData();
-  }, [currentUser]);
+  // Define columns using custom hook
+  const columns = useColumns(handleDelete);
 
+  // Initialize the table instance
   const table = useReactTable({
     data,
     columns,
@@ -228,9 +217,9 @@ export function DataTableDemo() {
     getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
-      globalFilter, // Use globalFilter state
+      globalFilter,
     },
-    globalFilterFn, // Define the global filter function
+    globalFilterFn,
     filterFns: {
       globalFilterFn,
     },
@@ -266,11 +255,11 @@ export function DataTableDemo() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.length ? (
+            {table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() ? "selected" : undefined}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -295,26 +284,6 @@ export function DataTableDemo() {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
     </div>
   );
-}
+};
