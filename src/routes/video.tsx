@@ -3,13 +3,15 @@ import jsQR from "jsqr";
 import { useAuth } from "@/contexts/useAuth";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
+import { decodeSuiPrivateKey } from "@mysten/sui/cryptography";
+import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
+import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 
-const QRScanner: React.FC<{ blobId: string | undefined }> = ({ blobId }) => {
+const QRScanner: React.FC = () => {
   const [scanKey, setScanKey] = useState<number>(0); // Used to reset the scanner
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [qrCode, setQrCode] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState(false);
   const { selectedScanner, currentUser } = useAuth(); // Ensure 'currentUser' is destructured correctly
@@ -76,15 +78,11 @@ const QRScanner: React.FC<{ blobId: string | undefined }> = ({ blobId }) => {
               })
               .catch((playError) => {
                 console.error("Error playing video:", playError);
-                setError(
-                  "Error playing video. Please interact with the page to start scanning."
-                );
               });
           }
         }
       } catch (err) {
         console.error("Error accessing camera:", err);
-        setError("Unable to access the camera. Please check permissions.");
       }
     };
 
@@ -116,7 +114,11 @@ const QRScanner: React.FC<{ blobId: string | undefined }> = ({ blobId }) => {
 
         if (code) {
           console.log("QR Code detected:", code.data);
-          setQrCode(code.data);
+
+          const { secretKey } = decodeSuiPrivateKey(code.data);
+          const address = Ed25519Keypair.fromSecretKey(secretKey);
+
+          setQrCode(address.toSuiAddress());
           setIsScanning(false);
           if (stream) {
             stream.getTracks().forEach((track) => track.stop());
@@ -146,9 +148,8 @@ const QRScanner: React.FC<{ blobId: string | undefined }> = ({ blobId }) => {
 
   const handleRetry = () => {
     setQrCode(null);
-    setError(null);
     setScanKey((prevKey) => prevKey + 1); // Change scanKey to re-run useEffect
-    alert("Scan successful");
+    // alert("Scan successful");
   };
 
   const handleScan = async () => {
@@ -178,7 +179,7 @@ const QRScanner: React.FC<{ blobId: string | undefined }> = ({ blobId }) => {
             scannerSecret: selectedScanner?.secret,
             itemSecret: qrCode,
             message: location, // Replaced with user's GPS data
-            blobId, // Replace with actual blobId
+            blobId: "", // Replace with actual blobId
           }),
         }
       );
@@ -217,22 +218,25 @@ const QRScanner: React.FC<{ blobId: string | undefined }> = ({ blobId }) => {
   return (
     <div className="flex flex-col items-center pb-10">
       <h1 className="text-2xl font-semibold mb-4">
-        QR Code Scanner: {selectedScanner?.name && `(${selectedScanner.name})`}
+        Selected Scanner: {selectedScanner?.name && `(${selectedScanner.name})`}
       </h1>
-
-      {error && (
-        <div className="mt-5 text-center pb-8">
-          <p className="text-red-500">{error}</p>
-          <Button onClick={handleRetry}>Retry</Button>
-        </div>
-      )}
 
       {qrCode ? (
         <div className="mt-5 text-center">
-          <p className="mb-2">QR Code Detected:</p>
-          <code className="block bg-gray-100 p-2 rounded break-all">
-            {qrCode}
-          </code>
+          <div className="flex items-center">
+            <p className="text-xs leading-none text-muted-foreground break-words whitespace-normal flex-1 min-w-0">
+              {qrCode}
+            </p>
+            <a
+              href={`https://suiscan.xyz/devnet/account/${qrCode}/portfolio`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-primary transition-colors flex-shrink-0"
+              aria-label={`Open profile for ${qrCode}`}
+            >
+              <OpenInNewWindowIcon className="w-4 h-4" />
+            </a>
+          </div>
           <div className="flex justify-center space-x-4 mt-4">
             <Button
               onClick={handleScan}
@@ -244,7 +248,7 @@ const QRScanner: React.FC<{ blobId: string | undefined }> = ({ blobId }) => {
             <Button
               onClick={handleRetry}
               variant="ghost"
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+              className="px-4 py-2 rounded transition"
             >
               Scan Again
             </Button>
