@@ -27,7 +27,7 @@ const QrCodeDialog: FC<QrCodeDialogProps> = ({
   onOpenChange,
   dialogTitle = "QR Code",
   dialogDescription = "Here is your QR code:",
-  name
+  name,
 }) => {
   const qrRef = useRef<HTMLDivElement>(null);
 
@@ -75,13 +75,6 @@ const QrCodeDialog: FC<QrCodeDialogProps> = ({
           <QRCode value={qrData} size={256} />
         </div>
         <DialogFooter className="flex space-x-2">
-          <Button
-            variant="secondary"
-            type="button"
-            onClick={() => onOpenChange(false)}
-          >
-            Close
-          </Button>
           <Button
             variant="default"
             type="button"

@@ -91,14 +91,19 @@ export default function Items() {
   // Define a global filter function
   const customGlobalFilter: FilterFn<ItemType> = useMemo(
     () => (row, filterValue) => {
-      if (!filterValue) return true;
+      console.log("Filtering row:", row); // Debugging line
+      console.log("Filter value:", filterValue); // Debugging line
 
-      const lowercasedFilter = filterValue.toLowerCase();
+      if (!filterValue || filterValue.trim() === "") return true;
+
+      const lowercasedFilter = filterValue.toLowerCase().trim();
       const { name = "", description = "" } = row.original;
+      const lowercasedName = name.toLowerCase();
+      const lowercasedDescription = description.toLowerCase();
 
       return (
-        name.toLowerCase().includes(lowercasedFilter) ||
-        description.toLowerCase().includes(lowercasedFilter)
+        lowercasedName.includes(lowercasedFilter) ||
+        lowercasedDescription.includes(lowercasedFilter)
       );
     },
     []
@@ -255,23 +260,30 @@ export default function Items() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem
-                  onClick={() => navigator.clipboard.writeText(item.id.id)}
-                >
-                  Copy Item ID
-                </DropdownMenuItem>
+                <DropdownMenuLabel>Actions:</DropdownMenuLabel>
+
                 <DropdownMenuSeparator />
+
+                <DropdownMenuItem>
+                  <a
+                    href={`https://suiscan.xyz/devnet/object/${item.id.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full" // Ensures the link fills the DropdownMenuItem
+                  >
+                    View Item on SuiScan
+                  </a>
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => navigate(`/items/${item.id.id}`)}
                 >
-                  View Item Details
+                  View Item History
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
+
                 <DropdownMenuItem onClick={() => handleQR(item)}>
                   View QR Code
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
+
                 <DropdownMenuItem onClick={handleViewPDF}>
                   View PDF
                 </DropdownMenuItem>
@@ -356,10 +368,6 @@ export default function Items() {
   const table = useReactTable({
     data,
     columns,
-    filterFns: {
-      customGlobalFilter, // Registering the custom filter function
-    },
-    globalFilterFn: customGlobalFilter, // Assigning the custom filter function for global filtering
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter, // Set the global filter
     getCoreRowModel: getCoreRowModel(),
@@ -368,7 +376,11 @@ export default function Items() {
     getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
-      globalFilter, // Use globalFilter state
+      globalFilter,
+    },
+    globalFilterFn: customGlobalFilter,
+    filterFns: {
+      customGlobalFilter,
     },
   });
 
