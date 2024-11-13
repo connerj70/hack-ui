@@ -3,18 +3,20 @@ import jsQR from "jsqr";
 import { useAuth } from "@/contexts/useAuth";
 import { Button } from "@/components/ui/button";
 import { decodeSuiPrivateKey } from "@mysten/sui/cryptography";
-import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@radix-ui/react-toast";
 import { useNavigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
+import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 
 const QRScanner: React.FC = () => {
   const [scanKey, setScanKey] = useState<number>(0); // Used to reset the scanner
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [qrCode, setQrCode] = useState<string | null>(null);
+  const [itemSecret, setSecret] = useState<string | null>(null);
+  const [itemPublic, setPublic] = useState<string | null>(null);
+
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState(false);
   const { selectedScanner, currentUser } = useAuth(); // Ensure 'currentUser' is destructured correctly
@@ -121,9 +123,11 @@ const QRScanner: React.FC = () => {
           console.log("QR Code detected:", code.data);
 
           const { secretKey } = decodeSuiPrivateKey(code.data);
-          const address = Ed25519Keypair.fromSecretKey(secretKey);
+          const keyPair = Ed25519Keypair.fromSecretKey(secretKey);
 
-          setQrCode(address.toSuiAddress());
+          setPublic(keyPair.getPublicKey().toSuiAddress());
+
+          setSecret(code.data);
           setIsScanning(false);
           if (stream) {
             stream.getTracks().forEach((track) => track.stop());
@@ -152,7 +156,7 @@ const QRScanner: React.FC = () => {
   }, [scanKey]); // Depend on scanKey to allow retries
 
   const handleRetry = () => {
-    setQrCode(null);
+    setSecret(null);
     setScanKey((prevKey) => prevKey + 1); // Change scanKey to re-run useEffect
     // alert("Scan successful");
   };
@@ -182,7 +186,7 @@ const QRScanner: React.FC = () => {
           },
           body: JSON.stringify({
             scannerSecret: selectedScanner?.secret,
-            itemSecret: qrCode,
+            itemSecret: itemSecret,
             message: location, // Replaced with user's GPS data
             blobId: "", // Replace with actual blobId
           }),
@@ -233,18 +237,18 @@ const QRScanner: React.FC = () => {
       <h1 className="text-2xl font-semibold mb-4">
         Selected Scanner: {selectedScanner?.name && `(${selectedScanner.name})`}
       </h1>
-      {qrCode ? (
+      {itemPublic ? (
         <div className="mt-5 text-center">
           <div className="flex items-center">
             <p className="text-xs leading-none text-muted-foreground break-words whitespace-normal flex-1 min-w-0">
-              {qrCode}
+              {itemPublic}
             </p>
             <a
-              href={`https://suiscan.xyz/devnet/account/${qrCode}/portfolio`}
+              href={`https://suiscan.xyz/devnet/account/${itemPublic}/portfolio`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-primary transition-colors flex-shrink-0"
-              aria-label={`Open profile for ${qrCode}`}
+              aria-label={`Open profile for ${itemPublic}`}
             >
               <OpenInNewWindowIcon className="w-4 h-4" />
             </a>
@@ -252,7 +256,9 @@ const QRScanner: React.FC = () => {
           <div className="flex justify-center space-x-4 mt-4">
             <Button
               onClick={handleScan}
-              disabled={submitting && !qrCode && !location && !selectedScanner}
+              disabled={
+                submitting && !itemPublic && !location && !selectedScanner
+              }
               className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition disabled:opacity-50"
             >
               {submitting ? "Submitting..." : "Submit"}
