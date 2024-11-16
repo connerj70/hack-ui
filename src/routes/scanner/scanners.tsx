@@ -93,14 +93,11 @@ const Scanners: FC = () => {
         );
 
         if (resp.status === 304) {
-          console.log("Data not modified since last request.");
           setLoadingData(false);
           return;
         }
 
         const body = await resp.json();
-
-        console.log("Fetched scanner:", body); // Debugging line
 
         if (!body.success) {
           toast({
@@ -121,8 +118,6 @@ const Scanners: FC = () => {
           setLoadingData(false);
           return;
         }
-
-        console.log("selected scanner ", selectedScanner);
 
         setScanners(body.scanners);
         setLoadingData(false);

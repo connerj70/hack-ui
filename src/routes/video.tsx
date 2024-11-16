@@ -62,11 +62,9 @@ const QRScanner: React.FC = () => {
 
     const startQRScanner = async () => {
       try {
-        console.log("Requesting camera access...");
         stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: "environment" },
         });
-        console.log("Camera access granted.");
 
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
@@ -77,7 +75,6 @@ const QRScanner: React.FC = () => {
           if (playPromise !== undefined) {
             playPromise
               .then(() => {
-                console.log("Video playing successfully.");
                 if (isComponentMounted) {
                   setIsScanning(true);
                   scanQRCode();
@@ -120,8 +117,6 @@ const QRScanner: React.FC = () => {
         });
 
         if (code) {
-          console.log("QR Code detected:", code.data);
-
           const { secretKey } = decodeSuiPrivateKey(code.data);
           const keyPair = Ed25519Keypair.fromSecretKey(secretKey);
 
@@ -175,7 +170,6 @@ const QRScanner: React.FC = () => {
 
       const jwt = await currentUser.getIdToken();
 
-      console.log(jwt);
       const res: Response = await fetch(
         `${import.meta.env.VITE_API_URL}/event/sui/scan`,
         {
@@ -211,13 +205,13 @@ const QRScanner: React.FC = () => {
       }
 
       // Assuming the response contains JSON data
-      const data = await res.json();
+      await res.json();
       toast({
         title: "Scan Successful",
         description: "The item has been successfully scanned and processed.",
         variant: "default",
       });
-      console.log("Scan Success:", data);
+
       // Optionally reset the scanner after successful submission
       handleRetry();
     } catch (error) {

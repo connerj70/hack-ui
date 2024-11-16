@@ -128,7 +128,6 @@ export default function CreateScanner() {
 
         const storageInfo = await response.json();
         setUploadedBlob(storageInfo);
-        console.log("storageInfo", storageInfo);
       }
 
       // If PDF is not included, handle accordingly

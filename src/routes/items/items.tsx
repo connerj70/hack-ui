@@ -91,9 +91,6 @@ export default function Items() {
   // Define a global filter function
   const customGlobalFilter: FilterFn<ItemType> = useMemo(
     () => (row, filterValue) => {
-      console.log("Filtering row:", row); // Debugging line
-      console.log("Filter value:", filterValue); // Debugging line
-
       if (!filterValue || filterValue.trim() === "") return true;
 
       const lowercasedFilter = filterValue.toLowerCase().trim();
@@ -224,8 +221,6 @@ export default function Items() {
 
               const body = await resp.json();
 
-              console.log("Fetched QR data:", body); // Debugging line
-
               const qrData = body;
 
               if (qrData) {
@@ -275,7 +270,7 @@ export default function Items() {
                   </a>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => navigate(`/items/${item.id.id}`)}
+                  onClick={() => navigate(`/items/${item.itemAddress}`)}
                 >
                   View Item History
                 </DropdownMenuItem>
@@ -334,8 +329,6 @@ export default function Items() {
         }
 
         const body = await resp.json();
-
-        console.log("Fetched items:", body); // Debugging line
 
         // Safeguard: Ensure body is an array
         if (Array.isArray(body)) {

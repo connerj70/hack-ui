@@ -95,8 +95,8 @@ const ActionsCell: React.FC<ActionsCellProps> = ({
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
-      const result = await response.json();
-      console.log("Delete successful:", result);
+      await response.json();
+     
       toast({
         title: "Delete Successful",
         description: "The scanner has been successfully deleted.",

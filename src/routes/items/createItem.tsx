@@ -87,7 +87,6 @@ export default function CreateItem() {
 
     if (response.ok) {
       const storageInfo = await response.json();
-      console.log("Storage Info:", storageInfo);
 
       if (storageInfo.alreadyCertified) {
         return {
@@ -154,7 +153,7 @@ export default function CreateItem() {
 
       if (includePdf && pdf) {
         const blob = await storeBlob(pdf);
-      
+
         blobId = blob.blobId;
       }
 
