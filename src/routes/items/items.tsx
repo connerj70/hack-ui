@@ -47,6 +47,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
 
 // Import the modified QrCodeDialog
 import QrCodeDialog from "@/components/QrCodeDialog";
@@ -136,6 +141,38 @@ export default function Items() {
           </Button>
         ),
         cell: ({ row }) => <div>{row.getValue("description")}</div>,
+      },
+      {
+        accessorKey: "timestampMs",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Last Updated
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => {
+          const timestamp = row.getValue("timestampMs");
+
+          // Convert timestamp to readable date
+          const formatDate = (ms:any) => {
+            const date = new Date(Number(ms));
+            return date.toLocaleString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            });
+          };
+
+          return (
+            <div className="whitespace-nowrap">{formatDate(timestamp)}</div>
+          );
+        },
       },
       {
         id: "actions",
@@ -386,115 +423,116 @@ export default function Items() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Define the layout for the map based on isMobile
-  const memoizedMap = useMemo(() => {
-    const width = isMobile ? "100vw" : "50vw";
-    const height = isMobile ? "40vh" : "100vh";
-    return <MapComponent width={width} height={height} />;
-  }, [data, isMobile]);
-
   return (
     <>
-      <div
-        className={isMobile ? "flex flex-col w-full" : "flex flex-row w-full"}
+      <ResizablePanelGroup
+        direction={isMobile ? "vertical" : "horizontal"}
+        className="min-h-screen w-full rounded-lg"
       >
-        {memoizedMap}
-        <div className="flex flex-col w-full md:w-1/2 max-w-4xl mx-auto md:px-4 lg:px-8 pt-10 overflow-auto">
-          <div className="flex-1 space-y-4 pt-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-3xl font-bold tracking-tight pl-4">Items</h2>
-              <div className="flex items-center space-x-2 pr-4">
-                <Button onClick={() => navigate("/items/create")}>
-                  Create Item
-                </Button>
+        <ResizablePanel defaultSize={50} minSize={30}>
+          <MapComponent width={"100vw"} height={"100vh"} />
+        </ResizablePanel>
+
+        <ResizableHandle />
+
+        <ResizablePanel defaultSize={50}>
+          <div className="flex flex-col w-full mx-auto px-4 pt-10 h-full overflow-auto">
+            <div className="flex-1 space-y-4 pt-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-3xl font-bold tracking-tight">Items</h2>
+                <div className="flex items-center space-x-2">
+                  <Button onClick={() => navigate("/items/create")}>
+                    Create Item
+                  </Button>
+                </div>
               </div>
-            </div>
 
-            <div className="flex items-center py-4">
-              <Input
-                value={globalFilter}
-                onChange={(e) => setGlobalFilter(e.target.value)}
-                placeholder="Type to search..."
-                className="max-w-sm"
-              />
-            </div>
+              <div className="flex items-center py-4">
+                <Input
+                  value={globalFilter}
+                  onChange={(e) => setGlobalFilter(e.target.value)}
+                  placeholder="Type to search..."
+                  className="max-w-sm"
+                />
+              </div>
 
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
+              <Table>
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
                       ))}
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      {isLoading ? (
-                        <div className="mb-4">
-                          <Progress value={progress} className="h-2 w-full" />
-                        </div>
-                      ) : (
-                        <p>No Items. Click the "Create Item" button.</p>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        data-state={row.getIsSelected() && "selected"}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center"
+                      >
+                        {isLoading ? (
+                          <div className="mb-4">
+                            <Progress value={progress} className="h-2 w-full" />
+                          </div>
+                        ) : (
+                          <p>No Items. Click the "Create Item" button.</p>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
 
-            <div className="flex items-center justify-end space-x-2 py-4 pr-4">
-              <div className="space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                >
-                  Next
-                </Button>
+              <div className="flex items-center justify-end space-x-2 py-4">
+                <div className="space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                  >
+                    Next
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
 
       {/* Render the QrCodeDialog */}
       {qrData && (
