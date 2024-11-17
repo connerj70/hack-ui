@@ -20,7 +20,7 @@ const QRScanner: React.FC = () => {
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState(false);
   const { selectedScanner, currentUser } = useAuth(); // Ensure 'currentUser' is destructured correctly
-  const [location, setLocation] = useState<string>("");
+  const [location, setLocation] = useState<string | null>(null);
   const { toast } = useToast();
   const nav = useNavigate();
 
@@ -248,6 +248,8 @@ const QRScanner: React.FC = () => {
             </a>
           </div>
           <div className="flex justify-center space-x-4 mt-4">
+            <p> {location}</p>
+
             <Button
               onClick={handleScan}
               disabled={
