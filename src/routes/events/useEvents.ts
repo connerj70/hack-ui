@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { EventDetails } from "@/routes/events/page";
+import { User } from "firebase/auth";
 
-const useEvents = (currentUser: any) => {
+const useEvents = (currentUser: User) => {
   const [data, setData] = useState<EventDetails[]>([]);
 
   const fetchData = useCallback(async () => {

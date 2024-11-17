@@ -75,7 +75,6 @@ const Scanners: FC = () => {
           toast({
             title: "Authentication Error",
             description: "You must be logged in to view scanners.",
-            variant: "destructive",
           });
           setLoadingData(false);
           return;
@@ -103,7 +102,6 @@ const Scanners: FC = () => {
           toast({
             title: "Error",
             description: body.message || "Failed to fetch scanners.",
-            variant: "destructive",
           });
           setLoadingData(false);
           return;
@@ -113,7 +111,6 @@ const Scanners: FC = () => {
           toast({
             title: "Error",
             description: "Invalid data format received.",
-            variant: "destructive",
           });
           setLoadingData(false);
           return;
@@ -126,7 +123,6 @@ const Scanners: FC = () => {
         toast({
           title: "Error",
           description: JSON.stringify(error),
-          variant: "destructive",
         });
         setLoadingData(false);
       }

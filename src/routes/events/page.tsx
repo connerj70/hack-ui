@@ -1,4 +1,4 @@
-// src/routes/events/page.tsx
+"use client";
 
 import React, { useMemo, useCallback } from "react";
 import {
@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/table";
 import { useAuth } from "@/contexts/useAuth";
 import useEvents from "./useEvents";
+import GraphComponent from "./eventGraph";
 
 export type EventDetails = {
   combinedSignature: string;
@@ -41,9 +42,7 @@ export type EventDetails = {
     id: string;
   };
   itemAddress: string;
-  itemBytes: string;
   message: string;
-  name: string;
   scannerAddress: string;
   url: string;
   lastTransaction: {
@@ -167,7 +166,7 @@ const useColumns = (
 
 export const DataTableDemo: React.FC = () => {
   const { currentUser } = useAuth();
-  const { data, deleteEvent } = useEvents(currentUser);
+  const { data, deleteEvent } = useEvents(currentUser!);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState<string>("");
@@ -227,6 +226,8 @@ export const DataTableDemo: React.FC = () => {
 
   return (
     <div className="w-full">
+      {/* Ensure 'data' is defined and is an array before passing to GraphComponent */}
+      {Array.isArray(data) && <GraphComponent rawData={data} />}
       <div className="flex items-center py-4 space-x-4">
         {/* Global Filter Input */}
         <Input
