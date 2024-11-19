@@ -153,13 +153,13 @@ export default function Root() {
             The network is a neutral data standard for use by all trade
             counterparties.
           </p>
-          <Link
+          {/* <Link
             to="/explore"
             className="uppercase flex items-center md:justify-center w-full mt-8"
           >
             Learn more
             <ArrowRightIcon style={{ width: "20px", height: "20px" }} />
-          </Link>
+          </Link> */}
         </div>
       </div>
       <div className="p-8 md:px-20 font-sans text-black gap-6 flex flex-col md:flex-row min-h-96 w-100 mt-20 md:mt-6 justify-around items-start">
@@ -174,13 +174,13 @@ export default function Root() {
             Pomerene is a decentralized infrastructure network. Powered by
             hardware.
           </p>
-          <Link
+          {/* <Link
             to="/explore"
             className="uppercase flex items-center md:justify-center w-full mt-8"
           >
             Get connected
             <ArrowRightIcon style={{ width: "20px", height: "20px" }} />
-          </Link>
+          </Link> */}
         </div>
       </div>
       <div className="p-8 md:px-20 bg-green-100 font-sans text-black gap-6 flex flex-col md:flex-row-reverse min-h-96 w-100 mt-20 md:mt-6 justify-around items-start">
@@ -195,13 +195,13 @@ export default function Root() {
             The network is an open, global inventory tracking system, secured by
             cryptographic authentication.
           </p>
-          <Link
+          {/* <Link
             to="/explore"
             className="uppercase flex items-center md:justify-center w-full mt-8"
           >
             Start tracking
             <ArrowRightIcon style={{ width: "20px", height: "20px" }} />
-          </Link>
+          </Link> */}
         </div>
       </div>
       <div className="p-8 md:px-20 font-sans text-black gap-6 flex flex-col md:flex-row min-h-96 w-100 mt-20 md:mt-6 justify-around items-start">
@@ -217,13 +217,13 @@ export default function Root() {
             stack that includes: smart invoices, counterparty escrow contracts,
             trade finance and insurance products.
           </p>
-          <Link
+          {/* <Link
             to="/explore"
             className="uppercase flex items-center md:justify-center w-full mt-8"
           >
             Learn more
             <ArrowRightIcon style={{ width: "20px", height: "20px" }} />
-          </Link>
+          </Link> */}
         </div>
       </div>
 
